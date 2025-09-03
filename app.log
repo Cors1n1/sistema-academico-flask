@@ -483,3 +483,6 @@ werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'relato
 03/09/2025 17:47:57 - INFO - Usuário 'visitante' fez login.
 03/09/2025 17:55:01 - INFO - Usuário 'visitante' fez logout.
 03/09/2025 17:55:09 - INFO - Usuário 'admin' fez login.
+03/09/2025 18:02:31 - INFO - Usuário 'admin' fez logout.
+03/09/2025 18:02:35 - WARNING - Tentativa de login falhou para o usuário 'Kleber'.
+03/09/2025 18:02:36 - INFO - Usuário 'admin' fez login.
