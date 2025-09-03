@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Gerenciar Usuários{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Gerenciamento de Usuários</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <h2 style="font-weight: 400; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-top: 30px;">Usuários Existentes</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome de Usuário</th> <th>Permissão (Função)</th> <th style="width: 25%;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in usuarios %}
+            <tr>
+                <td>{{ user.username }}</td> <td>{{ user.role }}</td>
+                <td class="actions-cell">
+                    {% if user.username == session.username %}
+                        <span style="color: var(--secondary-color); font-style: italic;">(Usuário atual)</span>
+                    {% else %}
+                        <a href="{{ url_for('editar_usuario', username=user.username) }}" class="action-btn edit-btn">Editar</a>
+                        <a href="{{ url_for('deletar_usuario', username=user.username) }}" class="action-btn delete-btn" onclick="return confirm('Você tem certeza que deseja deletar este usuário? Esta ação não pode ser desfeita.');">Deletar</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h2 style="font-weight: 400; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-top: 50px;">Criar Novo Usuário</h2>
+    <form method="post" action="{{ url_for('gerenciar_usuarios') }}" style="margin-top: 20px;">
+        <div class="form-group">
+            <label for="username">Nome de Usuário:</label>
+            <input type="text" id="username" name="username" required placeholder="Ex: joao.silva">
+        </div>
+        <div class="form-group">
+            <label for="password">Senha:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="role">Permissão (Função):</label>
+            <select id="role" name="role">
+                <option value="viewer">Visitante (Apenas Visualização)</option>
+                <option value="admin">Administrador (Acesso Total)</option>
+            </select>
+        </div>
+        <button type="submit">Criar Usuário</button>
+    </form>
+</div>
+{% endblock %}

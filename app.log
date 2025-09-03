@@ -1,0 +1,475 @@
+03/09/2025 14:33:32 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+03/09/2025 14:33:32 - INFO - [33mPress CTRL+C to quit[0m
+03/09/2025 14:33:32 - INFO -  * Restarting with stat
+03/09/2025 14:33:33 - WARNING -  * Debugger is active!
+03/09/2025 14:33:33 - INFO -  * Debugger PIN: 528-364-890
+03/09/2025 14:33:45 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+03/09/2025 14:33:45 - INFO - [33mPress CTRL+C to quit[0m
+03/09/2025 14:34:00 - INFO - 127.0.0.1 - - [03/Sep/2025 14:34:00] "GET / HTTP/1.1" 200 -
+03/09/2025 14:34:12 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+03/09/2025 14:34:12 - INFO - [33mPress CTRL+C to quit[0m
+03/09/2025 14:34:15 - INFO - 127.0.0.1 - - [03/Sep/2025 14:34:15] "GET / HTTP/1.1" 200 -
+03/09/2025 14:34:17 - INFO - 127.0.0.1 - - [03/Sep/2025 14:34:17] "GET / HTTP/1.1" 200 -
+03/09/2025 14:34:20 - INFO - 127.0.0.1 - - [03/Sep/2025 14:34:20] "GET /logs HTTP/1.1" 200 -
+03/09/2025 14:34:37 - INFO - Usuário 'admin' fez logout.
+03/09/2025 14:34:37 - INFO - 127.0.0.1 - - [03/Sep/2025 14:34:37] "[32mGET /logout HTTP/1.1[0m" 302 -
+03/09/2025 14:34:37 - INFO - 127.0.0.1 - - [03/Sep/2025 14:34:37] "GET /login HTTP/1.1" 200 -
+03/09/2025 14:34:38 - INFO - Usuário 'admin' fez login.
+03/09/2025 14:34:38 - INFO - 127.0.0.1 - - [03/Sep/2025 14:34:38] "[32mPOST /login HTTP/1.1[0m" 302 -
+03/09/2025 14:34:38 - INFO - 127.0.0.1 - - [03/Sep/2025 14:34:38] "GET / HTTP/1.1" 200 -
+03/09/2025 14:34:40 - INFO - 127.0.0.1 - - [03/Sep/2025 14:34:40] "GET /relatorio HTTP/1.1" 200 -
+03/09/2025 14:34:42 - INFO - 127.0.0.1 - - [03/Sep/2025 14:34:42] "GET /logs HTTP/1.1" 200 -
+03/09/2025 14:36:06 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 49, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 112, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 154, in top-level template code
+    <a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a>
+    ^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'relatorio'. Did you mean 'login' instead?
+03/09/2025 14:36:11 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 49, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 112, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 154, in top-level template code
+    <a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a>
+    ^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'relatorio'. Did you mean 'login' instead?
+03/09/2025 14:36:12 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 49, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 112, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 154, in top-level template code
+    <a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a>
+    ^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'relatorio'. Did you mean 'login' instead?
+03/09/2025 14:36:12 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 49, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 112, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 154, in top-level template code
+    <a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a>
+    ^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'relatorio'. Did you mean 'login' instead?
+03/09/2025 14:36:12 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 49, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 112, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 154, in top-level template code
+    <a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a>
+    ^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'relatorio'. Did you mean 'login' instead?
+03/09/2025 14:36:12 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 49, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 112, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 154, in top-level template code
+    <a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a>
+    ^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'relatorio'. Did you mean 'login' instead?
+03/09/2025 14:36:13 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 49, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 112, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 154, in top-level template code
+    <a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a>
+    ^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'relatorio'. Did you mean 'login' instead?
+03/09/2025 14:36:13 - ERROR - Exception on /logs [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 49, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 59, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 104, in view_logs
+    return render_template('logs.html', log_entries=log_entries)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\logs.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 154, in top-level template code
+    <a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a>
+    ^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'relatorio'. Did you mean 'login' instead?
+03/09/2025 14:36:13 - ERROR - Exception on /logs [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 49, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 59, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 104, in view_logs
+    return render_template('logs.html', log_entries=log_entries)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\logs.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 154, in top-level template code
+    <a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a>
+    ^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'relatorio'. Did you mean 'login' instead?
+03/09/2025 14:36:27 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 49, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 112, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 154, in top-level template code
+    <a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a>
+    ^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'relatorio'. Did you mean 'login' instead?
+03/09/2025 14:38:34 - INFO - Usuário 'admin' fez logout.
+03/09/2025 14:38:35 - INFO - Usuário 'admin' fez login.
+03/09/2025 14:52:41 - INFO - Usuário 'admin' fez logout.
+03/09/2025 14:52:45 - INFO - Usuário 'visitante' fez login.
+03/09/2025 14:52:48 - INFO - Usuário 'visitante' fez logout.
+03/09/2025 15:02:31 - INFO - Usuário 'admin' fez login.
+03/09/2025 15:09:21 - INFO - Usuário 'admin' fez logout.
+03/09/2025 15:09:24 - INFO - Usuário 'visitante' fez login.
+03/09/2025 15:19:40 - INFO - Usuário 'visitante' fez logout.
+03/09/2025 15:19:42 - INFO - Usuário 'admin' fez login.
+03/09/2025 15:24:23 - INFO - Admin 'admin' CRIOU o usuário 'Victor' com a permissão 'admin'.
+03/09/2025 15:24:26 - INFO - Usuário 'admin' fez logout.
+03/09/2025 15:24:29 - INFO - Usuário 'Victor' fez login.
+03/09/2025 15:24:38 - INFO - Admin 'Victor' CRIOU o usuário 'Teste' com a permissão 'viewer'.
+03/09/2025 15:24:39 - INFO - Usuário 'Victor' fez logout.
+03/09/2025 15:24:41 - INFO - Usuário 'Teste' fez login.
+03/09/2025 15:24:44 - INFO - Usuário 'Teste' fez logout.
+03/09/2025 15:24:46 - INFO - Usuário 'Victor' fez login.
+03/09/2025 15:45:39 - INFO - Admin 'Victor' ALTEROU a permissão de 'visitante' para 'viewer'.
+03/09/2025 15:46:06 - INFO - Usuário 'Victor' fez logout.
+03/09/2025 15:46:07 - INFO - Usuário 'Victor' fez login.
+03/09/2025 15:46:26 - INFO - Usuário 'Victor' fez logout.
+03/09/2025 15:46:29 - WARNING - Tentativa de login falhou para o usuário 'Visitante'.
+03/09/2025 15:46:35 - INFO - Usuário 'visitante' fez login.
+03/09/2025 15:46:39 - INFO - Usuário 'visitante' fez logout.
+03/09/2025 15:46:42 - INFO - Usuário 'Victor' fez login.
+03/09/2025 15:53:56 - INFO - Usuário 'Victor' fez logout.
+03/09/2025 15:53:59 - INFO - Usuário 'Victor' fez login.
+03/09/2025 16:05:15 - INFO - Usuário 'Victor' fez logout.
+03/09/2025 16:05:17 - INFO - Usuário 'Victor' fez login.
+03/09/2025 16:12:45 - INFO - Usuário 'Victor' EXPORTOU os dados para PDF.
+03/09/2025 16:15:37 - INFO - Usuário 'Victor' EXPORTOU os dados para PDF.
+03/09/2025 16:16:46 - INFO - Usuário 'Victor' EXPORTOU os dados para PDF.
+03/09/2025 16:42:56 - INFO - Usuário 'Victor' fez logout.
+03/09/2025 16:42:58 - INFO - Usuário 'Victor' fez login.
+03/09/2025 16:43:45 - INFO - Usuário 'Victor' fez logout.
+03/09/2025 16:44:17 - INFO - Usuário 'Victor' fez login.

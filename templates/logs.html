@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Logs do Sistema{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Logs de Atividade do Sistema</h1>
+    <p>As atividades mais recentes são exibidas no topo.</p>
+    <div class="table-responsive">
+        <table class="log-table" style="font-size: 0.9em;">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Data/Hora</th> <th style="width: 10%;">Nível</th> <th>Mensagem</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if log_entries %}
+                    {% for entry in log_entries %}
+                    <tr>
+                        <td>{{ entry.timestamp }}</td>
+                        <td>
+                            {% if entry.level == 'INFO' %}<span class="log-level-badge log-level-info">INFO</span>
+                            {% elif entry.level == 'WARNING' %}<span class="log-level-badge log-level-warning">WARNING</span>
+                            {% elif entry.level == 'ERROR' %}<span class="log-level-badge log-level-error">ERROR</span>
+                            {% else %}{{ entry.level }}{% endif %}
+                        </td>
+                        <td class="log-message">{{ entry.message }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="3" style="text-align: center; padding: 20px;">Nenhuma atividade registrada ainda.</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<style>
+    .log-table { table-layout: fixed; }
+    .log-level-badge { padding: 3px 8px; border-radius: 12px; font-weight: 600; color: white; white-space: nowrap; }
+    .log-level-info { background-color: var(--primary-color); }
+    .log-level-warning { background-color: #f1e05a; color: #333; }
+    .log-level-error { background-color: var(--danger-color); }
+    .log-message { font-family: 'Courier New', Courier, monospace; white-space: pre-wrap; word-break: break-all; }
+</style>
+{% endblock %}

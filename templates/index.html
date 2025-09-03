@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Hub Principal - Sistema Acadêmico{% endblock %}
+
+{% block content %}
+<style>
+    /* Estilos específicos para o Hub */
+    .hub-hero {
+        text-align: center;
+        padding: 60px 20px; /* Aumenta o padding */
+        margin-bottom: 50px; /* Aumenta a margem inferior */
+        background: linear-gradient(135deg, var(--primary-color) 0%, #6a5acd 100%); /* Degradê moderno */
+        color: white; /* Texto branco para contraste */
+        border-radius: 12px; /* Cantos mais arredondados */
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Sombra mais pronunciada */
+        animation: fadeIn 0.8s ease-out forwards; /* Animação ao carregar */
+    }
+    .hub-hero h1 {
+        font-size: 3.5em; /* Fonte maior para o título */
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: white; /* Garante que o título seja branco */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra no texto */
+    }
+    .hub-hero p {
+        font-size: 1.3em; /* Fonte maior para a descrição */
+        color: rgba(255, 255, 255, 0.9); /* Um pouco transparente */
+        max-width: 700px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Continua responsivo */
+        gap: 35px; /* Aumenta o espaçamento entre os cards */
+    }
+    .action-card {
+        background-color: var(--surface-color);
+        padding: 35px; /* Aumenta o padding interno */
+        border-radius: 12px; /* Cantos mais arredondados */
+        text-align: center;
+        text-decoration: none;
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 6px 18px var(--shadow-color); /* Sombra mais suave */
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        display: flex; /* Para centralizar conteúdo verticalmente */
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .action-card:hover {
+        transform: translateY(-12px); /* Efeito de elevação mais acentuado */
+        box-shadow: 0 18px 30px rgba(0, 0, 0, 0.15); /* Sombra mais intensa no hover */
+        background-color: rgba(var(--primary-color-rgb, 74, 144, 226), 0.1); /* Um leve brilho da cor primária no hover */
+    }
+    body.dark-mode .action-card:hover {
+        box-shadow: 0 18px 30px rgba(0, 0, 0, 0.3); /* Sombra mais escura no hover no modo dark */
+        background-color: rgba(var(--primary-color-rgb, 88, 166, 255), 0.1);
+    }
+    .action-card i {
+        font-size: 3.8em; /* Ícones maiores */
+        color: var(--primary-color);
+        margin-bottom: 25px; /* Mais espaço abaixo do ícone */
+        transition: color 0.3s ease;
+    }
+    .action-card:hover i {
+        color: #58a6ff; /* Uma cor ligeiramente diferente no hover para o ícone */
+    }
+    .action-card h2 {
+        font-size: 1.6em; /* Títulos maiores para os cards */
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+    .action-card p {
+        font-size: 1.05em; /* Texto de descrição um pouco maior */
+        line-height: 1.6;
+        color: var(--text-color); /* Garante a cor padrão do texto */
+        opacity: 0.8; /* Suaviza um pouco o texto */
+    }
+
+    /* Animação de entrada mais suave para os cards */
+    .action-card {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    .action-card:nth-child(1) { animation-delay: 0.1s; }
+    .action-card:nth-child(2) { animation-delay: 0.2s; }
+    .action-card:nth-child(3) { animation-delay: 0.3s; }
+    .action-card:nth-child(4) { animation-delay: 0.4s; }
+    .action-card:nth-child(5) { animation-delay: 0.5s; }
+    .action-card:nth-child(6) { animation-delay: 0.6s; }
+    /* Adicione mais se tiver mais cards */
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="hub-hero">
+    <h1>Bem-vindo ao Sistema Acadêmico</h1>
+    <p>Gerencie alunos, cursos, usuários e atividades com facilidade e eficiência. Escolha uma opção para começar.</p>
+</div>
+
+<div class="action-grid">
+    <a href="{{ url_for('lista_alunos') }}" class="action-card">
+        <i class="fas fa-users"></i>
+        <h2>Ver Turma</h2>
+        <p>Visualize, edite e delete os registros de todos os alunos cadastrados.</p>
+    </a>
+    
+    {% if session.get('role') == 'admin' %}
+        <a href="{{ url_for('adicionar') }}" class="action-card">
+            <i class="fas fa-user-plus"></i>
+            <h2>Adicionar Aluno</h2>
+            <p>Cadastre um novo aluno em nosso sistema.</p>
+        </a>
+    {% endif %}
+
+    <a href="{{ url_for('relatorio') }}" class="action-card">
+        <i class="fas fa-chart-pie"></i>
+        <h2>Gerar Relatório</h2>
+        <p>Acesse estatísticas importantes do sistema.</p>
+    </a>
+
+    {% if session.get('role') == 'admin' %}
+        <a href="{{ url_for('gerenciar_usuarios') }}" class="action-card">
+            <i class="fas fa-user-shield"></i>
+            <h2>Gerenciar Usuários</h2>
+            <p>Crie novas contas de acesso e veja os usuários existentes.</p>
+        </a>
+        
+        <a href="{{ url_for('view_logs') }}" class="action-card">
+            <i class="fas fa-clipboard-list"></i>
+            <h2>Ver Logs</h2>
+            <p>Monitore as atividades registradas no sistema.</p>
+        </a>
+    {% endif %}
+</div>
+
+{% endblock %}

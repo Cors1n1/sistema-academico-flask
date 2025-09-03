@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Relatório - Sistema de Alunos{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Relatório da Plataforma</h1>
+    {% if dados %}
+    <div class="report-grid">
+        <div class="stat-card">
+            <div class="value">{{ dados.total_alunos }}</div>
+            <div class="label">Total de Alunos Cadastrados</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">{{ dados.media_idades }}</div>
+            <div class="label">Média de Idade dos Alunos</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">{{ dados.media_horas }}</div>
+            <div class="label">Média de Horas de Estudo Diárias</div>
+        </div>
+    </div>
+    {% else %}
+    <p class="no-data">Não há dados suficientes para gerar um relatório.</p>
+    {% endif %}
+</div>
+{% endblock %}

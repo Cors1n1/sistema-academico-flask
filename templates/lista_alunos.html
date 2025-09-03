@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Lista de Alunos - Sistema de Alunos{% endblock %}
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <h1>Alunos Cadastrados</h1>
+        <div class="export-buttons">
+            <a id="export-pdf-btn" href="{{ url_for('exportar', formato='pdf') }}" class="action-btn export-btn">
+                <i class="fas fa-file-pdf" style="margin-right: 8px;"></i>Exportar PDF
+            </a>
+            <a href="{{ url_for('exportar', formato='excel') }}" class="action-btn export-btn">
+                <i class="fas fa-file-excel" style="margin-right: 8px;"></i>Exportar Excel
+            </a>
+        </div>
+    </div>
+    {% if alunos %}
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th> <th>Idade</th> <th>Curso</th> <th>Horas/Dia</th> <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for aluno in alunos %}
+            <tr>
+                <td>{{ aluno.nome }}</td> <td>{{ aluno.idade }}</td> <td>{{ aluno.curso }}</td>
+                <td>{{ aluno.horas_estudo }}</td>
+                <td class="actions-cell">
+                    {% if session.get('role') == 'admin' %}
+                        <a href="{{ url_for('editar', nome_do_aluno=aluno.nome) }}" class="action-btn edit-btn">Editar</a>
+                        <a href="{{ url_for('deletar', nome_do_aluno=aluno.nome) }}" class="action-btn delete-btn">Deletar</a>
+                    {% else %}
+                        <span>Acesso restrito</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-data">Nenhum aluno cadastrado ainda.</p>
+    {% endif %}
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const pdfBtn = document.getElementById('export-pdf-btn');
+        if (pdfBtn) {
+            pdfBtn.addEventListener('click', (event) => {
+                event.preventDefault();
+                const rootStyles = getComputedStyle(document.documentElement);
+                const currentColor = rootStyles.getPropertyValue('--primary-color').trim();
+                const url = event.currentTarget.href + '?color=' + encodeURIComponent(currentColor);
+                window.location.href = url;
+            });
+        }
+    });
+</script>
+{% endblock %}

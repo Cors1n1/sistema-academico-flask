@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema Acadêmico</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2; --background-color: #f4f6f8; --surface-color: #ffffff;
+            --text-color: #333333; --danger-color: #dc3545; --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode {
+            --primary-color: #58a6ff; --background-color: #0d1117; --surface-color: #161b22;
+            --text-color: #c9d1d9; --danger-color: #f85149; --border-color: #30363d;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+        body {
+            font-family: 'Poppins', sans-serif; display: flex; justify-content: center;
+            align-items: center; min-height: 100vh; margin: 0;
+            background-color: var(--background-color); color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            position: relative;
+        }
+        .login-card {
+            background-color: var(--surface-color); padding: 40px; border-radius: 10px;
+            box-shadow: 0 10px 25px var(--shadow-color); text-align: center;
+            width: 100%; max-width: 400px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+        h1 { color: var(--primary-color); margin-bottom: 30px; }
+        .form-group { text-align: left; margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input {
+            width: 100%; padding: 12px; border: 1px solid var(--border-color);
+            border-radius: 5px; font-size: 1em; box-sizing: border-box;
+            background-color: var(--background-color); color: var(--text-color);
+        }
+        button[type="submit"] {
+            width: 100%; padding: 12px; background-color: var(--primary-color);
+            color: white; border: none; border-radius: 5px;
+            font-size: 1.1em; font-weight: 600; cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button[type="submit"]:hover { opacity: 0.9; }
+        .flash-message { padding: 15px; margin-bottom: 20px; border-radius: 5px; border: 1px solid; }
+        .flash-message.danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
+        body.dark-mode .flash-message.danger { color: #f85149; background-color: rgba(248, 81, 73, 0.1); border-color: #f85149; }
+        #theme-toggle {
+            position: absolute; top: 20px; right: 20px; background: var(--surface-color);
+            border: 1px solid var(--border-color); color: var(--text-color);
+            padding: 8px 12px; border-radius: 20px; cursor: pointer;
+            font-size: 0.9em; transition: all 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <button id="theme-toggle">Alterar Tema</button>
+    <div class="login-card">
+        <h1>Acesso ao Sistema</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="post">
+            <div class="form-group">
+                <label for="username">Usuário</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        function applyTheme(theme) {
+            if (theme === 'dark') { body.classList.add('dark-mode'); themeToggle.textContent = 'Modo Claro ☀️'; }
+            else { body.classList.remove('dark-mode'); themeToggle.textContent = 'Modo Escuro 🌙'; }
+        }
+        document.addEventListener('DOMContentLoaded', () => { const savedTheme = localStorage.getItem('theme') || 'light'; applyTheme(savedTheme); });
+        themeToggle.addEventListener('click', () => { const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark'; applyTheme(newTheme); localStorage.setItem('theme', newTheme); });
+    </script>
+</body>
+</html>

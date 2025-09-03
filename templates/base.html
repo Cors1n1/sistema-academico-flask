@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema Acadêmico{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><a href="{{ url_for('index') }}">Sistema Acadêmico</a></div>
+        <div class="nav-links">
+            {% if session.username %}
+                <span>Bem-vindo(a), <strong>{{ session.username }}</strong>!</span>
+            {% endif %}
+            <a href="{{ url_for('lista_alunos') }}" class="{{ 'active' if 'lista' in request.path else '' }}">Ver Turma</a>
+            {% if session.get('role') == 'admin' %}
+                <a href="{{ url_for('adicionar') }}" class="{{ 'active' if request.path == '/adicionar' else '' }}">Adicionar Aluno</a>
+            {% endif %}
+            <a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a>
+            {% if session.get('role') == 'admin' %}
+                <a href="{{ url_for('view_logs') }}" class="{{ 'active' if request.path == '/logs' else '' }}">Ver Logs</a>
+                <a href="{{ url_for('gerenciar_usuarios') }}" class="{{ 'active' if request.path == '/gerenciar_usuarios' else '' }}">Gerenciar Usuários</a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="logout-btn">Sair</a>
+            <button id="theme-toggle">Alterar Tema</button>
+            <div class="color-picker-wrapper">
+                <input type="color" id="theme-color-picker">
+                <button id="reset-color-btn" title="Restaurar cor padrão"><i class="fas fa-undo"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const colorPicker = document.getElementById('theme-color-picker');
+        const root = document.documentElement;
+        const resetColorBtn = document.getElementById('reset-color-btn');
+
+        function applyTheme(theme) {
+            if (theme === 'dark') { body.classList.add('dark-mode'); themeToggle.textContent = 'Modo Claro ☀️'; }
+            else { body.classList.remove('dark-mode'); themeToggle.textContent = 'Modo Escuro 🌙'; }
+        }
+        
+        function applyPrimaryColor(color) {
+            root.style.setProperty('--custom-primary-color', color);
+        }
+
+        colorPicker.addEventListener('input', (event) => {
+            const newColor = event.target.value;
+            applyPrimaryColor(newColor);
+            localStorage.setItem('themeColor', newColor);
+        });
+
+        resetColorBtn.addEventListener('click', () => {
+            localStorage.removeItem('themeColor');
+            root.style.removeProperty('--custom-primary-color');
+            const isDarkMode = body.classList.contains('dark-mode');
+            const defaultColor = isDarkMode 
+                ? getComputedStyle(root).getPropertyValue('--primary-color-dark-default') 
+                : getComputedStyle(root).getPropertyValue('--primary-color-light-default');
+            colorPicker.value = defaultColor.trim();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(savedTheme);
+            const savedColor = localStorage.getItem('themeColor');
+            if (savedColor) {
+                applyPrimaryColor(savedColor);
+                colorPicker.value = savedColor;
+            } else {
+                const initialColor = getComputedStyle(root).getPropertyValue('--primary-color');
+                colorPicker.value = initialColor.trim();
+            }
+        });
+        
+        themeToggle.addEventListener('click', () => {
+            const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+            applyTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (!localStorage.getItem('themeColor')) {
+                const newDefaultColor = getComputedStyle(root).getPropertyValue('--primary-color');
+                colorPicker.value = newDefaultColor.trim();
+            }
+        });
+    </script>
+</body>
+</html>

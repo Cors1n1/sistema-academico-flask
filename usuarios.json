@@ -1,0 +1,22 @@
+[
+    {
+        "username": "admin",
+        "password_hash": "scrypt:32768:8:1$zBh4LrHVOFmCa5NV$0142c1628228e752ba4cf4c6b1ada97e5f5cc570f927b7f6fc710a54171a1f9ad03e3558515655a6024f017920789111e967bbcaaeb71113f989a0eca7c561e4",
+        "role": "admin"
+    },
+    {
+        "username": "visitante",
+        "password_hash": "scrypt:32768:8:1$6nrtHCnrST9A9sbB$9d8f44157ba8a83ed8e3111332d57ddefa2c65fe15c8e9a4e9563aed087b241dfed7be86cbd666ec5c81500119d5a832e7d032015ba6593aa97bb49da4698b67",
+        "role": "viewer"
+    },
+    {
+        "username": "Victor",
+        "password_hash": "scrypt:32768:8:1$RBjNzFNidLaowP4d$cfbce7f6036a31c5ce673fa48b956b4532308d7b578441aca78d06a84b7832a9150ca25385a37bcf2ddc6f84841862d0c18c662ab6c33923ecc1444ddc861ed1",
+        "role": "admin"
+    },
+    {
+        "username": "Teste",
+        "password_hash": "scrypt:32768:8:1$ynZUi1tsaQ9bOa1h$7ac7e967905d638648e85fdb44db396dd89def15e77004bb5abbcb5b64c71ed0692ab87660c3cd439642396f4c21440aedc53ed6be008df49d39086c362f77e5",
+        "role": "viewer"
+    }
+]

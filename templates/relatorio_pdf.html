@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <title>Relatório de Alunos</title>
+    <meta charset="utf-8">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4; margin: 1.5cm;
+            @bottom-center { content: "Página " counter(page); color: #888; font-size: 10pt; }
+        }
+        body { font-family: 'Poppins', sans-serif; font-size: 11pt; color: #333; }
+        .header { text-align: center; border-bottom: 2px solid {{ theme_color }}; padding-bottom: 10px; margin-bottom: 30px; }
+        .header h1 { color: {{ theme_color }}; margin: 0; font-size: 24pt; }
+        .header p { color: #666; margin: 5px 0 0; }
+        .summary-section { background-color: #f9f9f9; border: 1px solid #eee; border-left: 5px solid {{ theme_color }}; padding: 15px; margin-bottom: 30px; border-radius: 5px; }
+        .summary-section h3 { margin-top: 0; color: #333; }
+        .summary-section ul { list-style: none; padding: 0; margin: 0; }
+        .summary-section li { padding: 5px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: {{ theme_color }}; color: white; font-weight: 600; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Relatório de Alunos</h1>
+        <p>Documento gerado pelo Sistema Acadêmico em {{ data_hoje }}</p>
+    </div>
+    {% if dados %}
+    <div class="summary-section">
+        <h3>Resumo da Plataforma</h3>
+        <ul>
+            <li><strong>Total de Alunos:</strong> {{ dados.total_alunos }}</li>
+            <li><strong>Média de Idade:</strong> {{ dados.media_idades }} anos</li>
+            <li><strong>Média de Horas de Estudo:</strong> {{ dados.media_horas }} horas/dia</li>
+        </ul>
+    </div>
+    {% endif %}
+    <h3>Lista Detalhada de Alunos</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th> <th>Idade</th> <th>Curso</th> <th>Horas/Dia</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for aluno in alunos %}
+            <tr>
+                <td>{{ aluno.nome }}</td> <td>{{ aluno.idade }}</td> <td>{{ aluno.curso }}</td> <td>{{ aluno.horas_estudo }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
