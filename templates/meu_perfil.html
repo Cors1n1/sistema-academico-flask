@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Meu Perfil{% endblock %}
+
+{% block content %}
+<style>
+    .profile-card {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 40px;
+        align-items: center;
+    }
+    .profile-avatar {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 5em;
+        font-weight: 700;
+    }
+    .profile-info h2 {
+        font-size: 2.5em;
+        font-weight: 600;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    .info-item {
+        background-color: var(--background-color);
+        padding: 20px;
+        border-radius: 8px;
+    }
+    .info-item .label {
+        font-size: 0.9em;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+    .info-item .value {
+        font-size: 1.2em;
+    }
+</style>
+
+<div class="card">
+    {% if aluno %}
+        <div class="profile-card">
+            <div class="profile-avatar">
+                {{ aluno.nome[0] | upper }}
+            </div>
+            <div class="profile-info">
+                <h2>{{ aluno.nome }}</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="label">Idade</div>
+                        <div class="value">{{ aluno.idade }} anos</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Curso</div>
+                        <div class="value">{{ aluno.curso }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Média de Estudo</div>
+                        <div class="value">{{ aluno.horas_estudo }} horas/dia</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <h1>Perfil de Usuário</h1>
+        <p class="no-data">Não foi encontrado um perfil de aluno correspondente ao seu usuário ({{ session.username }}).</p>
+        {% if session.get('role') == 'admin' %}
+            <p><strong>Nota para o Admin:</strong> Para que um perfil de aluno apareça aqui, o 'nome' do aluno no cadastro deve ser idêntico ao 'username' do usuário.</p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

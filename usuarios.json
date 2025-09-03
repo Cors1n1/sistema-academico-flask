@@ -18,5 +18,25 @@
         "username": "Teste",
         "password_hash": "scrypt:32768:8:1$ynZUi1tsaQ9bOa1h$7ac7e967905d638648e85fdb44db396dd89def15e77004bb5abbcb5b64c71ed0692ab87660c3cd439642396f4c21440aedc53ed6be008df49d39086c362f77e5",
         "role": "viewer"
+    },
+    {
+        "username": "Leandro",
+        "password_hash": "scrypt:32768:8:1$fHfqzy51I2uyzrCg$671b3d00f688648d1f5e8286ed3b2511140c853f4a0718736986188d3fb0f9258022ddc774fa226c44b2e40ee2913bc4d4cf96f0d298b98225ec9100dc419b86",
+        "role": "admin"
+    },
+    {
+        "username": "Caio",
+        "password_hash": "scrypt:32768:8:1$HyCS1Rq35XtpFpTG$78c7e5dc5e3b61bf451cafc8732c4b21685f74434090ba2d6f7958bc2639184755fea148c8ecc7101c6886005651a20e7984a732ad55f95e238ab3038a65396d",
+        "role": "admin"
+    },
+    {
+        "username": "Luciano",
+        "password_hash": "scrypt:32768:8:1$rKCkjj1o1xcE3dCL$42d6684cf95a38e656b0d71f53f51688156e2bdc463d3a0bdbfb45afa472d419845490fe11a2451f4cd1916b4cc7939567fc8206e4103773d492aee8f7c24508",
+        "role": "admin"
+    },
+    {
+        "username": "Matheus",
+        "password_hash": "scrypt:32768:8:1$LDbCvsqzN2UYQkD7$dd1373d53cf0005f585ef94574c230dcba625752928e67a53acffac081effa02ef251c26488f05b6e7703324ce9bbd5aab9a6bb409a441e68dc89ff79c723cd5",
+        "role": "admin"
     }
 ]

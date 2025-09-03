@@ -241,3 +241,23 @@ def view_logs():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+@app.route('/meu_perfil')
+@login_required
+def meu_perfil():
+    # Pega o nome de usuário da sessão
+    username = session.get('username')
+    
+    # Carrega todos os alunos
+    alunos = carregar_dados()
+    
+    # Encontra o aluno cujo nome corresponde ao nome de usuário
+    aluno_correspondente = next((aluno for aluno in alunos if aluno['nome'] == username), None)
+    
+    # Renderiza a página do perfil, passando os dados do aluno (ou None se não encontrar)
+    return render_template('meu_perfil.html', aluno=aluno_correspondente)
+
+
+# (O resto de todas as outras rotas continua o mesmo)
+# ...

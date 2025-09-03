@@ -134,3 +134,72 @@ button[type="submit"]:hover { opacity: 0.9; transform: translateY(-3px); box-sha
 .flash-message.success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
 body.dark-mode .flash-message.danger { color: #f85149; background-color: rgba(248, 81, 73, 0.1); border-color: #f85149; }
 body.dark-mode .flash-message.success { color: #2ea043; background-color: rgba(46, 160, 67, 0.1); border-color: #2ea043; }
+
+/* ==========================================================================
+   7. ESTILOS DO PAINEL DE PERSONALIZAÇÃO DE TEMA
+   ========================================================================== */
+.theme-customizer {
+    position: relative; /* Necessário para o posicionamento do painel */
+}
+
+.customizer-panel {
+    position: absolute;
+    top: 50px; /* Distância do topo do menu */
+    right: 0;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 8px 16px var(--shadow-color);
+    padding: 15px;
+    width: 220px;
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(-10px);
+    visibility: hidden; /* Começa escondido */
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+.customizer-panel.visible {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+}
+
+.customizer-panel h4 {
+    margin: 0 0 10px 0;
+    font-weight: 600;
+    font-size: 0.9em;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+}
+
+.color-swatches {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.swatch {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--border-color);
+    transition: transform 0.2s;
+}
+
+.swatch:hover {
+    transform: scale(1.1);
+}
+
+.custom-color-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.custom-color-section label {
+    font-size: 0.9em;
+    font-weight: 400;
+}

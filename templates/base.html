@@ -7,13 +7,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <nav class="navbar">
         <div class="logo"><a href="{{ url_for('index') }}">Sistema Acadêmico</a></div>
         <div class="nav-links">
             {% if session.username %}
-                <span>Bem-vindo(a), <strong>{{ session.username }}</strong>!</span>
+                <a href="{{ url_for('meu_perfil') }}" title="Meu Perfil" class="nav-user-link">
+                    Bem-vindo(a), <strong>{{ session.username }}</strong>!
+                </a>
             {% endif %}
             <a href="{{ url_for('lista_alunos') }}" class="{{ 'active' if 'lista' in request.path else '' }}">Ver Turma</a>
             {% if session.get('role') == 'admin' %}
@@ -26,9 +29,27 @@
             {% endif %}
             <a href="{{ url_for('logout') }}" class="logout-btn">Sair</a>
             <button id="theme-toggle">Alterar Tema</button>
-            <div class="color-picker-wrapper">
-                <input type="color" id="theme-color-picker">
-                <button id="reset-color-btn" title="Restaurar cor padrão"><i class="fas fa-undo"></i></button>
+            
+            <div class="theme-customizer">
+                <button id="customizer-toggle-btn" title="Personalizar Tema">
+                    <i class="fas fa-palette"></i>
+                </button>
+                <div id="customizer-panel" class="customizer-panel">
+                    <h4>Cor do Tema</h4>
+                    <div class="color-swatches">
+                        <div class="swatch" style="background-color: #4a90e2;" data-color="#4a90e2"></div>
+                        <div class="swatch" style="background-color: #50b878;" data-color="#50b878"></div>
+                        <div class="swatch" style="background-color: #f5a623;" data-color="#f5a623"></div>
+                        <div class="swatch" style="background-color: #e57373;" data-color="#e57373"></div>
+                        <div class="swatch" style="background-color: #9013fe;" data-color="#9013fe"></div>
+                    </div>
+                    <div class="custom-color-section">
+                        <label for="theme-color-picker">Customizada</label>
+                        <input type="color" id="theme-color-picker">
+                    </div>
+                    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
+                    <button id="reset-color-btn" class="action-btn" style="width: 100%; padding: 8px;">Restaurar Padrão</button>
+                </div>
             </div>
         </div>
     </nav>
@@ -43,6 +64,29 @@
         const colorPicker = document.getElementById('theme-color-picker');
         const root = document.documentElement;
         const resetColorBtn = document.getElementById('reset-color-btn');
+
+        const customizerToggleBtn = document.getElementById('customizer-toggle-btn');
+        const customizerPanel = document.getElementById('customizer-panel');
+
+        customizerToggleBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            customizerPanel.classList.toggle('visible');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!customizerPanel.contains(event.target) && !customizerToggleBtn.contains(event.target)) {
+                customizerPanel.classList.remove('visible');
+            }
+        });
+
+        document.querySelectorAll('.swatch').forEach(swatch => {
+            swatch.addEventListener('click', () => {
+                const newColor = swatch.dataset.color;
+                applyPrimaryColor(newColor);
+                colorPicker.value = newColor;
+                localStorage.setItem('themeColor', newColor);
+            });
+        });
 
         function applyTheme(theme) {
             if (theme === 'dark') { body.classList.add('dark-mode'); themeToggle.textContent = 'Modo Claro ☀️'; }
