@@ -7,7 +7,11 @@
         <p style="font-style: italic; color: var(--secondary-color);">Curso: {{ prova.curso }}</p>
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
         
-        <form action="{{ url_for('corrigir_prova', prova_id=prova.id) }}" method="POST">
+        <div id="timer-container" style="text-align: right; margin-bottom: 10px;">
+            <p>Tempo restante: <span id="timer" style="font-weight: bold; color: var(--danger-color);"></span></p>
+        </div>
+        
+        <form id="prova-form" action="{{ url_for('corrigir_prova', prova_id=prova.id) }}" method="POST">
             {% for questao in prova.questoes %}
             <div class="exercicio-item mb-4 p-3 border rounded">
                 <h5>{{ loop.index }}. {{ questao.pergunta }}</h5>
@@ -35,4 +39,53 @@
         <p class="no-data">A prova que você está tentando acessar não existe ou foi removida.</p>
     {% endif %}
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tempoLimite = {{ prova.tempo_limite | default(0) }};
+        const form = document.getElementById('prova-form');
+        let tempoRestante = tempoLimite * 60; // Converte minutos para segundos
+        const timerElement = document.getElementById('timer');
+        let timerInterval;
+
+        function formatarTempo(segundos) {
+            const minutos = Math.floor(segundos / 60);
+            const seg = segundos % 60;
+            return `${minutos}:${seg < 10 ? '0' : ''}${seg}`;
+        }
+        
+        function iniciarCronometro() {
+            if (tempoLimite > 0) {
+                timerElement.textContent = formatarTempo(tempoRestante);
+                timerInterval = setInterval(function() {
+                    tempoRestante--;
+                    timerElement.textContent = formatarTempo(tempoRestante);
+                    if (tempoRestante <= 0) {
+                        clearInterval(timerInterval);
+                        alert('Tempo da prova esgotado! Suas respostas serão enviadas automaticamente.');
+                        form.submit();
+                    }
+                }, 1000);
+            } else {
+                timerElement.textContent = 'Tempo ilimitado';
+                timerElement.style.color = 'var(--text-color)';
+            }
+        }
+        
+        iniciarCronometro();
+
+        // Envia o formulário automaticamente ao sair da página
+        window.addEventListener('beforeunload', function(event) {
+            if (tempoRestante > 0) { // Evita submeter duas vezes se o tempo já tiver acabado
+                // Crie um campo oculto para indicar que a prova foi enviada
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'auto_submit';
+                input.value = 'true';
+                form.appendChild(input);
+                form.submit();
+            }
+        });
+    });
+</script>
 {% endblock %}

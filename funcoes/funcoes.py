@@ -43,7 +43,8 @@ def salvar_usuarios(usuarios):
     with open('usuarios.json', 'w', encoding='utf-8') as f:
         json.dump(usuarios, f, ensure_ascii=False, indent=4)
 
-# --- FUNÇÕES DE AULAS ---\n\n
+# --- FUNÇÕES DE AULAS ---
+
 def carregar_aulas():
     if not os.path.exists("aulas.json"): return []
     try:
@@ -78,7 +79,8 @@ def salvar_exercicios(exercicios):
     with open("exercicios.json", "w", encoding="utf-8") as f:
         json.dump(exercicios, f, ensure_ascii=False, indent=4)
 
-# --- NOVAS FUNÇÕES DE PROVAS ---\n
+# --- FUNÇÕES DE PROVAS ---
+
 def carregar_provas():
     """Carrega os dados das provas do arquivo provas.json."""
     if not os.path.exists("provas.json"):
@@ -103,3 +105,29 @@ def gerar_id_prova(provas):
         novo_id = 'P-' + ''.join(random.choices(string.digits, k=5))
         if not any(p.get('id') == novo_id for p in provas):
             return novo_id
+
+# --- FUNÇÕES DE RESULTADOS DE PROVAS ---
+
+def carregar_resultados_provas():
+    if not os.path.exists("resultados_provas.json"):
+        return []
+    try:
+        with open("resultados_provas.json", "r", encoding="utf-8") as f:
+            content = f.read()
+            if not content:
+                return []
+            return json.loads(content)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return []
+
+def salvar_resultados_provas(resultados):
+    with open("resultados_provas.json", "w", encoding="utf-8") as f:
+        json.dump(resultados, f, ensure_ascii=False, indent=4)
+
+def buscar_resultados_por_prova_id(prova_id):
+    resultados = carregar_resultados_provas()
+    return [r for r in resultados if r.get('prova_id') == prova_id]
+
+def buscar_prova_por_id(prova_id):
+    provas = carregar_provas()
+    return next((p for p in provas if p.get('id') == prova_id), None)

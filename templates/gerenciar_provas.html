@@ -24,6 +24,7 @@
                             <th>Título</th>
                             <th>Curso</th>
                             <th>Ações</th>
+                            <th style="width: 25%;">Resultados</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -35,6 +36,14 @@
                             <td>
                                 <a href="{{ url_for('editar_prova', prova_id=prova.id) }}" class="action-btn edit-btn">Editar</a>
                                 <a href="{{ url_for('deletar_prova', prova_id=prova.id) }}" class="action-btn delete-btn" onclick="return confirm('Tem certeza que deseja deletar esta prova?');">Deletar</a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('exportar_resultados_prova', prova_id=prova.id, formato='pdf') }}" class="action-btn export-btn">
+                                    <i class="fas fa-file-pdf" style="margin-right: 8px;"></i>PDF
+                                </a>
+                                <a href="{{ url_for('exportar_resultados_prova', prova_id=prova.id, formato='excel') }}" class="action-btn export-btn">
+                                    <i class="fas fa-file-excel" style="margin-right: 8px;"></i>Excel
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Detalhes do Resultado{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Detalhes do Resultado da Prova</h1>
+    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+
+    <h3>Prova: {{ resultado.titulo_prova }}</h3>
+    <p>Usuário: <strong>{{ resultado.usuario }}</strong></p>
+    <p>Curso: <strong>{{ resultado.curso }}</strong></p>
+    <p>Data: <strong>{{ resultado.data }}</strong></p>
+    <p>Pontuação: <strong>{{ resultado.pontuacao }} / {{ resultado.total_questoes }}</strong></p>
+
+    <div class="mt-4">
+        {% for resposta in resultado.respostas_detalhadas %}
+        <div class="resultado-item mb-4 p-3 border rounded {% if resposta.correta %}bg-success-light{% else %}bg-danger-light{% endif %}">
+            <h5>Pergunta: {{ loop.index }}. {{ resposta.pergunta }}</h5>
+            <p>Sua resposta: <strong>{{ resposta.resposta_usuario if resposta.resposta_usuario else 'Não respondida' }}</strong></p>
+            <p>Resposta correta: <strong>{{ resposta.resposta_correta }}</strong></p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 40px 0 20px 0;">
+    <a href="{{ url_for('gerenciar_resultados_provas') }}" class="action-btn cancel-btn">Voltar para a Lista de Resultados</a>
+</div>
+{% endblock %}

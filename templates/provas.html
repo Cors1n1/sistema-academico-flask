@@ -3,11 +3,17 @@
 {% block title %}Provas Disponíveis{% endblock %}
 
 {% block content %}
-
-
 <div class="card">
     <h1>Provas e Avaliações</h1>
     <p>Selecione uma prova abaixo para iniciar a avaliação.</p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
     {% if provas_por_curso %}
         {% for curso, provas in provas_por_curso.items() %}
@@ -16,10 +22,27 @@
                 <ul class="lesson-list">
                     {% for prova in provas %}
                         <li class="lesson-item">
-                            <a href="{{ url_for('ver_prova', prova_id=prova.id) }}">
-                                <span class="lesson-icon"><i class="fas fa-clipboard-check"></i></span>
-                                <span>{{ prova.titulo }}</span>
-                            </a>
+                            {% if session.get('role') == 'admin' %}
+                                <a href="{{ url_for('ver_prova', prova_id=prova.id) }}">
+                                    <span class="lesson-icon"><i class="fas fa-clipboard-check"></i></span>
+                                    <span>{{ prova.titulo }}</span>
+                                    <span style="font-style: italic; margin-left: auto;">(Admin: Sem restrições)</span>
+                                </a>
+                            {% else %}
+                                {% if prova.status == 'Disponível' %}
+                                    <a href="{{ url_for('ver_prova', prova_id=prova.id) }}">
+                                        <span class="lesson-icon"><i class="fas fa-clipboard-check"></i></span>
+                                        <span>{{ prova.titulo }}</span>
+                                        <span class="badge badge-success" style="margin-left: auto;">{{ prova.status }}</span>
+                                    </a>
+                                {% else %}
+                                    <span class="lesson-item disabled">
+                                        <span class="lesson-icon"><i class="fas fa-lock"></i></span>
+                                        <span>{{ prova.titulo }}</span>
+                                        <span class="badge badge-danger" style="margin-left: auto;">{{ prova.status }}</span>
+                                    </span>
+                                {% endif %}
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>

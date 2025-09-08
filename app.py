@@ -3,7 +3,9 @@ from functools import wraps
 from funcoes.funcoes import (
     carregar_dados, salvar_dados, gerar_relatorio_dados, 
     carregar_usuarios, salvar_usuarios, carregar_aulas, salvar_aulas,
-    carregar_exercicios, salvar_exercicios, carregar_provas, salvar_provas
+    carregar_exercicios, salvar_exercicios, carregar_provas, salvar_provas,
+    carregar_resultados_provas, salvar_resultados_provas,
+    buscar_resultados_por_prova_id, buscar_prova_por_id
 )
 import json
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -77,7 +79,58 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    return render_template('index.html')
+    # Define a lista completa de cards
+    all_cards = [
+        {'id': 'aulas', 'url': url_for('lista_aulas'), 'icon': 'fas fa-graduation-cap', 'title': 'Acessar Aulas', 'desc': 'Veja todo o material de estudo e as aulas preparadas para o seu curso.'},
+        {'id': 'turma', 'url': url_for('lista_alunos'), 'icon': 'fas fa-users', 'title': 'Ver Turma', 'desc': 'Visualize os colegas de turma e seus cursos.'},
+        {'id': 'exercicios', 'url': url_for('lista_exercicios'), 'icon': 'fas fa-pencil-alt', 'title': 'Exercícios', 'desc': 'Acesse e responda aos exercícios de avaliação do seu curso.'},
+        {'id': 'provas', 'url': url_for('lista_provas'), 'icon': 'fas fa-list-alt', 'title': 'Fazer Provas', 'desc': 'Acesse as provas do seu curso para avaliação do seu progresso.'},
+        {'id': 'boletim', 'url': url_for('meu_boletim'), 'icon': 'fas fa-clipboard-list', 'title': 'Meu Boletim', 'desc': 'Acesse seu histórico de resultados em todas as provas.', 'role': 'viewer'},
+        {'id': 'gerenciar_alunos', 'url': url_for('gerenciar_alunos'), 'icon': 'fas fa-user-cog', 'title': 'Gerenciar Alunos', 'desc': 'Adicione, edite e delete alunos e suas contas de acesso.', 'role': 'admin'},
+        {'id': 'gerenciar_aulas', 'url': url_for('gerenciar_aulas'), 'icon': 'fas fa-book-open', 'title': 'Gerenciar Aulas', 'desc': 'Crie, edite e organize o conteúdo das aulas para os alunos.', 'role': 'admin'},
+        {'id': 'gerenciar_exercicios', 'url': url_for('gerenciar_exercicios'), 'icon': 'fas fa-tasks', 'title': 'Gerenciar Exercícios', 'desc': 'Crie, edite e organize os exercícios de avaliação.', 'role': 'admin'},
+        {'id': 'gerenciar_provas', 'url': url_for('gerenciar_provas'), 'icon': 'fas fa-clipboard-check', 'title': 'Gerenciar Provas', 'desc': 'Crie, edite e delete provas para os cursos.', 'role': 'admin'},
+        {'id': 'gerenciar_resultados', 'url': url_for('gerenciar_resultados_provas'), 'icon': 'fas fa-file-invoice', 'title': 'Resultados das Provas', 'desc': 'Monitore os resultados de todas as provas realizadas.', 'role': 'admin'},
+        {'id': 'relatorio', 'url': url_for('relatorio'), 'icon': 'fas fa-chart-pie', 'title': 'Gerar Relatório', 'desc': 'Acesse as estatísticas importantes do sistema.'},
+        {'id': 'logs', 'url': url_for('view_logs'), 'icon': 'fas fa-clipboard-list', 'title': 'Ver Logs', 'desc': 'Monitore as atividades registradas no sistema.', 'role': 'admin'},
+    ]
+
+    # Filtra os cards com base na role do usuário
+    if session.get('role') == 'admin':
+        visible_cards = all_cards
+    else:
+        visible_cards = [card for card in all_cards if card.get('role') != 'admin']
+
+    # Pega a ordem salva na sessão, se existir
+    card_order = session.get('card_order')
+    if card_order:
+        # Cria um dicionário para busca rápida dos cards
+        card_dict = {card['id']: card for card in visible_cards}
+        # Reordena a lista de cards visíveis de acordo com a ordem salva
+        ordered_cards = [card_dict[card_id] for card_id in card_order if card_id in card_dict]
+        # Adiciona cards que não estavam na ordem salva (caso novos cards tenham sido adicionados)
+        existing_card_ids = {card['id'] for card in ordered_cards}
+        for card in visible_cards:
+            if card['id'] not in existing_card_ids:
+                ordered_cards.append(card)
+        visible_cards = ordered_cards
+
+    return render_template('index.html', cards=visible_cards)
+
+@app.route('/save_card_order', methods=['POST'])
+@login_required
+def save_card_order():
+    if request.is_json:
+        session['card_order'] = request.json.get('order')
+        return '', 204
+    return 'Bad Request', 400
+
+@app.route('/reset_card_order', methods=['POST'])
+@login_required
+def reset_card_order():
+    if 'card_order' in session:
+        session.pop('card_order', None)
+    return '', 204
 
 @app.route('/meu_perfil')
 @login_required
@@ -217,6 +270,9 @@ def corrigir_exercicio(exercicio_id):
 def lista_provas():
     todas_as_provas = carregar_provas()
     provas_por_curso = {}
+    resultados_anteriores = carregar_resultados_provas()
+    provas_realizadas = {res['prova_id'] for res in resultados_anteriores if res['usuario'] == session.get('username')}
+    hoje = datetime.now().date()
 
     if session.get('role') == 'admin':
         for prova in todas_as_provas:
@@ -231,8 +287,23 @@ def lista_provas():
         if aluno_atual:
             curso_do_aluno = aluno_atual.get('curso')
             provas_do_curso = [p for p in todas_as_provas if p.get('curso') == curso_do_aluno]
-            if provas_do_curso:
-                provas_por_curso[curso_do_aluno] = provas_do_curso
+            
+            for prova in provas_do_curso:
+                prova['status'] = 'Disponível'
+                
+                data_inicio_prova = datetime.strptime(prova.get('data_inicio'), '%Y-%m-%d').date() if prova.get('data_inicio') else None
+                data_fim_prova = datetime.strptime(prova.get('data_fim'), '%Y-%m-%d').date() if prova.get('data_fim') else None
+                
+                if prova.get('id') in provas_realizadas:
+                    prova['status'] = 'Concluída'
+                elif data_inicio_prova and data_inicio_prova > hoje:
+                    prova['status'] = 'Não iniciada'
+                elif data_fim_prova and data_fim_prova < hoje:
+                    prova['status'] = 'Expirada'
+                
+                if curso_do_aluno not in provas_por_curso:
+                    provas_por_curso[curso_do_aluno] = []
+                provas_por_curso[curso_do_aluno].append(prova)
 
     return render_template('provas.html', provas_por_curso=provas_por_curso)
 
@@ -246,12 +317,31 @@ def ver_prova(prova_id):
         flash('Prova não encontrada.', 'danger')
         return redirect(url_for('lista_provas'))
 
+    hoje = datetime.now().date()
+    data_inicio_prova = datetime.strptime(prova_selecionada.get('data_inicio'), '%Y-%m-%d').date() if prova_selecionada.get('data_inicio') else None
+    data_fim_prova = datetime.strptime(prova_selecionada.get('data_fim'), '%Y-%m-%d').date() if prova_selecionada.get('data_fim') else None
+    
+    resultados_anteriores = carregar_resultados_provas()
+    prova_ja_feita = any(res['prova_id'] == prova_id and res['usuario'] == session.get('username') for res in resultados_anteriores)
+    
     if session.get('role') != 'admin':
         username = session.get('username')
         alunos = carregar_dados()
         aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
         if not aluno_atual or prova_selecionada.get('curso') != aluno_atual.get('curso'):
             flash('Você não tem permissão para ver esta prova.', 'danger')
+            return redirect(url_for('lista_provas'))
+        
+        if prova_ja_feita:
+            flash('Você já realizou esta prova.', 'warning')
+            return redirect(url_for('lista_provas'))
+        
+        if data_inicio_prova and data_inicio_prova > hoje:
+            flash('Esta prova ainda não está disponível.', 'warning')
+            return redirect(url_for('lista_provas'))
+            
+        if data_fim_prova and data_fim_prova < hoje:
+            flash('O prazo para realizar esta prova já expirou.', 'danger')
             return redirect(url_for('lista_provas'))
 
     return render_template('ver_prova.html', prova=prova_selecionada)
@@ -283,6 +373,22 @@ def corrigir_prova(prova_id):
             'resposta_correta': questao['resposta_correta'],
             'correta': correta
         })
+    
+    resultados = carregar_resultados_provas()
+    novo_resultado = {
+        'id': str(int(time.time())),
+        'prova_id': prova_id,
+        'titulo_prova': prova_selecionada['titulo'],
+        'curso': prova_selecionada['curso'],
+        'usuario': session['username'],
+        'pontuacao': pontuacao,
+        'total_questoes': total_questoes,
+        'data': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        'respostas_detalhadas': respostas_detalhadas
+    }
+    resultados.append(novo_resultado)
+    salvar_resultados_provas(resultados)
+    app.logger.info(f"Usuário '{session['username']}' concluiu a prova '{prova_selecionada['titulo']}' com pontuação {pontuacao}/{total_questoes}.")
     
     return render_template('resultado_prova.html', 
                            prova=prova_selecionada,
@@ -541,6 +647,9 @@ def criar_prova():
             "id": str(int(time.time())),
             "titulo": request.form['titulo'],
             "curso": request.form['curso'],
+            "data_inicio": request.form['data_inicio'],
+            "data_fim": request.form['data_fim'],
+            "tempo_limite": request.form['tempo_limite'],
             "questoes": []
         }
         
@@ -581,6 +690,9 @@ def editar_prova(prova_id):
     if request.method == 'POST':
         prova_para_editar['titulo'] = request.form['titulo']
         prova_para_editar['curso'] = request.form['curso']
+        prova_para_editar['data_inicio'] = request.form['data_inicio']
+        prova_para_editar['data_fim'] = request.form['data_fim']
+        prova_para_editar['tempo_limite'] = request.form['tempo_limite']
         
         questoes_form = request.form.getlist('pergunta')
         opcoes_a_form = request.form.getlist('opcao_a')
@@ -617,6 +729,121 @@ def deletar_prova(prova_id):
         salvar_provas(provas_filtradas)
         flash(f"Prova '{prova_deletada['titulo']}' deletada com sucesso!", 'success')
         app.logger.info(f"Admin '{session['username']}' DELETOU a prova '{prova_deletada['titulo']}'.")
+    return redirect(url_for('gerenciar_provas'))
+    
+# --- ROTAS DE RESULTADOS DE PROVAS ---
+@app.route('/gerenciar_resultados_provas')
+@login_required
+@permission_required('admin')
+def gerenciar_resultados_provas():
+    resultados = carregar_resultados_provas()
+    return render_template('gerenciar_resultados_provas.html', resultados=resultados)
+
+@app.route('/ver_resultado_prova/<resultado_id>')
+@login_required
+@permission_required('admin')
+def ver_resultado_prova(resultado_id):
+    resultados = carregar_resultados_provas()
+    resultado_selecionado = next((r for r in resultados if r.get('id') == resultado_id), None)
+    if not resultado_selecionado:
+        flash('Resultado não encontrado.', 'danger')
+        return redirect(url_for('gerenciar_resultados_provas'))
+    return render_template('ver_resultado_prova.html', resultado=resultado_selecionado)
+
+@app.route('/meu_boletim')
+@login_required
+def meu_boletim():
+    username = session.get('username')
+    resultados = carregar_resultados_provas()
+    meus_resultados = [r for r in resultados if r.get('usuario') == username]
+    return render_template('boletim.html', resultados=meus_resultados)
+
+# --- NOVAS ROTAS DE EXPORTAÇÃO ---
+@app.route('/exportar_boletim/<formato>')
+@login_required
+def exportar_boletim(formato):
+    username = session.get('username')
+    resultados = [r for r in carregar_resultados_provas() if r.get('usuario') == username]
+    if not resultados:
+        flash("Nenhum resultado para exportar.", "warning")
+        return redirect(url_for('meu_boletim'))
+    
+    data_hoje = datetime.now().strftime("%d/%m/%Y")
+    
+    if formato == 'pdf':
+        try:
+            from weasyprint import HTML
+            html_renderizado = render_template('boletim_pdf.html', resultados=resultados, username=username, data_hoje=data_hoje)
+            pdf = HTML(string=html_renderizado).write_pdf()
+            return Response(pdf, mimetype='application/pdf', headers={'Content-Disposition': f'attachment;filename=boletim_{username}.pdf'})
+        except ImportError:
+            flash("Biblioteca WeasyPrint não encontrada para gerar PDF.", "danger")
+            return redirect(url_for('meu_boletim'))
+    
+    if formato == 'excel':
+        try:
+            import pandas as pd
+            import io
+            df = pd.DataFrame([
+                {'Data': r['data'], 'Prova': r['titulo_prova'], 'Curso': r['curso'], 'Pontuação': f"{r['pontuacao']}/{r['total_questoes']}"}
+                for r in resultados
+            ])
+            output = io.BytesIO()
+            writer = pd.ExcelWriter(output, engine='openpyxl')
+            df.to_excel(writer, index=False, sheet_name='Boletim')
+            writer.close()
+            output.seek(0)
+            return Response(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', headers={'Content-Disposition': f'attachment;filename=boletim_{username}.xlsx'})
+        except ImportError:
+            flash("Bibliotecas Pandas/OpenPyXL não encontradas para gerar Excel.", "danger")
+            return redirect(url_for('meu_boletim'))
+    
+    return redirect(url_for('meu_boletim'))
+
+@app.route('/exportar_resultados_prova/<prova_id>/<formato>')
+@login_required
+@permission_required('admin')
+def exportar_resultados_prova(prova_id, formato):
+    prova = buscar_prova_por_id(prova_id)
+    if not prova:
+        flash("Prova não encontrada.", "danger")
+        return redirect(url_for('gerenciar_provas'))
+        
+    resultados = buscar_resultados_por_prova_id(prova_id)
+    if not resultados:
+        flash("Nenhum resultado para esta prova foi encontrado para exportar.", "warning")
+        return redirect(url_for('gerenciar_provas'))
+    
+    data_hoje = datetime.now().strftime("%d/%m/%Y")
+
+    if formato == 'pdf':
+        try:
+            from weasyprint import HTML
+            html_renderizado = render_template('relatorio_provas_pdf.html', prova=prova, resultados=resultados, data_hoje=data_hoje)
+            pdf = HTML(string=html_renderizado).write_pdf()
+            return Response(pdf, mimetype='application/pdf', headers={'Content-Disposition': f'attachment;filename=resultados_prova_{prova_id}.pdf'})
+        except ImportError:
+            flash("Biblioteca WeasyPrint não encontrada para gerar PDF.", "danger")
+            return redirect(url_for('gerenciar_provas'))
+            
+    if formato == 'excel':
+        try:
+            import pandas as pd
+            import io
+            df = pd.DataFrame([
+                {'Usuário': r['usuario'], 'Pontuação': f"{r['pontuacao']}/{r['total_questoes']}", 'Data': r['data']}
+                for r in resultados
+            ])
+            output = io.BytesIO()
+            writer = pd.ExcelWriter(output, engine='openpyxl')
+            df.to_excel(writer, index=False, sheet_name=f'Resultados Prova {prova_id}')
+            writer.close()
+            output.seek(0)
+            return Response(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', headers={'Content-Disposition': f'attachment;filename=resultados_prova_{prova_id}.xlsx'})
+        except ImportError:
+            flash("Bibliotecas Pandas/OpenPyXL não encontradas para gerar Excel.", "danger")
+            return redirect(url_for('gerenciar_provas'))
+            
     return redirect(url_for('gerenciar_provas'))
 
 # --- OUTRAS ROTAS GERAIS ---

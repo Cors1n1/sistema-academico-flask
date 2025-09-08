@@ -4,77 +4,135 @@
 
 {% block content %}
 <div class="hub-hero" id="hub-hero">
-    <h1>Bem-vindo ao Sistema Acadêmico</h1>
-    <p>Gerencie alunos, cursos, usuários e atividades com facilidade e eficiência. Escolha uma opção para começar.</p>
-</div>
-
-<div class="action-grid">
-    <a href="{{ url_for('lista_aulas') }}" class="action-card">
-        <i class="fas fa-graduation-cap"></i>
-        <h2>Acessar Aulas</h2>
-        <p>Veja todo o material de estudo e as aulas preparadas para o seu curso.</p>
-    </a>
-
-    <a href="{{ url_for('lista_alunos') }}" class="action-card">
-        <i class="fas fa-users"></i>
-        <h2>Ver Turma</h2>
-        <p>Visualize os colegas de turma e seus cursos.</p>
-    </a>
-    
-    <a href="{{ url_for('lista_exercicios') }}" class="action-card">
-        <i class="fas fa-pencil-alt"></i>
-        <h2>Exercícios</h2>
-        <p>Acesse e responda aos exercícios de avaliação do seu curso.</p>
-    </a>
-    
-    <a href="{{ url_for('lista_provas') }}" class="action-card">
-        <i class="fas fa-list-alt"></i>
-        <h2>Fazer Provas</h2>
-        <p>Acesse as provas do seu curso para avaliação do seu progresso.</p>
-    </a>
-
     {% if session.get('role') == 'admin' %}
-        <a href="{{ url_for('gerenciar_alunos') }}" class="action-card">
-            <i class="fas fa-user-cog"></i>
-            <h2>Gerenciar Alunos</h2>
-            <p>Adicione, edite e delete alunos e suas contas de acesso.</p>
-        </a>
-    {% endif %}
-
-    <a href="{{ url_for('gerenciar_aulas') }}" class="action-card">
-        <i class="fas fa-book-open"></i>
-        <h2>Gerenciar Aulas</h2>
-        <p>Crie, edite e organize o conteúdo das aulas para os alunos.</p>
-    </a>
-
-    {% if session.get('role') == 'admin' %}
-        <a href="{{ url_for('gerenciar_exercicios') }}" class="action-card">
-            <i class="fas fa-tasks"></i>
-            <h2>Gerenciar Exercícios</h2>
-            <p>Crie, edite e organize os exercícios de avaliação.</p>
-        </a>
-    {% endif %}
-
-    {% if session.get('role') == 'admin' %}
-        <a href="{{ url_for('gerenciar_provas') }}" class="action-card">
-            <i class="fas fa-clipboard-check"></i>
-            <h2>Gerenciar Provas</h2>
-            <p>Crie, edite e delete provas para os cursos.</p>
-        </a>
-    {% endif %}
-
-    <a href="{{ url_for('relatorio') }}" class="action-card">
-        <i class="fas fa-chart-pie"></i>
-        <h2>Gerar Relatório</h2>
-        <p>Acesse as estatísticas importantes do sistema.</p>
-    </a>
-
-    {% if session.get('role') == 'admin' %}
-        <a href="{{ url_for('view_logs') }}" class="action-card">
-            <i class="fas fa-clipboard-list"></i>
-            <h2>Ver Logs</h2>
-            <p>Monitore as atividades registradas no sistema.</p>
-        </a>
+        <h1>Painel de Gerenciamento e Ensino</h1>
+        <p>Como administrador, sua função é gerenciar e organizar o conteúdo para a turma. Comece por aqui para administrar o sistema.</p>
+    {% else %}
+        <h1>Bem-vindo ao Sistema Acadêmico</h1>
+        <p>Pronto para aprender? Aqui você pode acessar suas aulas, exercícios e provas. Escolha uma opção para começar sua jornada.</p>
     {% endif %}
 </div>
+
+<div class="action-grid-header">
+    <button id="reset-order-btn" class="action-btn cancel-btn">Resetar Ordem</button>
+</div>
+<div class="action-grid" id="action-grid">
+    {% for card in cards %}
+    {% if card.id == 'aulas' %}
+        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
+            <i class="{{ card.icon }}"></i>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.desc }}</p>
+        </a>
+    {% elif card.id == 'turma' %}
+        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
+            <i class="{{ card.icon }}"></i>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.desc }}</p>
+        </a>
+    {% elif card.id == 'exercicios' %}
+        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
+            <i class="{{ card.icon }}"></i>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.desc }}</p>
+        </a>
+    {% elif card.id == 'provas' %}
+        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
+            <i class="{{ card.icon }}"></i>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.desc }}</p>
+        </a>
+    {% elif card.id == 'boletim' and session.get('role') != 'admin' %}
+        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
+            <i class="{{ card.icon }}"></i>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.desc }}</p>
+        </a>
+    {% elif card.id == 'gerenciar_alunos' and session.get('role') == 'admin' %}
+        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
+            <i class="{{ card.icon }}"></i>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.desc }}</p>
+        </a>
+    {% elif card.id == 'gerenciar_aulas' and session.get('role') == 'admin' %}
+        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
+            <i class="{{ card.icon }}"></i>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.desc }}</p>
+        </a>
+    {% elif card.id == 'gerenciar_exercicios' and session.get('role') == 'admin' %}
+        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
+            <i class="{{ card.icon }}"></i>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.desc }}</p>
+        </a>
+    {% elif card.id == 'gerenciar_provas' and session.get('role') == 'admin' %}
+        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
+            <i class="{{ card.icon }}"></i>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.desc }}</p>
+        </a>
+    {% elif card.id == 'gerenciar_resultados' and session.get('role') == 'admin' %}
+        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
+            <i class="{{ card.icon }}"></i>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.desc }}</p>
+        </a>
+    {% elif card.id == 'relatorio' %}
+        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
+            <i class="{{ card.icon }}"></i>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.desc }}</p>
+        </a>
+    {% elif card.id == 'logs' and session.get('role') == 'admin' %}
+        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
+            <i class="{{ card.icon }}"></i>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.desc }}</p>
+        </a>
+    {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const grid = document.getElementById('action-grid');
+        const resetButton = document.getElementById('reset-order-btn');
+
+        // Inicializa a biblioteca Sortable.js
+        new Sortable(grid, {
+            animation: 150,
+            ghostClass: 'ghost-item',
+            onEnd: function (evt) {
+                const newOrder = Array.from(grid.children).map(card => card.dataset.card);
+                
+                // Envia a nova ordem para o servidor via fetch
+                fetch('{{ url_for("save_card_order") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ order: newOrder }),
+                });
+            },
+        });
+
+        // Adiciona o evento de clique para o botão de reset
+        if (resetButton) {
+            resetButton.addEventListener('click', function() {
+                // Envia uma requisição para a nova rota de reset no Flask
+                fetch('{{ url_for("reset_card_order") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.reload(); // Recarrega a página para aplicar a ordem padrão
+                    }
+                });
+            });
+        }
+    });
+</script>
 {% endblock %}

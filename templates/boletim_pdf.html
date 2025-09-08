@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <title>Boletim de {{ username }}</title>
+    <meta charset="utf-8">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4; margin: 1.5cm;
+            @bottom-center { content: "Página " counter(page); color: #888; font-size: 10pt; }
+        }
+        body { font-family: 'Poppins', sans-serif; font-size: 11pt; color: #333; }
+        .header { text-align: center; border-bottom: 2px solid #4a90e2; padding-bottom: 10px; margin-bottom: 30px; }
+        .header h1 { color: #4a90e2; margin: 0; font-size: 24pt; }
+        .header p { color: #666; margin: 5px 0 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #4a90e2; color: white; font-weight: 600; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Boletim de {{ username }}</h1>
+        <p>Documento gerado pelo Sistema Acadêmico em {{ data_hoje }}</p>
+    </div>
+    
+    <h3>Resultados de Provas</h3>
+    {% if resultados %}
+    <table>
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Prova</th>
+                <th>Curso</th>
+                <th>Pontuação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for resultado in resultados %}
+            <tr>
+                <td>{{ resultado.data }}</td>
+                <td>{{ resultado.titulo_prova }}</td>
+                <td>{{ resultado.curso }}</td>
+                <td>{{ resultado.pontuacao }} / {{ resultado.total_questoes }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Nenhum resultado de prova encontrado para este aluno.</p>
+    {% endif %}
+</body>
+</html>

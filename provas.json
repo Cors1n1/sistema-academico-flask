@@ -1,17 +1,20 @@
 [
     {
-        "id": "1757345140",
+        "id": "1757349906",
         "titulo": "Aula 01",
         "curso": "Lógica de Programação",
+        "data_inicio": "2025-09-08",
+        "data_fim": "2025-09-08",
+        "tempo_limite": "60",
         "questoes": [
             {
                 "id": "0",
-                "pergunta": "Quanto é 1 + 1",
+                "pergunta": "1+1",
                 "opcoes": [
-                    "A.2",
-                    "1",
+                    "2",
                     "4",
-                    "5"
+                    "6",
+                    "98"
                 ],
                 "resposta_correta": "A"
             }

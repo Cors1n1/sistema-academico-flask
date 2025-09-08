@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Gerenciar Resultados{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Resultados das Provas</h1>
+    <p>Acesse os resultados salvos das provas realizadas pelos alunos.</p>
+
+    {% if resultados %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mt-3">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Usuário</th>
+                        <th>Prova</th>
+                        <th>Curso</th>
+                        <th>Pontuação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for resultado in resultados %}
+                    <tr>
+                        <td>{{ resultado.data }}</td>
+                        <td>{{ resultado.usuario }}</td>
+                        <td>{{ resultado.titulo_prova }}</td>
+                        <td>{{ resultado.curso }}</td>
+                        <td>{{ resultado.pontuacao }} / {{ resultado.total_questoes }}</td>
+                        <td>
+                            <a href="{{ url_for('ver_resultado_prova', resultado_id=resultado.id) }}" class="action-btn edit-btn">Ver Detalhes</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="no-data mt-3">Nenhum resultado de prova salvo ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}

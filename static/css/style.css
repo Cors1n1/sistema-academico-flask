@@ -231,18 +231,35 @@ h1 { font-size: 2em; font-weight: 600; margin-bottom: 20px; color: var(--text-co
 }
 .hub-hero h1 { font-size: 3.5em; font-weight: 700; margin: 0 0 15px 0; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.25); animation: fadeInUp 0.8s ease-out; }
 .hub-hero p { font-size: 1.3em; color: rgba(255, 255, 255, 0.9); max-width: 700px; margin: 0 auto; line-height: 1.6; font-weight: 300; animation: fadeInUp 0.8s ease-out 0.2s; animation-fill-mode: backwards; }
+.action-grid-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
 .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; animation: fadeInUp 0.8s ease-out 0.4s; animation-fill-mode: backwards;}
 .action-card {
     background-color: var(--surface-color); padding: 30px; border-radius: 10px;
     text-align: center; text-decoration: none; color: var(--text-color);
     border: 1px solid var(--border-color); box-shadow: 0 4px 12px var(--shadow-color);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: grab;
 }
 .action-card:hover { transform: translateY(-10px); box-shadow: 0 12px 24px rgba(0,0,0,0.1); }
 body.dark-mode .action-card:hover { box-shadow: 0 12px 24px rgba(0,0,0,0.2); }
 .action-card i { font-size: 3em; color: var(--primary-color); margin-bottom: 20px; }
 .action-card h2 { font-size: 1.5em; margin-bottom: 10px; }
 .action-card p { font-size: 1em; line-height: 1.5; }
+
+/* Estilos para o drag-and-drop */
+.ghost-item {
+    opacity: 0.5;
+    background-color: var(--primary-color);
+    border: 2px dashed var(--primary-color);
+}
+.ghost-item > * {
+    visibility: hidden;
+}
+
 table { width: 100%; border-collapse: collapse; margin-top: 20px; }
 tr { transition: background-color 0.2s ease; }
 th, td { padding: 12px 15px; border: 1px solid var(--border-color); text-align: left; vertical-align: middle; color: var(--text-color); }
