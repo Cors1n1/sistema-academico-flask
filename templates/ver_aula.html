@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}{{ aula.titulo }}{% endblock %}
+
+{% block content %}
+<style>
+    .lesson-content {
+        line-height: 1.8;
+    }
+    .lesson-content h1, .lesson-content h2, .lesson-content h3 {
+        color: var(--primary-color);
+    }
+    .lesson-content code {
+        background-color: var(--table-row-even-bg);
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-family: 'Courier New', Courier, monospace;
+    }
+    .lesson-content pre {
+        background-color: var(--table-row-even-bg);
+        padding: 15px;
+        border-radius: 5px;
+        white-space: pre-wrap;
+    }
+</style>
+
+<div class="card">
+    {% if aula %}
+        <h1>{{ aula.titulo }}</h1>
+        <p style="font-style: italic; color: var(--secondary-color);">Curso: {{ aula.curso }}</p>
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+
+        <div class="lesson-content">
+            {{ aula.conteudo | safe }}
+        </div>
+        
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 40px 0 20px 0;">
+        
+        {% if aula.exercicios %}
+        <a href="{{ url_for('ver_exercicios', aula_id=aula.id) }}" class="action-btn save-btn">Ver Exercícios</a>
+        {% endif %}
+        
+        <a href="{{ url_for('lista_aulas') }}" class="action-btn edit-btn" style="color: var(--primary-color);">Voltar para a Lista de Aulas</a>
+
+    {% else %}
+        <h1>Aula não encontrada</h1>
+        <p class="no-data">A aula que você está tentando acessar não existe ou foi removida.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,20 +1,20 @@
 [
     {
-        "nome": "Augusto",
-        "idade": 21,
+        "nome": "Astolfo",
+        "idade": 16,
         "curso": "Algorítimos e Estruturas de dados",
-        "horas_estudo": 1.0
+        "horas_estudo": 9.0
     },
     {
         "nome": "Kleber",
-        "idade": 70,
-        "curso": "Linguagens de Programação",
-        "horas_estudo": 3.0
+        "idade": 80,
+        "curso": "Lógica de Programação",
+        "horas_estudo": 21.0
     },
     {
         "nome": "Victor",
         "idade": 21,
         "curso": "Lógica de Programação",
-        "horas_estudo": 7.0
+        "horas_estudo": 2.0
     }
 ]

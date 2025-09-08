@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Editar Aluno{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Editar Aluno: {{ aluno.nome }}</h1>
+    <form method="post">
+        <div class="form-group">
+            <label>Nome do Aluno (não pode ser alterado)</label>
+            <input type="text" value="{{ aluno.nome }}" readonly disabled>
+        </div>
+        <div class="form-group">
+            <label for="idade">Idade:</label>
+            <input type="number" id="idade" name="idade" required value="{{ aluno.idade }}">
+        </div>
+        <div class="form-group">
+            <label for="curso">Curso:</label>
+            <select id="curso" name="curso">
+                <option value="Lógica de Programação" {% if aluno.curso == 'Lógica de Programação' %}selected{% endif %}>Lógica de Programação</option>
+                <option value="Linguagens de Programação" {% if aluno.curso == 'Linguagens de Programação' %}selected{% endif %}>Linguagens de Programação</option>
+                <option value="Algorítimos e Estruturas de dados" {% if aluno.curso == 'Algorítimos e Estruturas de dados' %}selected{% endif %}>Algorítimos e Estruturas de dados</option>
+            </select>
+        </div>
+         <div class="form-group">
+            <label for="horas_estudo">Média de Horas de Estudo:</label>
+            <input type="number" step="0.5" id="horas_estudo" name="horas_estudo" required value="{{ aluno.horas_estudo }}">
+        </div>
+
+        {% if usuario %}
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 10px 0;">
+        <h2 style="font-size: 1.5em; font-weight: 400;">Configurações de Acesso</h2>
+        <div class="form-group">
+            <label for="role">Permissão (Função):</label>
+            <select id="role" name="role">
+                <option value="viewer" {% if usuario.role == 'viewer' %}selected{% endif %}>Visitante</option>
+                <option value="admin" {% if usuario.role == 'admin' %}selected{% endif %}>Administrador</option>
+            </select>
+        </div>
+        {% endif %}
+        
+        <div class="form-actions">
+            <button type="submit">Salvar Alterações</button>
+            <a href="{{ url_for('gerenciar_alunos') }}" class="cancel-btn">Cancelar</a>
+        </div>
+    </form>
+    
+</div>
+{% endblock %}

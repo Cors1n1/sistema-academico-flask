@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Resultado{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Resultado do Exercício</h1>
+    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+    
+    {% if correto %}
+        <h3 class="text-success">Parabéns! Sua resposta está correta.</h3>
+    {% else %}
+        <h3 class="text-danger">Que pena! Sua resposta está incorreta.</h3>
+    {% endif %}
+
+    <div class="resultado-item mt-4 p-3 border rounded">
+        <h5>Pergunta: {{ exercicio.pergunta }}</h5>
+        <p>Sua resposta: <strong>{{ resposta_usuario if resposta_usuario else 'Não respondida' }}</strong></p>
+        <p>Resposta correta: <strong>{{ exercicio.resposta_correta }}</strong></p>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 40px 0 20px 0;">
+    <a href="{{ url_for('lista_exercicios') }}" class="action-btn cancel-btn">Voltar para a Lista de Exercícios</a>
+</div>
+{% endblock %}

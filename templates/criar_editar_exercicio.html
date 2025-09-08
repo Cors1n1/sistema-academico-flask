@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if exercicio else 'Criar' }} Exercício{% endblock %}
+{% block content %}
+<style>
+    /* Estilos para a organização do formulário */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    .form-control, .form-select {
+        background-color: var(--card-bg-color);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        width: 100%;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(var(--primary-rgb), 0.25);
+    }
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    .exercise-block {
+        border: 1px solid var(--border-color);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    .remove-exercise-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: var(--danger-color);
+        color: white;
+        border: none;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 25px;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">{{ 'Editar Exercício' if exercicio else 'Criar Novos Exercícios' }}</h2>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="form-group">
+                <label for="curso" class="form-label">Curso:</label>
+                <select id="curso" name="curso" class="form-select" required>
+                    <option value="" disabled {% if not exercicio %}selected{% endif %}>Selecione um curso</option>
+                    <option value="Lógica de Programação" {% if exercicio and exercicio.curso == 'Lógica de Programação' %}selected{% endif %}>Lógica de Programação</option>
+                    <option value="Linguagens de Programação" {% if exercicio and exercicio.curso == 'Linguagens de Programação' %}selected{% endif %}>Linguagens de Programação</option>
+                    <option value="Algorítimos e Estruturas de dados" {% if exercicio and exercicio.curso == 'Algorítimos e Estruturas de dados' %}selected{% endif %}>Algorítimos e Estruturas de dados</option>
+                </select>
+            </div>
+            
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
+            <h3>Exercícios</h3>
+
+            <div id="exercicios-container">
+                {% if exercicio %}
+                <div class="exercise-block">
+                    <div class="form-group">
+                        <label for="pergunta" class="form-label">Pergunta:</label>
+                        <textarea class="form-control" name="pergunta" rows="3" required>{{ exercicio.pergunta }}</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="opcao_a" class="form-label">Opção A:</label>
+                            <input type="text" class="form-control" name="opcao_a" value="{{ exercicio.opcoes[0] }}" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="opcao_b" class="form-label">Opção B:</label>
+                            <input type="text" class="form-control" name="opcao_b" value="{{ exercicio.opcoes[1] }}" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="opcao_c" class="form-label">Opção C:</label>
+                            <input type="text" class="form-control" name="opcao_c" value="{{ exercicio.opcoes[2] }}" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="opcao_d" class="form-label">Opção D:</label>
+                            <input type="text" class="form-control" name="opcao_d" value="{{ exercicio.opcoes[3] }}" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="resposta_correta" class="form-label">Resposta Correta:</label>
+                        <select class="form-select" name="resposta_correta" required>
+                            <option value="A" {% if exercicio.resposta_correta == 'A' %}selected{% endif %}>A</option>
+                            <option value="B" {% if exercicio.resposta_correta == 'B' %}selected{% endif %}>B</option>
+                            <option value="C" {% if exercicio.resposta_correta == 'C' %}selected{% endif %}>C</option>
+                            <option value="D" {% if exercicio.resposta_correta == 'D' %}selected{% endif %}>D</option>
+                        </select>
+                    </div>
+                </div>
+                {% else %}
+                <div class="exercise-block">
+                    <div class="form-group">
+                        <label class="form-label">Pergunta:</label>
+                        <textarea class="form-control" name="pergunta" rows="3" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção A:</label>
+                            <input type="text" class="form-control" name="opcao_a" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção B:</label>
+                            <input type="text" class="form-control" name="opcao_b" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção C:</label>
+                            <input type="text" class="form-control" name="opcao_c" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção D:</label>
+                            <input type="text" class="form-control" name="opcao_d" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Resposta Correta:</label>
+                        <select class="form-select" name="resposta_correta" required>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if not exercicio %}
+            <button type="button" id="add-exercicio-btn" class="action-btn save-btn">Adicionar Exercício</button>
+            {% endif %}
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
+            <div class="action-buttons">
+                <button type="submit" class="action-btn save-btn">Salvar</button>
+                <a href="{{ url_for('gerenciar_exercicios') }}" class="action-btn cancel-btn">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addBtn = document.getElementById('add-exercicio-btn');
+        const container = document.getElementById('exercicios-container');
+
+        if (addBtn) {
+            addBtn.addEventListener('click', function() {
+                const newExerciseBlock = document.createElement('div');
+                newExerciseBlock.className = 'exercise-block';
+                newExerciseBlock.innerHTML = `
+                    <button type="button" class="remove-exercise-btn">&times;</button>
+                    <div class="form-group">
+                        <label class="form-label">Pergunta:</label>
+                        <textarea class="form-control" name="pergunta" rows="3" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção A:</label>
+                            <input type="text" class="form-control" name="opcao_a" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção B:</label>
+                            <input type="text" class="form-control" name="opcao_b" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção C:</label>
+                            <input type="text" class="form-control" name="opcao_c" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção D:</label>
+                            <input type="text" class="form-control" name="opcao_d" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Resposta Correta:</label>
+                        <select class="form-select" name="resposta_correta" required>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                `;
+                container.appendChild(newExerciseBlock);
+            });
+        }
+
+        container.addEventListener('click', function(event) {
+            if (event.target.classList.contains('remove-exercise-btn')) {
+                event.target.closest('.exercise-block').remove();
+            }
+        });
+    });
+</script>
+{% endblock %}

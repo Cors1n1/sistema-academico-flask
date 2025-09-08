@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Aulas Disponíveis{% endblock %}
+
+{% block content %}
+<style>
+    .course-section {
+        margin-bottom: 40px;
+    }
+    .course-title {
+        font-size: 1.8em;
+        font-weight: 600;
+        color: var(--primary-color);
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    .lesson-list {
+        list-style: none;
+        padding: 0;
+    }
+    .lesson-item a {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        background-color: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        margin-bottom: 15px;
+        text-decoration: none;
+        color: var(--text-color);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .lesson-item a:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px var(--shadow-color);
+    }
+    .lesson-icon {
+        font-size: 1.5em;
+        margin-right: 20px;
+        color: var(--primary-color);
+    }
+</style>
+
+<div class="card">
+    <h1>Aulas e Conteúdos</h1>
+    <p>Selecione uma aula abaixo para ver o conteúdo completo.</p>
+
+    {% if aulas_por_curso %}
+        {% for curso, aulas in aulas_por_curso.items() %}
+            <div class="course-section">
+                <h2 class="course-title">{{ curso }}</h2>
+                <ul class="lesson-list">
+                    {% for aula in aulas %}
+                        <li class="lesson-item">
+                            <a href="{{ url_for('ver_aula', aula_id=aula.id) }}">
+                                <span class="lesson-icon"><i class="fas fa-book-reader"></i></span>
+                                <span>{{ aula.titulo }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-data">Nenhuma aula foi publicada pelos administradores ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}

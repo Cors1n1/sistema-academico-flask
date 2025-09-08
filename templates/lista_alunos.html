@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+
 {% block title %}Lista de Alunos - Sistema de Alunos{% endblock %}
+
 {% block content %}
 <div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
@@ -13,22 +15,29 @@
             </a>
         </div>
     </div>
+
     {% if alunos %}
     <table>
         <thead>
             <tr>
-                <th>Nome</th> <th>Idade</th> <th>Curso</th> <th>Horas/Dia</th> <th>Ações</th>
+                <th>Nome</th>
+                <th>Idade</th>
+                <th>Curso</th>
+                <th>Horas/Dia</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
             {% for aluno in alunos %}
             <tr>
-                <td>{{ aluno.nome }}</td> <td>{{ aluno.idade }}</td> <td>{{ aluno.curso }}</td>
+                <td>{{ aluno.nome }}</td>
+                <td>{{ aluno.idade }}</td>
+                <td>{{ aluno.curso }}</td>
                 <td>{{ aluno.horas_estudo }}</td>
                 <td class="actions-cell">
                     {% if session.get('role') == 'admin' %}
-                        <a href="{{ url_for('editar', nome_do_aluno=aluno.nome) }}" class="action-btn edit-btn">Editar</a>
-                        <a href="{{ url_for('deletar', nome_do_aluno=aluno.nome) }}" class="action-btn delete-btn">Deletar</a>
+                        <a href="{{ url_for('editar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn edit-btn">Editar</a>
+                        <a href="{{ url_for('deletar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn delete-btn" onclick="return confirm('Tem certeza que deseja deletar este aluno e sua conta de login?');">Deletar</a>
                     {% else %}
                         <span>Acesso restrito</span>
                     {% endif %}
@@ -41,6 +50,7 @@
     <p class="no-data">Nenhum aluno cadastrado ainda.</p>
     {% endif %}
 </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const pdfBtn = document.getElementById('export-pdf-btn');

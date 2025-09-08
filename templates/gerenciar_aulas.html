@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Gerenciar Aulas{% endblock %}
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Gerenciamento de Aulas</h1>
+        <a href="{{ url_for('criar_aula') }}" class="action-btn edit-btn" style="color: white; background-color: var(--success-color);">Criar Nova Aula</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Título da Aula</th>
+                <th>Curso Associado</th>
+                <th style="width: 25%;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for aula in aulas %}
+            <tr>
+                <td>{{ aula.titulo }}</td>
+                <td>{{ aula.curso }}</td>
+                <td class="actions-cell">
+                    <a href="{{ url_for('editar_aula', aula_id=aula.id) }}" class="action-btn edit-btn">Editar</a>
+                    <a href="{{ url_for('deletar_aula', aula_id=aula.id) }}" 
+                       class="action-btn delete-btn" 
+                       onclick="return confirm('Tem certeza que deseja deletar esta aula?');">
+                       Deletar
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" class="no-data">Nenhuma aula cadastrada ainda.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Gerenciar Exercícios{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="card-title">Gerenciar Exercícios</h2>
+        <a href="{{ url_for('criar_exercicio') }}" class="action-btn save-btn">Criar Novo Exercício</a>
+    </div>
+    <div class="card-body">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if exercicios %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mt-3">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Pergunta</th>
+                            <th>Curso</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exercicio in exercicios %}
+                        <tr>
+                            <td>{{ exercicio.id }}</td>
+                            <td>{{ exercicio.pergunta }}</td>
+                            <td>{{ exercicio.curso }}</td>
+                            <td>
+                                <a href="{{ url_for('editar_exercicio', exercicio_id=exercicio.id) }}" class="action-btn edit-btn">Editar</a>
+                                <a href="{{ url_for('deletar_exercicio', exercicio_id=exercicio.id) }}" class="action-btn delete-btn" onclick="return confirm('Tem certeza que deseja deletar este exercício?');">Deletar</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="no-data mt-3">Nenhum exercício cadastrado ainda.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

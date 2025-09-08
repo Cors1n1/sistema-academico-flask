@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Exercícios{% endblock %}
+{% block head %}
+<style>
+    /* Estilos específicos para a listagem de exercícios */
+    .card-list-group .list-group-item {
+        background-color: var(--background-color);
+        border: 1px solid var(--border-color);
+        margin-bottom: 10px;
+        border-radius: 8px;
+        transition: background-color 0.2s ease;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-decoration: none;
+        color: var(--text-color);
+    }
+    .card-list-group .list-group-item:hover {
+        background-color: var(--card-bg-color);
+    }
+    .card-list-group .list-group-item h5 {
+        margin-bottom: 5px;
+    }
+    .card-list-group .list-group-item small {
+        color: var(--secondary-color);
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Exercícios por Curso</h2>
+    </div>
+    <div class="card-body">
+        {% if exercicios_por_curso %}
+            {% for curso, exercicios in exercicios_por_curso.items() %}
+                <div class="curso-section mb-5">
+                    <h4 class="mb-3">{{ curso }}</h4>
+                    <div class="list-group card-list-group">
+                        {% for exercicio in exercicios %}
+                        <a href="{{ url_for('ver_exercicio', exercicio_id=exercicio.id) }}" class="list-group-item list-group-item-action">
+                            <div>
+                                <h5>{{ exercicio.pergunta }}</h5>
+                                <small class="text-muted">ID do Exercício: {{ exercicio.id }}</small>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-data">Nenhum exercício disponível ainda.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

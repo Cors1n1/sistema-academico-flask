@@ -1,25 +1,64 @@
 {% extends "base.html" %}
+
 {% block title %}Relatório - Sistema de Alunos{% endblock %}
+
 {% block content %}
 <div class="card">
     <h1>Relatório da Plataforma</h1>
     {% if dados %}
     <div class="report-grid">
         <div class="stat-card">
-            <div class="value">{{ dados.total_alunos }}</div>
-            <div class="label">Total de Alunos Cadastrados</div>
+            <div class="stat-icon total"><i class="fas fa-users"></i></div>
+            <div class="stat-info">
+                <div class="value count-up" data-target="{{ dados.total_alunos }}">0</div>
+                <div class="label">Total de Alunos Cadastrados</div>
+            </div>
         </div>
         <div class="stat-card">
-            <div class="value">{{ dados.media_idades }}</div>
-            <div class="label">Média de Idade dos Alunos</div>
+            <div class="stat-icon age"><i class="fas fa-birthday-cake"></i></div>
+            <div class="stat-info">
+                <div class="value count-up" data-target="{{ dados.media_idades }}">0.0</div>
+                <div class="label">Média de Idade dos Alunos</div>
+            </div>
         </div>
         <div class="stat-card">
-            <div class="value">{{ dados.media_horas }}</div>
-            <div class="label">Média de Horas de Estudo Diárias</div>
+            <div class="stat-icon hours"><i class="fas fa-clock"></i></div>
+            <div class="stat-info">
+                <div class="value count-up" data-target="{{ dados.media_horas }}">0.0</div>
+                <div class="label">Média de Horas de Estudo Diárias</div>
+            </div>
         </div>
     </div>
     {% else %}
     <p class="no-data">Não há dados suficientes para gerar um relatório.</p>
     {% endif %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const counters = document.querySelectorAll('.count-up');
+    const speed = 200; // A velocidade da animação
+
+    counters.forEach(counter => {
+        const animate = () => {
+            const target = +counter.getAttribute('data-target');
+            const count = +counter.innerText;
+
+            // Define o incremento. Se for decimal, usa um incremento menor
+            const isDecimal = target % 1 !== 0;
+            const increment = isDecimal ? target / (speed * 2) : Math.ceil(target / speed);
+
+            if (count < target) {
+                const newCount = count + increment;
+                // Formata para uma casa decimal se o alvo for decimal
+                counter.innerText = isDecimal ? Math.min(newCount, target).toFixed(1) : Math.ceil(Math.min(newCount, target));
+                setTimeout(animate, 10);
+            } else {
+                counter.innerText = isDecimal ? target.toFixed(1) : target;
+            }
+        };
+        animate();
+    });
+});
+</script>
 {% endblock %}

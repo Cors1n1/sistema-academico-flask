@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Exercício{% endblock %}
+{% block content %}
+<div class="card">
+    {% if exercicio %}
+        <h1>Exercício</h1>
+        <p style="font-style: italic; color: var(--secondary-color);">Curso: {{ exercicio.curso }}</p>
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+        
+        <form action="{{ url_for('corrigir_exercicio', exercicio_id=exercicio.id) }}" method="POST">
+            <div class="exercicio-item mb-4 p-3 border rounded">
+                <h5>{{ exercicio.pergunta }}</h5>
+                <ul class="list-group mt-3">
+                    {% for opcao in exercicio.opcoes %}
+                        <li class="list-group-item">
+                            <label>
+                                <input type="radio" name="resposta" value="{{ opcao }}" required>
+                                {{ opcao }}
+                            </label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <button type="submit" class="action-btn save-btn mt-3">Verificar Resposta</button>
+        </form>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 40px 0 20px 0;">
+        <a href="{{ url_for('lista_exercicios') }}" class="action-btn cancel-btn">Voltar para a Lista de Exercícios</a>
+    
+    {% else %}
+        <h1>Exercício não encontrado</h1>
+        <p class="no-data">O exercício que você está tentando acessar não existe ou foi removido.</p>
+    {% endif %}
+</div>
+{% endblock %}

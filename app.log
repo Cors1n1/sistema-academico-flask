@@ -486,3 +486,939 @@ werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'relato
 03/09/2025 18:02:31 - INFO - Usuário 'admin' fez logout.
 03/09/2025 18:02:35 - WARNING - Tentativa de login falhou para o usuário 'Kleber'.
 03/09/2025 18:02:36 - INFO - Usuário 'admin' fez login.
+04/09/2025 09:58:38 - INFO - Usuário 'admin' DELETOU o aluno 'Victor'.
+04/09/2025 09:58:52 - INFO - Admin 'admin' DELETOU o usuário 'Leandro'.
+04/09/2025 09:58:55 - INFO - Admin 'admin' DELETOU o usuário 'Caio'.
+04/09/2025 09:58:58 - INFO - Admin 'admin' DELETOU o usuário 'Luciano'.
+04/09/2025 09:59:00 - INFO - Admin 'admin' DELETOU o usuário 'Matheus'.
+04/09/2025 09:59:11 - INFO - Usuário 'admin' ADICIONOU o aluno 'Victor'.
+04/09/2025 09:59:14 - INFO - Usuário 'admin' fez logout.
+04/09/2025 09:59:18 - INFO - Usuário 'Victor' fez login.
+04/09/2025 10:12:18 - INFO - Usuário 'Victor' fez logout.
+04/09/2025 10:12:23 - INFO - Usuário 'visitante' fez login.
+04/09/2025 10:12:40 - INFO - Usuário 'visitante' fez logout.
+04/09/2025 10:12:43 - INFO - Usuário 'Victor' fez login.
+04/09/2025 11:06:09 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 37, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 90, in index
+    return render_template('index.html', chart_data=chart_data)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 17, in top-level template code
+    <a href="{{ url_for('meu_perfil') }}" title="Meu Perfil" class="nav-user-link">
+    ^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'meu_perfil'. Did you mean 'exportar' instead?
+04/09/2025 11:06:11 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 37, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 90, in index
+    return render_template('index.html', chart_data=chart_data)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 17, in top-level template code
+    <a href="{{ url_for('meu_perfil') }}" title="Meu Perfil" class="nav-user-link">
+    ^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'meu_perfil'. Did you mean 'exportar' instead?
+04/09/2025 11:06:12 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 37, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 90, in index
+    return render_template('index.html', chart_data=chart_data)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 17, in top-level template code
+    <a href="{{ url_for('meu_perfil') }}" title="Meu Perfil" class="nav-user-link">
+    ^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'meu_perfil'. Did you mean 'exportar' instead?
+04/09/2025 11:06:12 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 37, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 90, in index
+    return render_template('index.html', chart_data=chart_data)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 17, in top-level template code
+    <a href="{{ url_for('meu_perfil') }}" title="Meu Perfil" class="nav-user-link">
+    ^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'meu_perfil'. Did you mean 'exportar' instead?
+04/09/2025 11:06:12 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 37, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 90, in index
+    return render_template('index.html', chart_data=chart_data)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 17, in top-level template code
+    <a href="{{ url_for('meu_perfil') }}" title="Meu Perfil" class="nav-user-link">
+    ^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'meu_perfil'. Did you mean 'exportar' instead?
+04/09/2025 11:06:20 - ERROR - Exception on /adicionar [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 37, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 47, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 144, in adicionar
+    return render_template('adicionar.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\adicionar.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 17, in top-level template code
+    <a href="{{ url_for('meu_perfil') }}" title="Meu Perfil" class="nav-user-link">
+    ^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'meu_perfil'. Did you mean 'exportar' instead?
+04/09/2025 11:06:29 - INFO - Usuário 'Victor' fez login.
+04/09/2025 11:06:29 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 37, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 90, in index
+    return render_template('index.html', chart_data=chart_data)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 17, in top-level template code
+    <a href="{{ url_for('meu_perfil') }}" title="Meu Perfil" class="nav-user-link">
+    ^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'meu_perfil'. Did you mean 'exportar' instead?
+04/09/2025 11:19:14 - INFO - Usuário 'Victor' ADICIONOU o aluno 'Teste'.
+04/09/2025 11:19:28 - INFO - Usuário 'Victor' DELETOU o aluno 'Victor'.
+04/09/2025 11:19:37 - INFO - Usuário 'Victor' ADICIONOU o aluno 'Caralho'.
+04/09/2025 11:19:50 - INFO - Usuário 'Victor' DELETOU o aluno 'Caralho'.
+Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 33, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 78, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 54, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 116, in block 'content'
+    <a href="{{ url_for('adicionar') }}" class="action-card">
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'adicionar'. Did you mean 'static' instead?
+Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 33, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 78, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 54, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 116, in block 'content'
+    <a href="{{ url_for('adicionar') }}" class="action-card">
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'adicionar'. Did you mean 'static' instead?
+Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 33, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 78, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 54, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 116, in block 'content'
+    <a href="{{ url_for('adicionar') }}" class="action-card">
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'adicionar'. Did you mean 'static' instead?
+Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 33, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 78, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 54, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 116, in block 'content'
+    <a href="{{ url_for('adicionar') }}" class="action-card">
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'adicionar'. Did you mean 'static' instead?
+Exception on /lista [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 33, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 92, in lista_alunos
+    return render_template('lista_alunos.html', alunos=alunos)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\lista_alunos.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 54, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\templates\lista_alunos.html", line 30, in block 'content'
+    <a href="{{ url_for('editar', nome_do_aluno=aluno.nome) }}" class="action-btn edit-btn">Editar</a>
+    ^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'editar' with values ['nome_do_aluno']. Did you mean 'editar_aluno' instead?
+Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 35, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 81, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 61, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 116, in block 'content'
+    <a href="{{ url_for('adicionar') }}" class="action-card">
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'adicionar'. Did you mean 'static' instead?
+Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 35, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 81, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 61, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 116, in block 'content'
+    <a href="{{ url_for('adicionar') }}" class="action-card">
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'adicionar'. Did you mean 'static' instead?
+Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 35, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 81, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 61, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 116, in block 'content'
+    <a href="{{ url_for('adicionar') }}" class="action-card">
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'adicionar'. Did you mean 'static' instead?
+Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 35, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 81, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 61, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 116, in block 'content'
+    <a href="{{ url_for('adicionar') }}" class="action-card">
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'adicionar'. Did you mean 'static' instead?
+Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 35, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 81, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 61, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 116, in block 'content'
+    <a href="{{ url_for('adicionar') }}" class="action-card">
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'adicionar'. Did you mean 'static' instead?
+Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 34, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 79, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 61, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 116, in block 'content'
+    <a href="{{ url_for('adicionar') }}" class="action-card">
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'adicionar'. Did you mean 'static' instead?
+Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 34, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\Users\Corsini\Desktop\teste\app.py", line 79, in index
+    return render_template('index.html')
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\Corsini\Desktop\teste\templates\base.html", line 61, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\Desktop\teste\templates\index.html", line 116, in block 'content'
+    <a href="{{ url_for('adicionar') }}" class="action-card">
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\Corsini\AppData\Local\Programs\Python\Python313\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'adicionar'. Did you mean 'static' instead?
+Admin 'Victor' ADICIONOU o aluno 'Victor'.
+Admin 'Victor' CRIOU a conta de login para 'Victor'.
+Admin 'Victor' ADICIONOU o aluno 'Teste'.
+Admin 'Victor' DELETOU o aluno 'Teste'.
+Admin 'Victor' DELETOU o usuário associado a 'Teste'.
+Admin 'Victor' ADICIONOU o aluno 'Victor'.
+Admin 'Victor' CRIOU a conta de login para 'Victor'.
+Admin 'Victor' ADICIONOU o aluno 'Kleber'.
+Admin 'Victor' CRIOU a conta de login para 'Kleber'.
+Usuário 'Victor' EXPORTOU os dados para PDF.
+Admin 'Victor' ADICIONOU o aluno 'Astolfo'.
+Admin 'Victor' CRIOU a conta de login para 'Astolfo'.
+Usuário 'Victor' fez logout.
+Tentativa de login falhou para o usuário 'Altolfo'.
+Tentativa de login falhou para o usuário 'visitante'.
+Usuário 'Victor' fez login.
+Usuário 'Victor' fez logout.
+Usuário 'Victor' fez login.
+Usuário 'Victor' fez logout.
+Tentativa de login falhou para o usuário 'admin'.
+Usuário 'Victor' fez login.
+Usuário 'Victor' fez logout.
+Tentativa de login falhou para o usuário 'admin'.
+Usuário 'Victor' fez login.
+Usuário 'Victor' fez logout.
+Tentativa de login falhou para o usuário 'admin'.
+Usuário 'Victor' fez login.
+Admin 'Victor' ADICIONOU o aluno 'admin'.
+Admin 'Victor' CRIOU a conta de login para 'admin'.
+Admin 'Victor' DELETOU o aluno 'admin'.
+Admin 'Victor' DELETOU o usuário associado a 'admin'.
+Usuário 'Victor' fez logout.
+Usuário 'Victor' fez login.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Kleber' fez logout.
+Usuário 'Victor' fez login.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Kleber' fez logout.
+Usuário 'Victor' fez login.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Kleber' fez logout.
+Usuário 'Victor' fez login.
+Admin 'Victor' CRIOU a aula 'Aula 01'.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Kleber' fez logout.
+Usuário 'Victor' fez login.
+Admin 'Victor' DELETOU a aula 'Aula 01'.
+Admin 'Victor' CRIOU a aula 'teste'.
+Admin 'Victor' EDITOU o aluno 'Kleber'.
+Admin 'Victor' ALTEROU a permissão de 'Kleber'.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Kleber' fez logout.
+Usuário 'Victor' fez login.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Kleber' fez logout.
+Usuário 'Victor' fez login.
+Admin 'Victor' EDITOU a aula 'teste'.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Kleber' fez logout.
+Usuário 'Victor' fez login.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Kleber' fez logout.
+Usuário 'Victor' fez login.
+Admin 'Victor' CRIOU a aula 'Aula 01'.
+Admin 'Victor' EDITOU a aula 'Aula 01'.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Kleber' fez logout.
+Usuário 'Victor' fez login.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Kleber' fez logout.
+Usuário 'Victor' fez login.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Kleber' fez logout.
+Usuário 'Victor' fez login.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Kleber' fez logout.
+Usuário 'Victor' fez login.
+Usuário 'Victor' EXPORTOU os dados para PDF.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Kleber' fez logout.
+Usuário 'Victor' fez login.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Victor' fez login.
+Usuário 'Victor' EXPORTOU os dados para PDF.
+Usuário 'Victor' fez logout.
+Usuário 'Kleber' fez login.
+Usuário 'Kleber' EXPORTOU os dados para PDF.
+Usuário 'Kleber' fez logout.

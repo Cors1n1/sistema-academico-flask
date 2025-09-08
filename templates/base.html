@@ -7,26 +7,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    {% block head %}{% endblock %}
 </head>
 <body>
     <nav class="navbar">
         <div class="logo"><a href="{{ url_for('index') }}">Sistema Acadêmico</a></div>
         <div class="nav-links">
             {% if session.username %}
-                <a href="{{ url_for('meu_perfil') }}" title="Meu Perfil" class="nav-user-link">
-                    Bem-vindo(a), <strong>{{ session.username }}</strong>!
+                <a href="{{ url_for('meu_perfil') }}" title="Meu Perfil">
+                    <span>Bem-vindo(a), <strong>{{ session.username }}</strong>!</span>
                 </a>
             {% endif %}
-            <a href="{{ url_for('lista_alunos') }}" class="{{ 'active' if 'lista' in request.path else '' }}">Ver Turma</a>
+            
+            <a href="{{ url_for('lista_aulas') }}" class="{{ 'active' if 'aulas' in request.path else '' }}">Aulas</a>
+            
+            <a href="{{ url_for('lista_alunos') }}" class="{{ 'active' if 'lista_alunos' in request.path else '' }}">Ver Turma</a>
+
+            <a href="{{ url_for('lista_exercicios') }}" class="{{ 'active' if 'lista_exercicios' in request.path or 'exercicio' in request.path else '' }}">Exercícios</a>
+            
             {% if session.get('role') == 'admin' %}
-                <a href="{{ url_for('adicionar') }}" class="{{ 'active' if request.path == '/adicionar' else '' }}">Adicionar Aluno</a>
+                <a href="{{ url_for('gerenciar_alunos') }}" class="{{ 'active' if 'gerenciar_alunos' in request.path else '' }}">Gerenciar Alunos</a>
+                <a href="{{ url_for('gerenciar_aulas') }}" class="{{ 'active' if 'gerenciar_aulas' in request.path else '' }}">Gerenciar Aulas</a>
+                <a href="{{ url_for('gerenciar_exercicios') }}" class="{{ 'active' if 'gerenciar_exercicios' in request.path or 'criar_exercicio' in request.path or 'editar_exercicio' in request.path else '' }}">Gerenciar Exercícios</a>
             {% endif %}
+
             <a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a>
+            
             {% if session.get('role') == 'admin' %}
                 <a href="{{ url_for('view_logs') }}" class="{{ 'active' if request.path == '/logs' else '' }}">Ver Logs</a>
-                <a href="{{ url_for('gerenciar_usuarios') }}" class="{{ 'active' if request.path == '/gerenciar_usuarios' else '' }}">Gerenciar Usuários</a>
             {% endif %}
+
             <a href="{{ url_for('logout') }}" class="logout-btn">Sair</a>
             <button id="theme-toggle">Alterar Tema</button>
             
@@ -48,6 +59,14 @@
                         <input type="color" id="theme-color-picker">
                     </div>
                     <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
+                    <div class="setting-row">
+                        <label for="gradient-toggle">Fundo Animado</label>
+                        <label class="switch">
+                            <input type="checkbox" id="gradient-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
                     <button id="reset-color-btn" class="action-btn" style="width: 100%; padding: 8px;">Restaurar Padrão</button>
                 </div>
             </div>
@@ -64,21 +83,38 @@
         const colorPicker = document.getElementById('theme-color-picker');
         const root = document.documentElement;
         const resetColorBtn = document.getElementById('reset-color-btn');
-
         const customizerToggleBtn = document.getElementById('customizer-toggle-btn');
         const customizerPanel = document.getElementById('customizer-panel');
+        const gradientToggle = document.getElementById('gradient-toggle');
+        const heroElement = document.getElementById('hub-hero');
 
         customizerToggleBtn.addEventListener('click', (event) => {
             event.stopPropagation();
             customizerPanel.classList.toggle('visible');
         });
-
         document.addEventListener('click', (event) => {
             if (!customizerPanel.contains(event.target) && !customizerToggleBtn.contains(event.target)) {
                 customizerPanel.classList.remove('visible');
             }
         });
 
+        function applyTheme(theme) {
+            if (theme === 'dark') { body.classList.add('dark-mode'); themeToggle.textContent = 'Modo Claro ☀️'; }
+            else { body.classList.remove('dark-mode'); themeToggle.textContent = 'Modo Escuro 🌙'; }
+        }
+        themeToggle.addEventListener('click', () => {
+            const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+            applyTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (!localStorage.getItem('themeColor')) {
+                const newDefaultColor = getComputedStyle(root).getPropertyValue('--primary-color');
+                colorPicker.value = newDefaultColor.trim();
+            }
+        });
+
+        function applyPrimaryColor(color) {
+            root.style.setProperty('--custom-primary-color', color);
+        }
         document.querySelectorAll('.swatch').forEach(swatch => {
             swatch.addEventListener('click', () => {
                 const newColor = swatch.dataset.color;
@@ -87,22 +123,11 @@
                 localStorage.setItem('themeColor', newColor);
             });
         });
-
-        function applyTheme(theme) {
-            if (theme === 'dark') { body.classList.add('dark-mode'); themeToggle.textContent = 'Modo Claro ☀️'; }
-            else { body.classList.remove('dark-mode'); themeToggle.textContent = 'Modo Escuro 🌙'; }
-        }
-        
-        function applyPrimaryColor(color) {
-            root.style.setProperty('--custom-primary-color', color);
-        }
-
         colorPicker.addEventListener('input', (event) => {
             const newColor = event.target.value;
             applyPrimaryColor(newColor);
             localStorage.setItem('themeColor', newColor);
         });
-
         resetColorBtn.addEventListener('click', () => {
             localStorage.removeItem('themeColor');
             root.style.removeProperty('--custom-primary-color');
@@ -113,6 +138,25 @@
             colorPicker.value = defaultColor.trim();
         });
 
+        function applyGradientAnimation(state) {
+            if (heroElement) {
+                if (state === 'enabled') {
+                    heroElement.classList.add('gradient-animated');
+                    if(gradientToggle) gradientToggle.checked = true;
+                } else {
+                    heroElement.classList.remove('gradient-animated');
+                    if(gradientToggle) gradientToggle.checked = false;
+                }
+            }
+        }
+        if (gradientToggle) {
+            gradientToggle.addEventListener('change', () => {
+                const newState = gradientToggle.checked ? 'enabled' : 'disabled';
+                applyGradientAnimation(newState);
+                localStorage.setItem('gradientAnimation', newState);
+            });
+        }
+        
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
             applyTheme(savedTheme);
@@ -124,15 +168,9 @@
                 const initialColor = getComputedStyle(root).getPropertyValue('--primary-color');
                 colorPicker.value = initialColor.trim();
             }
-        });
-        
-        themeToggle.addEventListener('click', () => {
-            const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
-            applyTheme(newTheme);
-            localStorage.setItem('theme', newTheme);
-            if (!localStorage.getItem('themeColor')) {
-                const newDefaultColor = getComputedStyle(root).getPropertyValue('--primary-color');
-                colorPicker.value = newDefaultColor.trim();
+            if(gradientToggle){
+                const savedGradientState = localStorage.getItem('gradientAnimation') || 'enabled';
+                applyGradientAnimation(savedGradientState);
             }
         });
     </script>
