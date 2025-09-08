@@ -3,7 +3,7 @@ from functools import wraps
 from funcoes.funcoes import (
     carregar_dados, salvar_dados, gerar_relatorio_dados, 
     carregar_usuarios, salvar_usuarios, carregar_aulas, salvar_aulas,
-    carregar_exercicios, salvar_exercicios
+    carregar_exercicios, salvar_exercicios, carregar_provas, salvar_provas
 )
 import json
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -211,6 +211,85 @@ def corrigir_exercicio(exercicio_id):
                            correto=correto)
 
 
+# --- ROTAS DE PROVAS (ALUNO) ---
+@app.route('/provas')
+@login_required
+def lista_provas():
+    todas_as_provas = carregar_provas()
+    provas_por_curso = {}
+
+    if session.get('role') == 'admin':
+        for prova in todas_as_provas:
+            curso = prova.get('curso', 'Sem Curso')
+            if curso not in provas_por_curso:
+                provas_por_curso[curso] = []
+            provas_por_curso[curso].append(prova)
+    else:
+        username = session.get('username')
+        alunos = carregar_dados()
+        aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
+        if aluno_atual:
+            curso_do_aluno = aluno_atual.get('curso')
+            provas_do_curso = [p for p in todas_as_provas if p.get('curso') == curso_do_aluno]
+            if provas_do_curso:
+                provas_por_curso[curso_do_aluno] = provas_do_curso
+
+    return render_template('provas.html', provas_por_curso=provas_por_curso)
+
+@app.route('/prova/<prova_id>')
+@login_required
+def ver_prova(prova_id):
+    todas_as_provas = carregar_provas()
+    prova_selecionada = next((p for p in todas_as_provas if p.get('id') == prova_id), None)
+    
+    if not prova_selecionada:
+        flash('Prova não encontrada.', 'danger')
+        return redirect(url_for('lista_provas'))
+
+    if session.get('role') != 'admin':
+        username = session.get('username')
+        alunos = carregar_dados()
+        aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
+        if not aluno_atual or prova_selecionada.get('curso') != aluno_atual.get('curso'):
+            flash('Você não tem permissão para ver esta prova.', 'danger')
+            return redirect(url_for('lista_provas'))
+
+    return render_template('ver_prova.html', prova=prova_selecionada)
+
+
+@app.route('/corrigir_prova/<prova_id>', methods=['POST'])
+@login_required
+def corrigir_prova(prova_id):
+    todas_as_provas = carregar_provas()
+    prova_selecionada = next((p for p in todas_as_provas if p.get('id') == prova_id), None)
+    
+    if not prova_selecionada:
+        flash('Prova não encontrada.', 'danger')
+        return redirect(url_for('lista_provas'))
+    
+    respostas_usuario = request.form
+    pontuacao = 0
+    total_questoes = len(prova_selecionada['questoes'])
+
+    respostas_detalhadas = []
+    for questao in prova_selecionada['questoes']:
+        resposta_usuario = respostas_usuario.get(f"questao_{questao['id']}")
+        correta = (resposta_usuario == questao['resposta_correta'])
+        if correta:
+            pontuacao += 1
+        respostas_detalhadas.append({
+            'pergunta': questao['pergunta'],
+            'resposta_usuario': resposta_usuario,
+            'resposta_correta': questao['resposta_correta'],
+            'correta': correta
+        })
+    
+    return render_template('resultado_prova.html', 
+                           prova=prova_selecionada,
+                           pontuacao=pontuacao,
+                           total_questoes=total_questoes,
+                           respostas_detalhadas=respostas_detalhadas)
+
 # --- ROTAS DE GERENCIAMENTO (ADMIN) DE ALUNOS E AULAS ---
 @app.route('/gerenciar_alunos', methods=['GET', 'POST'])
 @login_required
@@ -360,7 +439,7 @@ def deletar_aula(aula_id):
         app.logger.info(f"Admin '{session['username']}' DELETOU a aula '{aula_deletada['titulo']}'.")
     return redirect(url_for('gerenciar_aulas'))
 
-# --- NOVAS ROTAS DE GERENCIAMENTO (ADMIN) DE EXERCÍCIOS ---
+# --- ROTAS DE GERENCIAMENTO (ADMIN) DE EXERCÍCIOS ---
 @app.route('/gerenciar_exercicios')
 @login_required
 @permission_required('admin')
@@ -441,6 +520,104 @@ def deletar_exercicio(exercicio_id):
         flash(f"Exercício deletado com sucesso!", 'success')
         app.logger.info(f"Admin '{session['username']}' DELETOU o exercício '{exercicio_deletado['pergunta']}'.")
     return redirect(url_for('gerenciar_exercicios'))
+
+
+# --- ROTAS DE GERENCIAMENTO (ADMIN) DE PROVAS ---
+@app.route('/gerenciar_provas')
+@login_required
+@permission_required('admin')
+def gerenciar_provas():
+    provas = carregar_provas()
+    return render_template('gerenciar_provas.html', provas=provas)
+
+@app.route('/criar_prova', methods=['GET', 'POST'])
+@login_required
+@permission_required('admin')
+def criar_prova():
+    if request.method == 'POST':
+        provas = carregar_provas()
+        
+        nova_prova = {
+            "id": str(int(time.time())),
+            "titulo": request.form['titulo'],
+            "curso": request.form['curso'],
+            "questoes": []
+        }
+        
+        questoes_form = request.form.getlist('pergunta')
+        opcoes_a_form = request.form.getlist('opcao_a')
+        opcoes_b_form = request.form.getlist('opcao_b')
+        opcoes_c_form = request.form.getlist('opcao_c')
+        opcoes_d_form = request.form.getlist('opcao_d')
+        respostas_corretas_form = request.form.getlist('resposta_correta')
+        
+        for i in range(len(questoes_form)):
+            if questoes_form[i]:
+                nova_prova['questoes'].append({
+                    "id": str(i),
+                    "pergunta": questoes_form[i],
+                    "opcoes": [opcoes_a_form[i], opcoes_b_form[i], opcoes_c_form[i], opcoes_d_form[i]],
+                    "resposta_correta": respostas_corretas_form[i]
+                })
+
+        provas.append(nova_prova)
+        salvar_provas(provas)
+        flash('Prova criada com sucesso!', 'success')
+        app.logger.info(f"Admin '{session['username']}' CRIOU a prova '{nova_prova['titulo']}'.")
+        return redirect(url_for('gerenciar_provas'))
+    
+    return render_template('criar_editar_prova.html', prova=None)
+
+
+@app.route('/editar_prova/<prova_id>', methods=['GET', 'POST'])
+@login_required
+@permission_required('admin')
+def editar_prova(prova_id):
+    provas = carregar_provas()
+    prova_para_editar = next((p for p in provas if p.get('id') == prova_id), None)
+    if not prova_para_editar:
+        return redirect(url_for('gerenciar_provas'))
+
+    if request.method == 'POST':
+        prova_para_editar['titulo'] = request.form['titulo']
+        prova_para_editar['curso'] = request.form['curso']
+        
+        questoes_form = request.form.getlist('pergunta')
+        opcoes_a_form = request.form.getlist('opcao_a')
+        opcoes_b_form = request.form.getlist('opcao_b')
+        opcoes_c_form = request.form.getlist('opcao_c')
+        opcoes_d_form = request.form.getlist('opcao_d')
+        respostas_corretas_form = request.form.getlist('resposta_correta')
+        
+        prova_para_editar['questoes'] = []
+        for i in range(len(questoes_form)):
+            if questoes_form[i]:
+                prova_para_editar['questoes'].append({
+                    "id": str(i),
+                    "pergunta": questoes_form[i],
+                    "opcoes": [opcoes_a_form[i], opcoes_b_form[i], opcoes_c_form[i], opcoes_d_form[i]],
+                    "resposta_correta": respostas_corretas_form[i]
+                })
+        
+        salvar_provas(provas)
+        flash('Prova atualizada com sucesso!', 'success')
+        app.logger.info(f"Admin '{session['username']}' EDITOU a prova '{prova_para_editar['titulo']}'.")
+        return redirect(url_for('gerenciar_provas'))
+        
+    return render_template('criar_editar_prova.html', prova=prova_para_editar)
+
+@app.route('/deletar_prova/<prova_id>')
+@login_required
+@permission_required('admin')
+def deletar_prova(prova_id):
+    provas = carregar_provas()
+    prova_deletada = next((p for p in provas if p.get('id') == prova_id), None)
+    provas_filtradas = [p for p in provas if p.get('id') != prova_id]
+    if len(provas) > len(provas_filtradas) and prova_deletada:
+        salvar_provas(provas_filtradas)
+        flash(f"Prova '{prova_deletada['titulo']}' deletada com sucesso!", 'success')
+        app.logger.info(f"Admin '{session['username']}' DELETOU a prova '{prova_deletada['titulo']}'.")
+    return redirect(url_for('gerenciar_provas'))
 
 # --- OUTRAS ROTAS GERAIS ---
 @app.route('/relatorio')

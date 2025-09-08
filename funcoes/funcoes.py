@@ -1,5 +1,7 @@
 import json
 import os
+import random
+import string
 
 # --- FUNÇÕES DE ALUNOS ---
 def carregar_dados():
@@ -41,7 +43,7 @@ def salvar_usuarios(usuarios):
     with open('usuarios.json', 'w', encoding='utf-8') as f:
         json.dump(usuarios, f, ensure_ascii=False, indent=4)
 
-# --- FUNÇÕES DE AULAS ---
+# --- FUNÇÕES DE AULAS ---\n\n
 def carregar_aulas():
     if not os.path.exists("aulas.json"): return []
     try:
@@ -76,7 +78,7 @@ def salvar_exercicios(exercicios):
     with open("exercicios.json", "w", encoding="utf-8") as f:
         json.dump(exercicios, f, ensure_ascii=False, indent=4)
 
-# --- NOVAS FUNÇÕES DE PROVAS ---
+# --- NOVAS FUNÇÕES DE PROVAS ---\n
 def carregar_provas():
     """Carrega os dados das provas do arquivo provas.json."""
     if not os.path.exists("provas.json"):
@@ -94,3 +96,10 @@ def salvar_provas(provas):
     """Salva os dados das provas no arquivo provas.json."""
     with open("provas.json", "w", encoding="utf-8") as f:
         json.dump(provas, f, ensure_ascii=False, indent=4)
+        
+def gerar_id_prova(provas):
+    """Gera um ID único para uma nova prova (formato: P-XXXXX)."""
+    while True:
+        novo_id = 'P-' + ''.join(random.choices(string.digits, k=5))
+        if not any(p.get('id') == novo_id for p in provas):
+            return novo_id

@@ -13,61 +13,71 @@
 <body>
     <nav class="navbar">
         <div class="logo"><a href="{{ url_for('index') }}">Sistema Acadêmico</a></div>
+        
+        <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu">
+            <i class="fas fa-bars"></i>
+        </button>
+
         <div class="nav-links">
-            {% if session.username %}
-                <a href="{{ url_for('meu_perfil') }}" title="Meu Perfil">
+            <ul class="main-menu" id="main-menu">
+                <li><a href="{{ url_for('lista_aulas') }}" class="{{ 'active' if 'aulas' in request.path else '' }}">Aulas</a></li>
+                <li><a href="{{ url_for('lista_alunos') }}" class="{{ 'active' if 'lista_alunos' in request.path else '' }}">Ver Turma</a></li>
+                <li><a href="{{ url_for('lista_exercicios') }}" class="{{ 'active' if 'lista_exercicios' in request.path or 'exercicio' in request.path else '' }}">Exercícios</a></li>
+                <li><a href="{{ url_for('lista_provas') }}" class="{{ 'active' if 'provas' in request.path else '' }}">Provas</a></li>
+
+                {% if session.get('role') == 'admin' %}
+                    <li class="nav-dropdown">
+                        <a href="#" class="nav-dropdown-toggle">Gerenciar <i class="fas fa-caret-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ url_for('gerenciar_alunos') }}" class="{{ 'active' if 'gerenciar_alunos' in request.path else '' }}">Alunos</a></li>
+                            <li><a href="{{ url_for('gerenciar_aulas') }}" class="{{ 'active' if 'gerenciar_aulas' in request.path else '' }}">Aulas</a></li>
+                            <li><a href="{{ url_for('gerenciar_exercicios') }}" class="{{ 'active' if 'gerenciar_exercicios' in request.path or 'criar_exercicio' in request.path or 'editar_exercicio' in request.path else '' }}">Exercícios</a></li>
+                            <li><a href="{{ url_for('gerenciar_provas') }}" class="{{ 'active' if 'gerenciar_provas' in request.path or 'criar_prova' in request.path or 'editar_prova' in request.path else '' }}">Provas</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
+
+                <li><a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a></li>
+                
+                {% if session.get('role') == 'admin' %}
+                    <li><a href="{{ url_for('view_logs') }}" class="{{ 'active' if request.path == '/logs' else '' }}">Ver Logs</a></li>
+                {% endif %}
+            </ul>
+            
+            <div class="user-actions">
+                <a href="{{ url_for('meu_perfil') }}" class="nav-user-link">
                     <span>Bem-vindo(a), <strong>{{ session.username }}</strong>!</span>
                 </a>
-            {% endif %}
-            
-            <a href="{{ url_for('lista_aulas') }}" class="{{ 'active' if 'aulas' in request.path else '' }}">Aulas</a>
-            
-            <a href="{{ url_for('lista_alunos') }}" class="{{ 'active' if 'lista_alunos' in request.path else '' }}">Ver Turma</a>
-
-            <a href="{{ url_for('lista_exercicios') }}" class="{{ 'active' if 'lista_exercicios' in request.path or 'exercicio' in request.path else '' }}">Exercícios</a>
-            
-            {% if session.get('role') == 'admin' %}
-                <a href="{{ url_for('gerenciar_alunos') }}" class="{{ 'active' if 'gerenciar_alunos' in request.path else '' }}">Gerenciar Alunos</a>
-                <a href="{{ url_for('gerenciar_aulas') }}" class="{{ 'active' if 'gerenciar_aulas' in request.path else '' }}">Gerenciar Aulas</a>
-                <a href="{{ url_for('gerenciar_exercicios') }}" class="{{ 'active' if 'gerenciar_exercicios' in request.path or 'criar_exercicio' in request.path or 'editar_exercicio' in request.path else '' }}">Gerenciar Exercícios</a>
-            {% endif %}
-
-            <a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a>
-            
-            {% if session.get('role') == 'admin' %}
-                <a href="{{ url_for('view_logs') }}" class="{{ 'active' if request.path == '/logs' else '' }}">Ver Logs</a>
-            {% endif %}
-
-            <a href="{{ url_for('logout') }}" class="logout-btn">Sair</a>
-            <button id="theme-toggle">Alterar Tema</button>
-            
-            <div class="theme-customizer">
-                <button id="customizer-toggle-btn" title="Personalizar Tema">
-                    <i class="fas fa-palette"></i>
-                </button>
-                <div id="customizer-panel" class="customizer-panel">
-                    <h4>Cor do Tema</h4>
-                    <div class="color-swatches">
-                        <div class="swatch" style="background-color: #4a90e2;" data-color="#4a90e2"></div>
-                        <div class="swatch" style="background-color: #50b878;" data-color="#50b878"></div>
-                        <div class="swatch" style="background-color: #f5a623;" data-color="#f5a623"></div>
-                        <div class="swatch" style="background-color: #e57373;" data-color="#e57373"></div>
-                        <div class="swatch" style="background-color: #9013fe;" data-color="#9013fe"></div>
+                <a href="{{ url_for('logout') }}" class="logout-btn">Sair</a>
+                <button id="theme-toggle">Alterar Tema</button>
+                <div class="theme-customizer">
+                    <button id="customizer-toggle-btn" title="Personalizar Tema">
+                        <i class="fas fa-palette"></i>
+                    </button>
+                    <div id="customizer-panel" class="customizer-panel">
+                        <h4>Cor do Tema</h4>
+                        <div class="color-swatches">
+                            <div class="swatch" style="background-color: #4a90e2;" data-color="#4a90e2"></div>
+                            <div class="swatch" style="background-color: #50b878;" data-color="#50b878"></div>
+                            <div class="swatch" style="background-color: #f5a623;" data-color="#f5a623"></div>
+                            <div class="swatch" style="background-color: #e57373;" data-color="#e57373"></div>
+                            <div class="swatch" style="background-color: #9013fe;" data-color="#9013fe"></div>
+                        </div>
+                        <div class="custom-color-section">
+                            <label for="theme-color-picker">Customizada</label>
+                            <input type="color" id="theme-color-picker">
+                        </div>
+                        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
+                        <div class="setting-row">
+                            <label for="gradient-toggle">Fundo Animado</label>
+                            <label class="switch">
+                                <input type="checkbox" id="gradient-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
+                        <button id="reset-color-btn" class="action-btn" style="width: 100%; padding: 8px;">Restaurar Padrão</button>
                     </div>
-                    <div class="custom-color-section">
-                        <label for="theme-color-picker">Customizada</label>
-                        <input type="color" id="theme-color-picker">
-                    </div>
-                    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
-                    <div class="setting-row">
-                        <label for="gradient-toggle">Fundo Animado</label>
-                        <label class="switch">
-                            <input type="checkbox" id="gradient-toggle">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
-                    <button id="reset-color-btn" class="action-btn" style="width: 100%; padding: 8px;">Restaurar Padrão</button>
                 </div>
             </div>
         </div>
@@ -78,99 +88,153 @@
     </main>
 
     <script>
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        const colorPicker = document.getElementById('theme-color-picker');
-        const root = document.documentElement;
-        const resetColorBtn = document.getElementById('reset-color-btn');
-        const customizerToggleBtn = document.getElementById('customizer-toggle-btn');
-        const customizerPanel = document.getElementById('customizer-panel');
-        const gradientToggle = document.getElementById('gradient-toggle');
-        const heroElement = document.getElementById('hub-hero');
-
-        customizerToggleBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            customizerPanel.classList.toggle('visible');
-        });
-        document.addEventListener('click', (event) => {
-            if (!customizerPanel.contains(event.target) && !customizerToggleBtn.contains(event.target)) {
-                customizerPanel.classList.remove('visible');
-            }
-        });
-
         function applyTheme(theme) {
-            if (theme === 'dark') { body.classList.add('dark-mode'); themeToggle.textContent = 'Modo Claro ☀️'; }
-            else { body.classList.remove('dark-mode'); themeToggle.textContent = 'Modo Escuro 🌙'; }
-        }
-        themeToggle.addEventListener('click', () => {
-            const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
-            applyTheme(newTheme);
-            localStorage.setItem('theme', newTheme);
-            if (!localStorage.getItem('themeColor')) {
-                const newDefaultColor = getComputedStyle(root).getPropertyValue('--primary-color');
-                colorPicker.value = newDefaultColor.trim();
+            const body = document.body;
+            const themeToggle = document.getElementById('theme-toggle');
+            if (theme === 'dark') {
+                body.classList.add('dark-mode');
+                if (themeToggle) themeToggle.textContent = 'Modo Claro ☀️';
+            } else {
+                body.classList.remove('dark-mode');
+                if (themeToggle) themeToggle.textContent = 'Modo Escuro 🌙';
             }
-        });
+        }
 
         function applyPrimaryColor(color) {
+            const root = document.documentElement;
+            const colorPicker = document.getElementById('theme-color-picker');
             root.style.setProperty('--custom-primary-color', color);
+            if (colorPicker) colorPicker.value = color;
         }
-        document.querySelectorAll('.swatch').forEach(swatch => {
-            swatch.addEventListener('click', () => {
-                const newColor = swatch.dataset.color;
-                applyPrimaryColor(newColor);
-                colorPicker.value = newColor;
-                localStorage.setItem('themeColor', newColor);
-            });
-        });
-        colorPicker.addEventListener('input', (event) => {
-            const newColor = event.target.value;
-            applyPrimaryColor(newColor);
-            localStorage.setItem('themeColor', newColor);
-        });
-        resetColorBtn.addEventListener('click', () => {
-            localStorage.removeItem('themeColor');
-            root.style.removeProperty('--custom-primary-color');
-            const isDarkMode = body.classList.contains('dark-mode');
-            const defaultColor = isDarkMode 
-                ? getComputedStyle(root).getPropertyValue('--primary-color-dark-default') 
-                : getComputedStyle(root).getPropertyValue('--primary-color-light-default');
-            colorPicker.value = defaultColor.trim();
-        });
 
         function applyGradientAnimation(state) {
+            const heroElement = document.getElementById('hub-hero');
+            const gradientToggle = document.getElementById('gradient-toggle');
             if (heroElement) {
                 if (state === 'enabled') {
                     heroElement.classList.add('gradient-animated');
-                    if(gradientToggle) gradientToggle.checked = true;
+                    if (gradientToggle) gradientToggle.checked = true;
                 } else {
                     heroElement.classList.remove('gradient-animated');
-                    if(gradientToggle) gradientToggle.checked = false;
+                    if (gradientToggle) gradientToggle.checked = false;
                 }
             }
         }
-        if (gradientToggle) {
-            gradientToggle.addEventListener('change', () => {
-                const newState = gradientToggle.checked ? 'enabled' : 'disabled';
-                applyGradientAnimation(newState);
-                localStorage.setItem('gradientAnimation', newState);
-            });
+
+        // --- Lógica de carregamento do tema ---
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(savedTheme);
+
+        const savedColor = localStorage.getItem('themeColor');
+        if (savedColor) {
+            applyPrimaryColor(savedColor);
+        } else {
+            const root = document.documentElement;
+            const initialColor = getComputedStyle(root).getPropertyValue('--primary-color-light-default').trim();
+            const colorPicker = document.getElementById('theme-color-picker');
+            if (colorPicker) colorPicker.value = initialColor;
         }
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            applyTheme(savedTheme);
-            const savedColor = localStorage.getItem('themeColor');
-            if (savedColor) {
-                applyPrimaryColor(savedColor);
-                colorPicker.value = savedColor;
-            } else {
-                const initialColor = getComputedStyle(root).getPropertyValue('--primary-color');
-                colorPicker.value = initialColor.trim();
+
+        const savedGradientState = localStorage.getItem('gradientAnimation');
+        applyGradientAnimation(savedGradientState || 'enabled');
+
+
+        // --- Event listeners para interação ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const colorPicker = document.getElementById('theme-color-picker');
+            const root = document.documentElement;
+            const resetColorBtn = document.getElementById('reset-color-btn');
+            const customizerToggleBtn = document.getElementById('customizer-toggle-btn');
+            const customizerPanel = document.getElementById('customizer-panel');
+            const heroElement = document.getElementById('hub-hero');
+            const menuToggle = document.getElementById('menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            const navDropdowns = document.querySelectorAll('.nav-dropdown');
+            const gradientToggle = document.getElementById('gradient-toggle');
+
+            // Responsive menu toggle
+            if(menuToggle && navLinks) {
+                menuToggle.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                });
             }
+            
+            // Dropdown menu toggle
+            navDropdowns.forEach(dropdown => {
+                dropdown.addEventListener('click', (event) => {
+                    if (event.target.closest('.nav-dropdown-toggle')) {
+                        event.preventDefault();
+                        dropdown.classList.toggle('active');
+                    }
+                });
+            });
+
+            customizerToggleBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                customizerPanel.classList.toggle('visible');
+            });
+            document.addEventListener('click', (event) => {
+                if (!customizerPanel.contains(event.target) && !customizerToggleBtn.contains(event.target)) {
+                    customizerPanel.classList.remove('visible');
+                }
+            });
+
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    const newTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+                    applyTheme(newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    if (!localStorage.getItem('themeColor')) {
+                        const defaultColor = newTheme === 'dark' 
+                            ? getComputedStyle(root).getPropertyValue('--primary-color-dark-default') 
+                            : getComputedStyle(root).getPropertyValue('--primary-color-light-default');
+                        if (colorPicker) colorPicker.value = defaultColor.trim();
+                    }
+                });
+            }
+
+            document.querySelectorAll('.swatch').forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    const newColor = swatch.dataset.color;
+                    applyPrimaryColor(newColor);
+                    localStorage.setItem('themeColor', newColor);
+                });
+            });
+
+            if (colorPicker) {
+                colorPicker.addEventListener('input', (event) => {
+                    const newColor = event.target.value;
+                    applyPrimaryColor(newColor);
+                    localStorage.setItem('themeColor', newColor);
+                });
+            }
+
+            if (resetColorBtn) {
+                resetColorBtn.addEventListener('click', () => {
+                    localStorage.removeItem('themeColor');
+                    root.style.removeProperty('--custom-primary-color');
+                    const isDarkMode = document.body.classList.contains('dark-mode');
+                    const defaultColor = isDarkMode 
+                        ? getComputedStyle(root).getPropertyValue('--primary-color-dark-default') 
+                        : getComputedStyle(root).getPropertyValue('--primary-color-light-default');
+                    if (colorPicker) colorPicker.value = defaultColor.trim();
+                });
+            }
+
+            if (gradientToggle) {
+                gradientToggle.addEventListener('change', () => {
+                    const newState = gradientToggle.checked ? 'enabled' : 'disabled';
+                    applyGradientAnimation(newState);
+                    localStorage.setItem('gradientAnimation', newState);
+                });
+            }
+            
+            // Sincroniza o estado do switch de animação com o localStorage
             if(gradientToggle){
                 const savedGradientState = localStorage.getItem('gradientAnimation') || 'enabled';
                 applyGradientAnimation(savedGradientState);
+                gradientToggle.checked = (savedGradientState === 'enabled');
             }
         });
     </script>

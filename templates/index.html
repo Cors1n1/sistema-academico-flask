@@ -26,6 +26,12 @@
         <h2>Exercícios</h2>
         <p>Acesse e responda aos exercícios de avaliação do seu curso.</p>
     </a>
+    
+    <a href="{{ url_for('lista_provas') }}" class="action-card">
+        <i class="fas fa-list-alt"></i>
+        <h2>Fazer Provas</h2>
+        <p>Acesse as provas do seu curso para avaliação do seu progresso.</p>
+    </a>
 
     {% if session.get('role') == 'admin' %}
         <a href="{{ url_for('gerenciar_alunos') }}" class="action-card">
@@ -46,6 +52,14 @@
             <i class="fas fa-tasks"></i>
             <h2>Gerenciar Exercícios</h2>
             <p>Crie, edite e organize os exercícios de avaliação.</p>
+        </a>
+    {% endif %}
+
+    {% if session.get('role') == 'admin' %}
+        <a href="{{ url_for('gerenciar_provas') }}" class="action-card">
+            <i class="fas fa-clipboard-check"></i>
+            <h2>Gerenciar Provas</h2>
+            <p>Crie, edite e delete provas para os cursos.</p>
         </a>
     {% endif %}
 

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Gerenciar Provas{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="card-title">Gerenciar Provas</h2>
+        <a href="{{ url_for('criar_prova') }}" class="action-btn save-btn">Criar Nova Prova</a>
+    </div>
+    <div class="card-body">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if provas %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mt-3">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Curso</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prova in provas %}
+                        <tr>
+                            <td>{{ prova.id }}</td>
+                            <td>{{ prova.titulo }}</td>
+                            <td>{{ prova.curso }}</td>
+                            <td>
+                                <a href="{{ url_for('editar_prova', prova_id=prova.id) }}" class="action-btn edit-btn">Editar</a>
+                                <a href="{{ url_for('deletar_prova', prova_id=prova.id) }}" class="action-btn delete-btn" onclick="return confirm('Tem certeza que deseja deletar esta prova?');">Deletar</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="no-data mt-3">Nenhuma prova cadastrada ainda.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

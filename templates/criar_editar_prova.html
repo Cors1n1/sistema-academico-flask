@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if prova else 'Criar' }} Prova{% endblock %}
+{% block content %}
+<style>
+    /* Estilos para a organização do formulário */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    .form-control, .form-select {
+        background-color: var(--card-bg-color);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        width: 100%;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(var(--primary-rgb), 0.25);
+    }
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    .exercise-block {
+        border: 1px solid var(--border-color);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    .remove-exercise-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: var(--danger-color);
+        color: white;
+        border: none;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 25px;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">{{ 'Editar Prova' if prova else 'Criar Nova Prova' }}</h2>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="form-group">
+                <label for="titulo" class="form-label">Título da Prova:</label>
+                <input type="text" id="titulo" name="titulo" class="form-control" value="{{ prova.titulo if prova else '' }}" required>
+            </div>
+            <div class="form-group">
+                <label for="curso" class="form-label">Curso:</label>
+                <select id="curso" name="curso" class="form-select" required>
+                    <option value="" disabled {% if not prova %}selected{% endif %}>Selecione um curso</option>
+                    <option value="Lógica de Programação" {% if prova and prova.curso == 'Lógica de Programação' %}selected{% endif %}>Lógica de Programação</option>
+                    <option value="Linguagens de Programação" {% if prova and prova.curso == 'Linguagens de Programação' %}selected{% endif %}>Linguagens de Programação</option>
+                    <option value="Algorítimos e Estruturas de dados" {% if prova and prova.curso == 'Algorítimos e Estruturas de dados' %}selected{% endif %}>Algorítimos e Estruturas de dados</option>
+                </select>
+            </div>
+            
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
+            <h3>Questões</h3>
+
+            <div id="questoes-container">
+                {% if prova %}
+                    {% for questao in prova.questoes %}
+                    <div class="exercise-block">
+                        <button type="button" class="remove-exercise-btn">&times;</button>
+                        <div class="form-group">
+                            <label class="form-label">Pergunta:</label>
+                            <textarea class="form-control" name="pergunta" rows="3" required>{{ questao.pergunta }}</textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label class="form-label">Opção A:</label>
+                                <input type="text" class="form-control" name="opcao_a" value="{{ questao.opcoes[0] }}" required>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label class="form-label">Opção B:</label>
+                                <input type="text" class="form-control" name="opcao_b" value="{{ questao.opcoes[1] }}" required>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label class="form-label">Opção C:</label>
+                                <input type="text" class="form-control" name="opcao_c" value="{{ questao.opcoes[2] }}" required>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label class="form-label">Opção D:</label>
+                                <input type="text" class="form-control" name="opcao_d" value="{{ questao.opcoes[3] }}" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Resposta Correta:</label>
+                            <select class="form-select" name="resposta_correta" required>
+                                <option value="A" {% if questao.resposta_correta == 'A' %}selected{% endif %}>A</option>
+                                <option value="B" {% if questao.resposta_correta == 'B' %}selected{% endif %}>B</option>
+                                <option value="C" {% if questao.resposta_correta == 'C' %}selected{% endif %}>C</option>
+                                <option value="D" {% if questao.resposta_correta == 'D' %}selected{% endif %}>D</option>
+                            </select>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="exercise-block">
+                    <button type="button" class="remove-exercise-btn">&times;</button>
+                    <div class="form-group">
+                        <label class="form-label">Pergunta:</label>
+                        <textarea class="form-control" name="pergunta" rows="3" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção A:</label>
+                            <input type="text" class="form-control" name="opcao_a" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção B:</label>
+                            <input type="text" class="form-control" name="opcao_b" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção C:</label>
+                            <input type="text" class="form-control" name="opcao_c" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção D:</label>
+                            <input type="text" class="form-control" name="opcao_d" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Resposta Correta:</label>
+                        <select class="form-select" name="resposta_correta" required>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <button type="button" id="add-questao-btn" class="action-btn save-btn">Adicionar Questão</button>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
+            <div class="action-buttons">
+                <button type="submit" class="action-btn save-btn">Salvar Prova</button>
+                <a href="{{ url_for('gerenciar_provas') }}" class="action-btn cancel-btn">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addBtn = document.getElementById('add-questao-btn');
+        const container = document.getElementById('questoes-container');
+        
+        if (addBtn) {
+            addBtn.addEventListener('click', function() {
+                const newQuestionBlock = document.createElement('div');
+                newQuestionBlock.className = 'exercise-block';
+                newQuestionBlock.innerHTML = `
+                    <button type="button" class="remove-exercise-btn">&times;</button>
+                    <div class="form-group">
+                        <label class="form-label">Pergunta:</label>
+                        <textarea class="form-control" name="pergunta" rows="3" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção A:</label>
+                            <input type="text" class="form-control" name="opcao_a" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção B:</label>
+                            <input type="text" class="form-control" name="opcao_b" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção C:</label>
+                            <input type="text" class="form-control" name="opcao_c" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Opção D:</label>
+                            <input type="text" class="form-control" name="opcao_d" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Resposta Correta:</label>
+                        <select class="form-select" name="resposta_correta" required>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                `;
+                container.appendChild(newQuestionBlock);
+            });
+        }
+        
+        container.addEventListener('click', function(event) {
+            if (event.target.classList.contains('remove-exercise-btn')) {
+                event.target.closest('.exercise-block').remove();
+            }
+        });
+        
+        // Remove o botão de remover se for a última questão na página de edição
+        if (document.querySelectorAll('.exercise-block').length === 1 && '{{ prova }}' != '') {
+            const removeBtn = document.querySelector('.remove-exercise-btn');
+            if(removeBtn) removeBtn.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

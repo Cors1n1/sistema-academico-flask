@@ -5,18 +5,29 @@
     --primary-color-light-default: #4a90e2;
     --primary-color-dark-default: #58a6ff;
     --primary-color: var(--custom-primary-color, var(--primary-color-light-default));
-    --background-color: #f4f6f8; --surface-color: #ffffff;
-    --text-color: #333333; --border-color: #e0e0e0;
-    --shadow-color: rgba(0, 0, 0, 0.05); --transition-speed: 0.3s;
-    --table-row-even-bg: #f9f9f9; --success-color: #28a745;
-    --danger-color: #dc3545; --secondary-color: #6c757d;
+    --primary-rgb: 74, 144, 226; /* Valor RGB padrão para o modo claro */
+    --background-color: #f4f6f8; 
+    --surface-color: #ffffff;
+    --text-color: #333333; 
+    --border-color: #e0e0e0;
+    --shadow-color: rgba(0, 0, 0, 0.05); 
+    --transition-speed: 0.3s;
+    --table-row-even-bg: #f9f9f9; 
+    --success-color: #28a745;
+    --danger-color: #dc3545; 
+    --secondary-color: #6c757d;
 }
 body.dark-mode {
     --primary-color: var(--custom-primary-color, var(--primary-color-dark-default));
-    --background-color: #0d1117; --surface-color: #161b22;
-    --text-color: #c9d1d9; --border-color: #30363d;
-    --shadow-color: rgba(0, 0, 0, 0.2); --table-row-even-bg: #21262d;
-    --success-color: #2ea043; --danger-color: #f85149;
+    --primary-rgb: 88, 166, 255; /* Valor RGB padrão para o modo escuro */
+    --background-color: #0d1117; 
+    --surface-color: #161b22;
+    --text-color: #c9d1d9; 
+    --border-color: #30363d;
+    --shadow-color: rgba(0, 0, 0, 0.2); 
+    --table-row-even-bg: #21262d;
+    --success-color: #2ea043; 
+    --danger-color: #f85149;
     --secondary-color: #555;
 }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -48,17 +59,55 @@ h1 { font-size: 2em; font-weight: 600; margin-bottom: 20px; color: var(--text-co
     transition: background-color var(--transition-speed), border-color var(--transition-speed);
 }
 .navbar .logo a { font-size: 1.5em; font-weight: 700; color: var(--primary-color); text-decoration: none; }
-.navbar .nav-links { display: flex; align-items: center; gap: 20px; }
-.navbar .nav-links a {
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.main-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    font-size: 0.95em;
+    font-weight: 500;
+}
+.main-menu li a {
     color: var(--text-color); text-decoration: none;
-    font-weight: 400; transition: color 0.3s, transform 0.2s;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+.main-menu li a:hover, .main-menu li a.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: 20px;
+}
+.nav-user-link {
+    color: var(--text-color);
+    font-weight: 600;
+    text-decoration: none;
     padding: 5px 0;
+    transition: color 0.3s;
 }
-.navbar .nav-links a:hover, .navbar .nav-links a.active {
-    color: var(--primary-color); font-weight: 600; transform: translateY(-2px);
+.nav-user-link:hover {
+    color: var(--primary-color);
 }
-.logout-btn { font-weight: 600 !important; color: var(--danger-color) !important; }
-.logout-btn:hover { transform: translateY(-2px) scale(1.05) !important; color: var(--danger-color) !important; }
+.logout-btn {
+    font-weight: 600 !important;
+    color: var(--danger-color) !important;
+    padding: 5px 10px;
+}
+.logout-btn:hover {
+    transform: translateY(-2px) scale(1.05) !important;
+    color: var(--danger-color) !important;
+}
 #theme-toggle {
     background-color: var(--surface-color); border: 1px solid var(--border-color);
     color: var(--text-color); padding: 8px 15px; border-radius: 20px;
@@ -72,6 +121,99 @@ h1 { font-size: 2em; font-weight: 600; margin-bottom: 20px; color: var(--text-co
     transition: color 0.2s, transform 0.2s;
 }
 #customizer-toggle-btn:hover { color: var(--primary-color); transform: scale(1.1); }
+.nav-dropdown {
+    position: relative;
+}
+.nav-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 0;
+    min-width: 180px;
+    box-shadow: 0 4px 8px var(--shadow-color);
+    list-style: none;
+    display: none;
+    z-index: 100;
+}
+.nav-dropdown:hover .dropdown-menu,
+.nav-dropdown.active .dropdown-menu {
+    display: block;
+}
+.dropdown-menu li a {
+    display: block;
+    padding: 8px 15px;
+}
+/* Menu responsivo */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.8em;
+    cursor: pointer;
+    padding: 0;
+}
+
+@media (max-width: 1024px) {
+    .navbar {
+        flex-wrap: wrap;
+    }
+    .nav-links {
+        width: 100%;
+        order: 3;
+        flex-direction: column;
+        align-items: flex-start;
+        display: none;
+    }
+    .nav-links.active {
+        display: flex;
+    }
+    .main-menu {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        margin-top: 10px;
+        border-top: 1px solid var(--border-color);
+        padding-top: 10px;
+    }
+    .main-menu li {
+        width: 100%;
+    }
+    .main-menu li a {
+        display: block;
+        padding: 10px 15px;
+        margin-bottom: 5px;
+    }
+    .nav-dropdown .dropdown-menu {
+        position: static;
+        display: none;
+        width: 100%;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        background: none;
+        margin-top: 5px;
+    }
+    .nav-dropdown.active .dropdown-menu {
+        display: block;
+    }
+    .user-actions {
+        margin: 10px 0 0 auto;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    .menu-toggle {
+        display: block;
+    }
+}
 
 /* ==========================================================================
    3. ESTILOS DE COMPONENTES (HUB, TABELA, FORMULÁRIO, ETC.)
@@ -211,16 +353,76 @@ input:checked + .slider:before { transform: translateX(20px); }
 .slider.round { border-radius: 34px; }
 .slider.round:before { border-radius: 50%; }
 /* ==========================================================================
+   6. ESTILOS DE AULAS E PROVAS
+   ========================================================================== */
+.course-section { margin-bottom: 40px; }
+.course-title {
+    font-size: 1.8em;
+    font-weight: 600;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+.lesson-list { list-style: none; padding: 0; }
+.lesson-item a {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.lesson-item a:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px var(--shadow-color);
+}
+.lesson-icon {
+    font-size: 1.5em;
+    margin-right: 20px;
+    color: var(--primary-color);
+}
+/* ==========================================================================
+   7. ESTILOS DE EXERCÍCIOS
+   ========================================================================== */
+.card-list-group .list-group-item {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    margin-bottom: 10px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-color);
+}
+.card-list-group .list-group-item:hover {
+    background-color: var(--card-bg-color);
+}
+.card-list-group .list-group-item h5 {
+    margin-bottom: 5px;
+}
+.card-list-group .list-group-item small {
+    color: var(--secondary-color);
+}
+
+/* ==========================================================================
    8. ESTILOS DA PÁGINA DE PERFIL
    ========================================================================== */
-.profile-card-grid { 
-    display: grid; 
-    grid-template-columns: 250px 1fr; 
-    gap: 40px; 
-    align-items: flex-start; 
+.profile-card-grid {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 40px;
+    align-items: flex-start;
 }
-.profile-sidebar { 
-    text-align: center; 
+.profile-sidebar {
+    text-align: center;
 }
 .profile-avatar-container {
     width: 200px; height: 200px; border-radius: 50%;
@@ -233,32 +435,32 @@ input:checked + .slider:before { transform: translateX(20px); }
 .profile-avatar-container img {
     width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
 }
-.profile-info h2 { 
-    font-size: 2.5em; font-weight: 600; margin-top: 0; margin-bottom: 20px; 
+.profile-info h2 {
+    font-size: 2.5em; font-weight: 600; margin-top: 0; margin-bottom: 20px;
 }
-.info-grid { 
+.info-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;
 }
-.info-item { 
-    background-color: var(--background-color); padding: 20px; border-radius: 8px; 
+.info-item {
+    background-color: var(--background-color); padding: 20px; border-radius: 8px;
 }
-.info-item .label { 
-    font-size: 0.9em; font-weight: 600; color: var(--primary-color); 
-    margin-bottom: 5px; text-transform: uppercase; 
+.info-item .label {
+    font-size: 0.9em; font-weight: 600; color: var(--primary-color);
+    margin-bottom: 5px; text-transform: uppercase;
 }
-.info-item .value { 
-    font-size: 1.2em; 
+.info-item .value {
+    font-size: 1.2em;
 }
-.upload-form label { 
-    font-weight: 600; font-size: 1.1em; 
+.upload-form label {
+    font-weight: 600; font-size: 1.1em;
 }
 .upload-form input[type="file"] {
     margin-top: 10px;
     width: 100%;
     box-sizing: border-box;
 }
-.upload-form button { 
-    margin-top: 15px; 
+.upload-form button {
+    margin-top: 15px;
 }
 /* Estilos básicos para os botões de ação */
 .action-btn {

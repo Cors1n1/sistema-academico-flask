@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Provas Disponíveis{% endblock %}
+
+{% block content %}
+
+
+<div class="card">
+    <h1>Provas e Avaliações</h1>
+    <p>Selecione uma prova abaixo para iniciar a avaliação.</p>
+
+    {% if provas_por_curso %}
+        {% for curso, provas in provas_por_curso.items() %}
+            <div class="course-section">
+                <h2 class="course-title">{{ curso }}</h2>
+                <ul class="lesson-list">
+                    {% for prova in provas %}
+                        <li class="lesson-item">
+                            <a href="{{ url_for('ver_prova', prova_id=prova.id) }}">
+                                <span class="lesson-icon"><i class="fas fa-clipboard-check"></i></span>
+                                <span>{{ prova.titulo }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-data">Nenhuma prova foi publicada pelos administradores ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}

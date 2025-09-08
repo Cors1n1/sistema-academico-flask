@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Prova{% endblock %}
+{% block content %}
+<div class="card">
+    {% if prova %}
+        <h1>{{ prova.titulo }}</h1>
+        <p style="font-style: italic; color: var(--secondary-color);">Curso: {{ prova.curso }}</p>
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+        
+        <form action="{{ url_for('corrigir_prova', prova_id=prova.id) }}" method="POST">
+            {% for questao in prova.questoes %}
+            <div class="exercicio-item mb-4 p-3 border rounded">
+                <h5>{{ loop.index }}. {{ questao.pergunta }}</h5>
+                <ul class="list-group mt-3">
+                    {% set opcoes_letras = ['A', 'B', 'C', 'D'] %}
+                    {% for opcao in questao.opcoes %}
+                        <li class="list-group-item">
+                            <label>
+                                <input type="radio" name="questao_{{ questao.id }}" value="{{ opcoes_letras[loop.index0] }}" required>
+                                {{ opcao }}
+                            </label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+            <button type="submit" class="action-btn save-btn mt-3">Verificar Respostas</button>
+        </form>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 40px 0 20px 0;">
+        <a href="{{ url_for('lista_provas') }}" class="action-btn cancel-btn">Voltar para a Lista de Provas</a>
+    
+    {% else %}
+        <h1>Prova não encontrada</h1>
+        <p class="no-data">A prova que você está tentando acessar não existe ou foi removida.</p>
+    {% endif %}
+</div>
+{% endblock %}
