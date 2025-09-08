@@ -27,11 +27,11 @@
             <tr>
                 <td>{{ aluno.nome }}</td>
                 <td>{{ aluno.idade }}</td>
-                <td>{{ aluno.curso }}</td>
+                <td>{{ aluno.curso | join(', ') }}</td>
                 <td class="actions-cell">
                     <a href="{{ url_for('editar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn edit-btn">Editar</a>
-                    <a href="{{ url_for('deletar_aluno', nome_do_aluno=aluno.nome) }}" 
-                       class="action-btn delete-btn" 
+                    <a href="{{ url_for('deletar_aluno', nome_do_aluno=aluno.nome) }}"
+                       class="action-btn delete-btn"
                        onclick="return confirm('Tem certeza que deseja deletar este aluno e sua conta de login? Esta ação não pode ser desfeita.');">
                        Deletar
                     </a>
@@ -48,16 +48,22 @@
             <input type="text" id="nome" name="nome" required>
         </div>
         <div class="form-group">
-            <label for="idade">Idade:</label>
-            <input type="number" id="idade" name="idade" required min="1">
+            <label for="nascimento">Data de Nascimento:</label>
+            <input type="date" id="nascimento" name="nascimento" required>
         </div>
         <div class="form-group">
-            <label for="curso">Curso:</label>
-            <select id="curso" name="curso">
-                <option value="Lógica de Programação">Lógica de Programação</option>
-                <option value="Linguagens de Programação">Linguagens de Programação</option>
-                <option value="Algorítimos e Estruturas de dados">Algorítimos e Estruturas de dados</option>
-            </select>
+            <label class="form-label">Curso(s):</label>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" name="curso" value="Lógica de Programação"> Lógica de Programação
+                </label>
+                <label>
+                    <input type="checkbox" name="curso" value="Linguagens de Programação"> Linguagens de Programação
+                </label>
+                <label>
+                    <input type="checkbox" name="curso" value="Algorítimos e Estruturas de dados"> Algorítimos e Estruturas de dados
+                </label>
+            </div>
         </div>
          <div class="form-group">
             <label for="horas_estudo">Média de Horas de Estudo (por dia):</label>

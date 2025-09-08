@@ -1,20 +1,33 @@
 [
     {
         "nome": "Astolfo",
-        "idade": 16,
-        "curso": "Algorítimos e Estruturas de dados",
-        "horas_estudo": 9.0
+        "idade": 45,
+        "curso": [
+            "Linguagens de Programação"
+        ],
+        "horas_estudo": 9.0,
+        "nascimento": "2000-04-14"
     },
     {
         "nome": "Kleber",
-        "idade": 80,
-        "curso": "Lógica de Programação",
-        "horas_estudo": 21.0
+        "idade": 45,
+        "curso": [
+            "Lógica de Programação",
+            "Linguagens de Programação",
+            "Algorítimos e Estruturas de dados"
+        ],
+        "horas_estudo": 10.0,
+        "nascimento": "1980-04-12",
+        "profile_pic": null
     },
     {
         "nome": "Victor",
-        "idade": 21,
-        "curso": "Lógica de Programação",
-        "horas_estudo": 2.0
+        "idade": 20,
+        "curso": [
+            "Lógica de Programação"
+        ],
+        "horas_estudo": 6.5,
+        "profile_pic": null,
+        "nascimento": "2005-07-14"
     }
 ]

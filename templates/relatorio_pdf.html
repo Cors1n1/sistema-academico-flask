@@ -35,8 +35,24 @@
             <li><strong>Total de Alunos:</strong> {{ dados.total_alunos }}</li>
             <li><strong>Média de Idade:</strong> {{ dados.media_idades }} anos</li>
             <li><strong>Média de Horas de Estudo:</strong> {{ dados.media_horas }} horas/dia</li>
+            <li><strong>Total de Cursos:</strong> {{ dados.total_cursos }}</li>
         </ul>
     </div>
+
+    <h3>Alunos por Curso</h3>
+    <ul>
+        {% for curso, count in dados.alunos_por_curso.items() %}
+        <li><strong>{{ curso }}:</strong> {{ count }} alunos</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Distribuição de Idade</h3>
+    <ul>
+        {% for faixa, count in dados.faixas_idade.items() %}
+        <li><strong>{{ faixa }} anos:</strong> {{ count }} alunos</li>
+        {% endfor %}
+    </ul>
+
     {% endif %}
     <h3>Lista Detalhada de Alunos</h3>
     <table>

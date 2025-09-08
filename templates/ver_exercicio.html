@@ -10,6 +10,9 @@
         <form action="{{ url_for('corrigir_exercicio', exercicio_id=exercicio.id) }}" method="POST">
             <div class="exercicio-item mb-4 p-3 border rounded">
                 <h5>{{ exercicio.pergunta }}</h5>
+                {% if exercicio.imagem_url %}
+                    <img src="{{ exercicio.imagem_url }}" alt="Imagem do Exercício" style="width: {{ exercicio.imagem_width | default('100%') }}; height: auto; margin-top: 10px; border-radius: 8px;">
+                {% endif %}
                 <ul class="list-group mt-3">
                     {% for opcao in exercicio.opcoes %}
                         <li class="list-group-item">

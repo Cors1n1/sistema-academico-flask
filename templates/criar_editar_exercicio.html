@@ -28,6 +28,19 @@
                         <label for="pergunta" class="form-label">Pergunta:</label>
                         <textarea class="form-control" name="pergunta" rows="3" required>{{ exercicio.pergunta }}</textarea>
                     </div>
+                    <div class="form-group">
+                        <label for="imagem_url" class="form-label">URL da Imagem (Opcional):</label>
+                        <input type="text" class="form-control" name="imagem_url" value="{{ exercicio.imagem_url if exercicio.imagem_url else '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="imagem_width" class="form-label">Largura da Imagem (em % ou px - Opcional, Padrão: 100%):</label>
+                        <input type="text" class="form-control" name="imagem_width" value="{{ exercicio.imagem_width if exercicio.imagem_width else '100%' }}">
+                    </div>
+                    {% if exercicio.imagem_url %}
+                        <div class="image-preview-container">
+                            <img src="{{ exercicio.imagem_url }}" alt="Pré-visualização da Imagem" style="width: {{ exercicio.imagem_width if exercicio.imagem_width else '100%' }}; height: auto;">
+                        </div>
+                    {% endif %}
                     <div class="row">
                         <div class="col-md-6 form-group">
                             <label for="opcao_a" class="form-label">Opção A:</label>
@@ -61,6 +74,17 @@
                     <div class="form-group">
                         <label class="form-label">Pergunta:</label>
                         <textarea class="form-control" name="pergunta" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="imagem_url" class="form-label">URL da Imagem (Opcional):</label>
+                        <input type="text" class="form-control" name="imagem_url">
+                    </div>
+                    <div class="form-group">
+                        <label for="imagem_width" class="form-label">Largura da Imagem (em % ou px - Opcional, Padrão: 100%):</label>
+                        <input type="text" class="form-control" name="imagem_width" value="100%">
+                    </div>
+                    <div class="image-preview-container">
+                        <img src="" alt="Pré-visualização da Imagem" style="max-width: 100%; height: auto; display: none;">
                     </div>
                     <div class="row">
                         <div class="col-md-6 form-group">
@@ -111,6 +135,35 @@
         const addBtn = document.getElementById('add-exercicio-btn');
         const container = document.getElementById('exercicios-container');
 
+        // Função para atualizar a pré-visualização da imagem
+        function updateImagePreview(block) {
+            const urlInput = block.querySelector('input[name="imagem_url"]');
+            const widthInput = block.querySelector('input[name="imagem_width"]');
+            const previewContainer = block.querySelector('.image-preview-container');
+            const previewImg = previewContainer ? previewContainer.querySelector('img') : null;
+
+            if (previewImg && urlInput && widthInput) {
+                const url = urlInput.value;
+                const width = widthInput.value;
+                
+                if (url) {
+                    previewImg.src = url;
+                    previewImg.style.display = 'block';
+                    previewImg.style.width = width || '100%';
+                } else {
+                    previewImg.src = '';
+                    previewImg.style.display = 'none';
+                }
+            }
+        }
+        
+        // Adiciona listeners para os campos existentes na página
+        document.querySelectorAll('.exercise-block').forEach(block => {
+            updateImagePreview(block);
+            block.querySelector('input[name="imagem_url"]').addEventListener('input', () => updateImagePreview(block));
+            block.querySelector('input[name="imagem_width"]').addEventListener('input', () => updateImagePreview(block));
+        });
+
         if (addBtn) {
             addBtn.addEventListener('click', function() {
                 const newExerciseBlock = document.createElement('div');
@@ -120,6 +173,17 @@
                     <div class="form-group">
                         <label class="form-label">Pergunta:</label>
                         <textarea class="form-control" name="pergunta" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="imagem_url" class="form-label">URL da Imagem (Opcional):</label>
+                        <input type="text" class="form-control" name="imagem_url">
+                    </div>
+                    <div class="form-group">
+                        <label for="imagem_width" class="form-label">Largura da Imagem (em % ou px - Opcional, Padrão: 100%):</label>
+                        <input type="text" class="form-control" name="imagem_width" value="100%">
+                    </div>
+                    <div class="image-preview-container">
+                        <img src="" alt="Pré-visualização da Imagem" style="max-width: 100%; height: auto; display: none;">
                     </div>
                     <div class="row">
                         <div class="col-md-6 form-group">
@@ -150,6 +214,11 @@
                     </div>
                 `;
                 container.appendChild(newExerciseBlock);
+                
+                const newUrlInput = newExerciseBlock.querySelector('input[name="imagem_url"]');
+                const newWidthInput = newExerciseBlock.querySelector('input[name="imagem_width"]');
+                newUrlInput.addEventListener('input', () => updateImagePreview(newExerciseBlock));
+                newWidthInput.addEventListener('input', () => updateImagePreview(newExerciseBlock));
             });
         }
 

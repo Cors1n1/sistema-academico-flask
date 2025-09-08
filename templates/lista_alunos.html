@@ -4,8 +4,8 @@
 
 {% block content %}
 <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-        <h1>Alunos Cadastrados</h1>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="card-title">Alunos Cadastrados</h2>
         <div class="export-buttons">
             <a id="export-pdf-btn" href="{{ url_for('exportar', formato='pdf') }}" class="action-btn export-btn">
                 <i class="fas fa-file-pdf" style="margin-right: 8px;"></i>Exportar PDF
@@ -17,35 +17,37 @@
     </div>
 
     {% if alunos %}
-    <table>
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Idade</th>
-                <th>Curso</th>
-                <th>Horas/Dia</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for aluno in alunos %}
-            <tr>
-                <td>{{ aluno.nome }}</td>
-                <td>{{ aluno.idade }}</td>
-                <td>{{ aluno.curso }}</td>
-                <td>{{ aluno.horas_estudo }}</td>
-                <td class="actions-cell">
-                    {% if session.get('role') == 'admin' %}
-                        <a href="{{ url_for('editar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn edit-btn">Editar</a>
-                        <a href="{{ url_for('deletar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn delete-btn" onclick="return confirm('Tem certeza que deseja deletar este aluno e sua conta de login?');">Deletar</a>
-                    {% else %}
-                        <span>Acesso restrito</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover mt-3">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Idade</th>
+                    <th>Curso</th>
+                    <th>Horas/Dia</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aluno in alunos %}
+                <tr>
+                    <td>{{ aluno.nome }}</td>
+                    <td>{{ aluno.idade }}</td>
+                    <td>{{ aluno.curso | join(', ') }}</td>
+                    <td>{{ aluno.horas_estudo }}</td>
+                    <td class="actions-cell">
+                        {% if session.get('role') == 'admin' %}
+                            <a href="{{ url_for('editar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn edit-btn">Editar</a>
+                            <a href="{{ url_for('deletar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn delete-btn" onclick="return confirm('Tem certeza que deseja deletar este aluno e sua conta de login?');">Deletar</a>
+                        {% else %}
+                            <span>Acesso restrito</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
     <p class="no-data">Nenhum aluno cadastrado ainda.</p>
     {% endif %}

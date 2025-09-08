@@ -59,20 +59,31 @@
                 <form method="post" enctype="multipart/form-data" class="upload-form">
                     <label for="profile_pic">Alterar Foto</label>
                     <input type="file" name="profile_pic" id="profile_pic" accept="image/png, image/jpeg, image/gif" required>
-                    <button type="submit">Salvar Foto</button>
+                    <button type="submit" class="action-btn save-btn">Salvar Foto</button>
                 </form>
+                {% if aluno.profile_pic %}
+                <form method="post" action="{{ url_for('remover_foto_perfil') }}" style="margin-top: 10px;">
+                    <button type="submit" class="action-btn delete-btn" onclick="return confirm('Tem certeza que deseja remover a foto de perfil?');">Remover Foto</button>
+                </form>
+                {% endif %}
             </div>
 
             <div class="profile-info">
                 <h2>{{ aluno.nome }}</h2>
                 <div class="info-grid">
                     <div class="info-item">
-                        <div class="label">Idade</div>
-                        <div class="value">{{ aluno.idade }} anos</div>
+                        <div class="label">Data de Nascimento</div>
+                        <div class="value">{{ aluno.nascimento }}</div>
                     </div>
                     <div class="info-item">
-                        <div class="label">Curso</div>
-                        <div class="value">{{ aluno.curso }}</div>
+                        <div class="label">Curso(s)</div>
+                        <div class="value">
+                            <ul class="course-list">
+                            {% for curso in aluno.curso %}
+                                <li>{{ curso }}</li>
+                            {% endfor %}
+                            </ul>
+                        </div>
                     </div>
                     <div class="info-item">
                         <div class="label">Média de Estudo</div>

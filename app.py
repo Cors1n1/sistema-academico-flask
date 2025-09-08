@@ -1,27 +1,34 @@
+import os
+import re
+import random
+import time
+import json
+import io
+import pandas as pd
+from datetime import datetime, date
 from flask import Flask, render_template, request, redirect, url_for, Response, session, flash
 from functools import wraps
+from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
+from weasyprint import HTML
+import logging
+from logging.handlers import RotatingFileHandler
+
+# Importa as funções do seu módulo
 from funcoes.funcoes import (
-    carregar_dados, salvar_dados, gerar_relatorio_dados, 
+    carregar_dados, salvar_dados, gerar_relatorio_dados,
     carregar_usuarios, salvar_usuarios, carregar_aulas, salvar_aulas,
     carregar_exercicios, salvar_exercicios, carregar_provas, salvar_provas,
     carregar_resultados_provas, salvar_resultados_provas,
     buscar_resultados_por_prova_id, buscar_prova_por_id
 )
-import json
-from werkzeug.security import check_password_hash, generate_password_hash
-import pandas as pd
-from weasyprint import HTML
-import io
-from datetime import datetime
-import logging
-from logging.handlers import RotatingFileHandler
-import os
-import re
-import time
-import random
 
 app = Flask(__name__)
 app.secret_key = 'chave-secreta-para-o-projeto-unip-12345'
+UPLOAD_FOLDER = 'static/uploads/profile_pics'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # CONFIGURAÇÃO DO LOG
 handler = RotatingFileHandler('app.log', maxBytes=100000, backupCount=3, encoding='utf-8')
@@ -132,13 +139,50 @@ def reset_card_order():
         session.pop('card_order', None)
     return '', 204
 
-@app.route('/meu_perfil')
+@app.route('/meu_perfil', methods=['GET', 'POST'])
 @login_required
 def meu_perfil():
     username = session.get('username')
     alunos = carregar_dados()
     aluno_correspondente = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
+
+    if request.method == 'POST':
+        if 'profile_pic' in request.files:
+            file = request.files['profile_pic']
+            if file.filename != '':
+                filename = secure_filename(f"{username}_{file.filename}")
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(filepath)
+
+                if aluno_correspondente:
+                    aluno_correspondente['profile_pic'] = filename
+                    salvar_dados(alunos)
+                    flash('Foto de perfil atualizada com sucesso!', 'success')
+                else:
+                    flash('Perfil de aluno não encontrado para salvar a foto.', 'danger')
+        return redirect(url_for('meu_perfil'))
+
     return render_template('meu_perfil.html', aluno=aluno_correspondente)
+
+@app.route('/remover_foto_perfil', methods=['POST'])
+@login_required
+def remover_foto_perfil():
+    username = session.get('username')
+    alunos = carregar_dados()
+    aluno_correspondente = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
+
+    if aluno_correspondente and aluno_correspondente.get('profile_pic'):
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], aluno_correspondente['profile_pic'])
+        if os.path.exists(filepath):
+            os.remove(filepath)
+            
+        aluno_correspondente['profile_pic'] = None
+        salvar_dados(alunos)
+        flash('Foto de perfil removida com sucesso!', 'success')
+    else:
+        flash('Nenhuma foto de perfil encontrada para remover.', 'warning')
+        
+    return redirect(url_for('meu_perfil'))
 
 @app.route('/lista_alunos')
 @login_required
@@ -148,10 +192,14 @@ def lista_alunos():
         return render_template('lista_alunos.html', alunos=todos_alunos)
     else:
         username = session.get('username')
-        aluno_atual = next((aluno for aluno in todos_alunos if aluno.get('nome') == username), None)
-        if aluno_atual:
-            curso_do_aluno = aluno_atual.get('curso')
-            colegas_de_turma = [aluno for aluno in todos_alunos if aluno.get('curso') == curso_do_aluno]
+        alunos_do_usuario = [aluno for aluno in todos_alunos if aluno.get('nome') == username]
+        if alunos_do_usuario:
+            cursos_do_aluno = alunos_do_usuario[0].get('curso')
+            # Filtra todos os alunos que estão em pelo menos um dos cursos do aluno logado
+            colegas_de_turma = [
+                aluno for aluno in todos_alunos
+                if any(curso in aluno.get('curso', []) for curso in cursos_do_aluno)
+            ]
             return render_template('lista_alunos.html', alunos=colegas_de_turma)
         else:
             return render_template('lista_alunos.html', alunos=[])
@@ -173,10 +221,12 @@ def lista_aulas():
         alunos = carregar_dados()
         aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
         if aluno_atual:
-            curso_do_aluno = aluno_atual.get('curso')
-            aulas_do_curso = [aula for aula in todas_as_aulas if aula.get('curso') == curso_do_aluno]
-            if aulas_do_curso:
-                aulas_por_curso[curso_do_aluno] = aulas_do_curso
+            cursos_do_aluno = aluno_atual.get('curso')
+            # Adiciona aulas de todos os cursos que o aluno está matriculado
+            for curso_do_aluno in cursos_do_aluno:
+                aulas_do_curso = [aula for aula in todas_as_aulas if aula.get('curso') == curso_do_aluno]
+                if aulas_do_curso:
+                    aulas_por_curso[curso_do_aluno] = aulas_do_curso
     return render_template('aulas.html', aulas_por_curso=aulas_por_curso)
 
 @app.route('/aula/<aula_id>')
@@ -187,12 +237,12 @@ def ver_aula(aula_id):
     if not aula_selecionada:
         flash('Aula não encontrada.', 'danger')
         return redirect(url_for('lista_aulas'))
-    
+
     if session.get('role') != 'admin':
         username = session.get('username')
         alunos = carregar_dados()
         aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
-        if not aluno_atual or aula_selecionada.get('curso') != aluno_atual.get('curso'):
+        if not aluno_atual or aula_selecionada.get('curso') not in aluno_atual.get('curso', []):
             flash('Você não tem permissão para ver esta aula.', 'danger')
             return redirect(url_for('lista_aulas'))
     return render_template('ver_aula.html', aula=aula_selecionada)
@@ -216,10 +266,12 @@ def lista_exercicios():
         alunos = carregar_dados()
         aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
         if aluno_atual:
-            curso_do_aluno = aluno_atual.get('curso')
-            exercicios_do_curso = [ex for ex in todos_exercicios if ex.get('curso') == curso_do_aluno]
-            if exercicios_do_curso:
-                exercicios_por_curso[curso_do_aluno] = exercicios_do_curso
+            cursos_do_aluno = aluno_atual.get('curso')
+            # Adiciona exercícios de todos os cursos que o aluno está matriculado
+            for curso_do_aluno in cursos_do_aluno:
+                exercicios_do_curso = [ex for ex in todos_exercicios if ex.get('curso') == curso_do_aluno]
+                if exercicios_do_curso:
+                    exercicios_por_curso[curso_do_aluno] = exercicios_do_curso
 
     return render_template('lista_exercicios.html', exercicios_por_curso=exercicios_por_curso)
 
@@ -237,7 +289,7 @@ def ver_exercicio(exercicio_id):
         username = session.get('username')
         alunos = carregar_dados()
         aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
-        if not aluno_atual or exercicio_selecionado.get('curso') != aluno_atual.get('curso'):
+        if not aluno_atual or exercicio_selecionado.get('curso') not in aluno_atual.get('curso', []):
             flash('Você não tem permissão para ver este exercício.', 'danger')
             return redirect(url_for('lista_exercicios'))
 
@@ -285,25 +337,26 @@ def lista_provas():
         alunos = carregar_dados()
         aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
         if aluno_atual:
-            curso_do_aluno = aluno_atual.get('curso')
-            provas_do_curso = [p for p in todas_as_provas if p.get('curso') == curso_do_aluno]
-            
-            for prova in provas_do_curso:
-                prova['status'] = 'Disponível'
+            cursos_do_aluno = aluno_atual.get('curso')
+            for curso_do_aluno in cursos_do_aluno:
+                provas_do_curso = [p for p in todas_as_provas if p.get('curso') == curso_do_aluno]
                 
-                data_inicio_prova = datetime.strptime(prova.get('data_inicio'), '%Y-%m-%d').date() if prova.get('data_inicio') else None
-                data_fim_prova = datetime.strptime(prova.get('data_fim'), '%Y-%m-%d').date() if prova.get('data_fim') else None
-                
-                if prova.get('id') in provas_realizadas:
-                    prova['status'] = 'Concluída'
-                elif data_inicio_prova and data_inicio_prova > hoje:
-                    prova['status'] = 'Não iniciada'
-                elif data_fim_prova and data_fim_prova < hoje:
-                    prova['status'] = 'Expirada'
-                
-                if curso_do_aluno not in provas_por_curso:
-                    provas_por_curso[curso_do_aluno] = []
-                provas_por_curso[curso_do_aluno].append(prova)
+                for prova in provas_do_curso:
+                    prova['status'] = 'Disponível'
+                    
+                    data_inicio_prova = datetime.strptime(prova.get('data_inicio'), '%Y-%m-%d').date() if prova.get('data_inicio') else None
+                    data_fim_prova = datetime.strptime(prova.get('data_fim'), '%Y-%m-%d').date() if prova.get('data_fim') else None
+                    
+                    if prova.get('id') in provas_realizadas:
+                        prova['status'] = 'Concluída'
+                    elif data_inicio_prova and data_inicio_prova > hoje:
+                        prova['status'] = 'Não iniciada'
+                    elif data_fim_prova and data_fim_prova < hoje:
+                        prova['status'] = 'Expirada'
+                    
+                    if curso_do_aluno not in provas_por_curso:
+                        provas_por_curso[curso_do_aluno] = []
+                    provas_por_curso[curso_do_aluno].extend(provas_do_curso)
 
     return render_template('provas.html', provas_por_curso=provas_por_curso)
 
@@ -328,7 +381,7 @@ def ver_prova(prova_id):
         username = session.get('username')
         alunos = carregar_dados()
         aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
-        if not aluno_atual or prova_selecionada.get('curso') != aluno_atual.get('curso'):
+        if not aluno_atual or prova_selecionada.get('curso') not in aluno_atual.get('curso', []):
             flash('Você não tem permissão para ver esta prova.', 'danger')
             return redirect(url_for('lista_provas'))
         
@@ -410,8 +463,10 @@ def gerenciar_alunos():
             return redirect(url_for('gerenciar_alunos'))
         
         novo_aluno = {
-            "nome": nome, "idade": int(request.form['idade']),
-            "curso": request.form['curso'], "horas_estudo": float(request.form['horas_estudo'])
+            "nome": nome,
+            "nascimento": request.form['nascimento'],
+            "curso": request.form.getlist('curso'),
+            "horas_estudo": float(request.form['horas_estudo'])
         }
         alunos.append(novo_aluno)
         salvar_dados(alunos)
@@ -445,8 +500,8 @@ def editar_aluno(nome_do_aluno):
     if not aluno_para_editar: return redirect(url_for('gerenciar_alunos'))
     
     if request.method == 'POST':
-        aluno_para_editar['idade'] = int(request.form['idade'])
-        aluno_para_editar['curso'] = request.form['curso']
+        aluno_para_editar['nascimento'] = request.form['nascimento']
+        aluno_para_editar['curso'] = request.form.getlist('curso')
         aluno_para_editar['horas_estudo'] = float(request.form['horas_estudo'])
         salvar_dados(alunos)
         app.logger.info(f"Admin '{session['username']}' EDITOU o aluno '{nome_do_aluno}'.")
@@ -562,12 +617,14 @@ def criar_exercicio():
         
         # Coleta os dados de múltiplos exercícios
         questoes = request.form.getlist('pergunta')
+        imagem_urls = request.form.getlist('imagem_url')
         opcoes_a = request.form.getlist('opcao_a')
         opcoes_b = request.form.getlist('opcao_b')
         opcoes_c = request.form.getlist('opcao_c')
         opcoes_d = request.form.getlist('opcao_d')
         respostas_corretas = request.form.getlist('resposta_correta')
         curso = request.form.get('curso')
+        imagem_widths = request.form.getlist('imagem_width')
 
         for i in range(len(questoes)):
             if questoes[i]: # Adiciona apenas se a pergunta não estiver vazia
@@ -575,6 +632,8 @@ def criar_exercicio():
                     "id": str(int(time.time())) + str(random.randint(100, 999)),
                     "curso": curso,
                     "pergunta": questoes[i],
+                    "imagem_url": imagem_urls[i] if imagem_urls and len(imagem_urls) > i else '',
+                    "imagem_width": imagem_widths[i] if imagem_widths and len(imagem_widths) > i else '100%',
                     "opcoes": [opcoes_a[i], opcoes_b[i], opcoes_c[i], opcoes_d[i]],
                     "resposta_correta": respostas_corretas[i]
                 }
@@ -600,6 +659,8 @@ def editar_exercicio(exercicio_id):
         # Coleta apenas os dados do formulário de edição de um único exercício
         exercicio_para_editar['curso'] = request.form.get('curso')
         exercicio_para_editar['pergunta'] = request.form.get('pergunta')
+        exercicio_para_editar['imagem_url'] = request.form.get('imagem_url', '')
+        exercicio_para_editar['imagem_width'] = request.form.get('imagem_width', '100%')
         exercicio_para_editar['opcoes'] = [
             request.form.get('opcao_a'),
             request.form.get('opcao_b'),
@@ -654,6 +715,8 @@ def criar_prova():
         }
         
         questoes_form = request.form.getlist('pergunta')
+        imagem_urls = request.form.getlist('imagem_url')
+        imagem_widths = request.form.getlist('imagem_width')
         opcoes_a_form = request.form.getlist('opcao_a')
         opcoes_b_form = request.form.getlist('opcao_b')
         opcoes_c_form = request.form.getlist('opcao_c')
@@ -665,6 +728,8 @@ def criar_prova():
                 nova_prova['questoes'].append({
                     "id": str(i),
                     "pergunta": questoes_form[i],
+                    "imagem_url": imagem_urls[i] if imagem_urls and len(imagem_urls) > i else '',
+                    "imagem_width": imagem_widths[i] if imagem_widths and len(imagem_widths) > i else '100%',
                     "opcoes": [opcoes_a_form[i], opcoes_b_form[i], opcoes_c_form[i], opcoes_d_form[i]],
                     "resposta_correta": respostas_corretas_form[i]
                 })
@@ -695,6 +760,8 @@ def editar_prova(prova_id):
         prova_para_editar['tempo_limite'] = request.form['tempo_limite']
         
         questoes_form = request.form.getlist('pergunta')
+        imagem_urls = request.form.getlist('imagem_url')
+        imagem_widths = request.form.getlist('imagem_width')
         opcoes_a_form = request.form.getlist('opcao_a')
         opcoes_b_form = request.form.getlist('opcao_b')
         opcoes_c_form = request.form.getlist('opcao_c')
@@ -707,6 +774,8 @@ def editar_prova(prova_id):
                 prova_para_editar['questoes'].append({
                     "id": str(i),
                     "pergunta": questoes_form[i],
+                    "imagem_url": imagem_urls[i] if imagem_urls and len(imagem_urls) > i else '',
+                    "imagem_width": imagem_widths[i] if imagem_widths and len(imagem_widths) > i else '100%',
                     "opcoes": [opcoes_a_form[i], opcoes_b_form[i], opcoes_c_form[i], opcoes_d_form[i]],
                     "resposta_correta": respostas_corretas_form[i]
                 })
@@ -874,23 +943,32 @@ def view_logs():
 def exportar(formato):
     app.logger.info(f"Usuário '{session['username']}' EXPORTOU os dados para {formato.upper()}.")
     alunos = carregar_dados()
+    dados_relatorio = gerar_relatorio_dados()
+    
     if formato == 'pdf':
         try:
             from weasyprint import HTML
             theme_color = request.args.get('color', '#4a90e2')
-            dados_relatorio = gerar_relatorio_dados()
             data_atual = datetime.now().strftime("%d/%m/%Y")
-            html_renderizado = render_template('relatorio_pdf.html', alunos=alunos, dados=dados_relatorio, data_hoje=data_atual, theme_color=theme_color)
+            
+            # Converte a lista de cursos para string para o PDF
+            alunos_para_pdf = alunos.copy()
+            for aluno in alunos_para_pdf:
+                aluno['curso'] = ', '.join(aluno.get('curso', []))
+            
+            html_renderizado = render_template('relatorio_pdf.html', alunos=alunos_para_pdf, dados=dados_relatorio, data_hoje=data_atual, theme_color=theme_color)
             pdf = HTML(string=html_renderizado).write_pdf()
             return Response(pdf, mimetype='application/pdf', headers={'Content-Disposition': 'attachment;filename=relatorio_alunos.pdf'})
         except ImportError:
             flash("Biblioteca WeasyPrint não encontrada para gerar PDF.", "danger")
             return redirect(url_for('lista_alunos'))
+    
     if formato == 'excel':
         try:
             import pandas as pd
             import io
             df = pd.DataFrame(alunos)
+            df['curso'] = df['curso'].apply(lambda x: ', '.join(x) if isinstance(x, list) else x)
             output = io.BytesIO()
             writer = pd.ExcelWriter(output, engine='openpyxl')
             df.to_excel(writer, index=False, sheet_name='Alunos')
@@ -900,6 +978,7 @@ def exportar(formato):
         except ImportError:
             flash("Bibliotecas Pandas/OpenPyXL não encontradas para gerar Excel.", "danger")
             return redirect(url_for('lista_alunos'))
+    
     return redirect(url_for('lista_alunos'))
 
 if __name__ == '__main__':

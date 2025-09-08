@@ -15,6 +15,9 @@
             {% for questao in prova.questoes %}
             <div class="exercicio-item mb-4 p-3 border rounded">
                 <h5>{{ loop.index }}. {{ questao.pergunta }}</h5>
+                {% if questao.imagem_url %}
+                    <img src="{{ questao.imagem_url }}" alt="Imagem da Questão" style="width: {{ questao.imagem_width | default('100%') }}; height: auto; margin-top: 10px; border-radius: 8px;">
+                {% endif %}
                 <ul class="list-group mt-3">
                     {% set opcoes_letras = ['A', 'B', 'C', 'D'] %}
                     {% for opcao in questao.opcoes %}

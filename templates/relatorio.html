@@ -4,7 +4,17 @@
 
 {% block content %}
 <div class="card">
-    <h1>Relatório da Plataforma</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <h1>Relatório da Plataforma</h1>
+        <div class="export-buttons">
+            <a href="{{ url_for('exportar', formato='pdf') }}" class="action-btn export-btn">
+                <i class="fas fa-file-pdf" style="margin-right: 8px;"></i>Exportar PDF
+            </a>
+            <a href="{{ url_for('exportar', formato='excel') }}" class="action-btn export-btn">
+                <i class="fas fa-file-excel" style="margin-right: 8px;"></i>Exportar Excel
+            </a>
+        </div>
+    </div>
     {% if dados %}
     <div class="report-grid">
         <div class="stat-card">
@@ -27,6 +37,40 @@
                 <div class="value count-up" data-target="{{ dados.media_horas }}">0.0</div>
                 <div class="label">Média de Horas de Estudo Diárias</div>
             </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon courses"><i class="fas fa-book-open"></i></div>
+            <div class="stat-info">
+                <div class="value">{{ dados.total_cursos }}</div>
+                <div class="label">Total de Cursos Disponíveis</div>
+            </div>
+        </div>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
+    
+    <div class="row" style="display: flex; gap: 20px;">
+        <div class="col-md-6" style="flex: 1;">
+            <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Alunos por Curso</h3>
+            <ul class="list-group">
+                {% for curso, count in dados.alunos_por_curso.items() %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ curso }}
+                    <span class="badge badge-primary badge-pill">{{ count }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-6" style="flex: 1;">
+            <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Distribuição de Idade</h3>
+            <ul class="list-group">
+                {% for faixa, count in dados.faixas_idade.items() %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ faixa }} anos
+                    <span class="badge badge-primary badge-pill">{{ count }}</span>
+                </li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
     {% else %}

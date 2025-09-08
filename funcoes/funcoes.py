@@ -2,13 +2,29 @@ import json
 import os
 import random
 import string
+from datetime import datetime
 
 # --- FUNÇÕES DE ALUNOS ---
 def carregar_dados():
     if not os.path.exists("pessoas.json"): return []
     try:
         with open("pessoas.json", "r", encoding="utf-8") as f:
-            return sorted(json.load(f), key=lambda x: x.get('nome', ''))
+            pessoas = json.load(f)
+            # Converte o campo 'curso' para uma lista se for uma string
+            for p in pessoas:
+                if 'curso' in p and isinstance(p['curso'], str):
+                    p['curso'] = [p['curso']]
+                if 'nascimento' in p and p['nascimento']:
+                    try:
+                        data_nascimento = datetime.strptime(p['nascimento'], '%Y-%m-%d').date()
+                        hoje = datetime.now().date()
+                        idade = hoje.year - data_nascimento.year - ((hoje.month, hoje.day) < (data_nascimento.month, data_nascimento.day))
+                        p['idade'] = idade
+                    except (ValueError, TypeError):
+                        p['idade'] = None
+                else:
+                    p['idade'] = None
+            return sorted(pessoas, key=lambda x: x.get('nome', ''))
     except (json.JSONDecodeError, FileNotFoundError):
         return []
 
@@ -18,16 +34,37 @@ def salvar_dados(pessoas):
 
 def gerar_relatorio_dados():
     pessoas = carregar_dados()
-    if not pessoas: return {"total_alunos": 0, "media_idades": "0.0", "media_horas": "0.0"}
+    if not pessoas: return {"total_alunos": 0, "media_idades": "0.0", "media_horas": "0.0", "total_cursos": 0, "alunos_por_curso": {}, "faixas_idade": {}}
+
     total_alunos = len(pessoas)
-    soma_idades = sum(p.get('idade', 0) for p in pessoas)
+    idades_validas = [p.get('idade') for p in pessoas if p.get('idade') is not None]
+    soma_idades = sum(idades_validas)
     soma_horas = sum(p.get('horas_estudo', 0) for p in pessoas)
-    media_idades = soma_idades / total_alunos if total_alunos > 0 else 0
+
+    media_idades = soma_idades / len(idades_validas) if idades_validas else 0
     media_horas = soma_horas / total_alunos if total_alunos > 0 else 0
+
+    todos_cursos = []
+    for p in pessoas:
+        todos_cursos.extend(p.get('curso', []))
+    cursos_unicos = sorted(list(set(todos_cursos)))
+
+    alunos_por_curso = {curso: todos_cursos.count(curso) for curso in cursos_unicos}
+
+    faixas_idade = {
+        '0-17': len([i for i in idades_validas if i < 18]),
+        '18-24': len([i for i in idades_validas if 18 <= i <= 24]),
+        '25-34': len([i for i in idades_validas if 25 <= i <= 34]),
+        '35+': len([i for i in idades_validas if i >= 35]),
+    }
+
     return {
         "total_alunos": total_alunos,
         "media_idades": f"{media_idades:.1f}",
-        "media_horas": f"{media_horas:.1f}"
+        "media_horas": f"{media_horas:.1f}",
+        "total_cursos": len(cursos_unicos),
+        "alunos_por_curso": alunos_por_curso,
+        "faixas_idade": faixas_idade,
     }
 
 # --- FUNÇÕES DE USUÁRIOS ---

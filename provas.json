@@ -10,6 +10,8 @@
             {
                 "id": "0",
                 "pergunta": "1+1",
+                "imagem_url": "https://assets.dio.me/WPtrBrep1EGhDgBYvtre03KCfg8T1PwQeXanCHpyHbw/f:webp/q:80/L2FydGljbGVzL2NvdmVyL2I3NDg4MjJkLTEwMDUtNGU1NC1iZjcwLTAxZTEyMTE1OGEwZC5qcGc",
+                "imagem_width": "60%",
                 "opcoes": [
                     "2",
                     "4",

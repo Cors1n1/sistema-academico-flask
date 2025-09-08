@@ -55,6 +55,15 @@
         grid-template-columns: 1fr 1fr 1fr;
         gap: 20px;
     }
+    .image-preview-container {
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+    .image-preview-container img {
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 5px;
+    }
 </style>
 
 <div class="card">
@@ -106,6 +115,21 @@
                             <label class="form-label">Pergunta:</label>
                             <textarea class="form-control" name="pergunta" rows="3" required>{{ questao.pergunta }}</textarea>
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">URL da Imagem (Opcional):</label>
+                            <input type="text" class="form-control" name="imagem_url" value="{{ questao.imagem_url if questao.imagem_url else '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Largura da Imagem (em % ou px - Opcional, Padrão: 100%):</label>
+                            <input type="text" class="form-control" name="imagem_width" value="{{ questao.imagem_width if questao.imagem_width else '100%' }}">
+                        </div>
+                        <div class="image-preview-container">
+                            {% if questao.imagem_url %}
+                                <img src="{{ questao.imagem_url }}" alt="Pré-visualização da Imagem" style="width: {{ questao.imagem_width if questao.imagem_width else '100%' }}; height: auto;">
+                            {% else %}
+                                <img src="" alt="Pré-visualização da Imagem" style="display: none;">
+                            {% endif %}
+                        </div>
                         <div class="row">
                             <div class="col-md-6 form-group">
                                 <label class="form-label">Opção A:</label>
@@ -141,6 +165,17 @@
                     <div class="form-group">
                         <label class="form-label">Pergunta:</label>
                         <textarea class="form-control" name="pergunta" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">URL da Imagem (Opcional):</label>
+                        <input type="text" class="form-control" name="imagem_url">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Largura da Imagem (em % ou px - Opcional, Padrão: 100%):</label>
+                        <input type="text" class="form-control" name="imagem_width" value="100%">
+                    </div>
+                    <div class="image-preview-container">
+                        <img src="" alt="Pré-visualização da Imagem" style="max-width: 100%; height: auto; display: none;">
                     </div>
                     <div class="row">
                         <div class="col-md-6 form-group">
@@ -188,7 +223,36 @@
     document.addEventListener('DOMContentLoaded', function() {
         const addBtn = document.getElementById('add-questao-btn');
         const container = document.getElementById('questoes-container');
+
+        // Função para atualizar a pré-visualização da imagem
+        function updateImagePreview(block) {
+            const urlInput = block.querySelector('input[name="imagem_url"]');
+            const widthInput = block.querySelector('input[name="imagem_width"]');
+            const previewContainer = block.querySelector('.image-preview-container');
+            const previewImg = previewContainer ? previewContainer.querySelector('img') : null;
+
+            if (previewImg && urlInput && widthInput) {
+                const url = urlInput.value;
+                const width = widthInput.value;
+                
+                if (url) {
+                    previewImg.src = url;
+                    previewImg.style.display = 'block';
+                    previewImg.style.width = width || '100%';
+                } else {
+                    previewImg.src = '';
+                    previewImg.style.display = 'none';
+                }
+            }
+        }
         
+        // Adiciona listeners para os campos existentes na página
+        document.querySelectorAll('.exercise-block').forEach(block => {
+            updateImagePreview(block);
+            block.querySelector('input[name="imagem_url"]').addEventListener('input', () => updateImagePreview(block));
+            block.querySelector('input[name="imagem_width"]').addEventListener('input', () => updateImagePreview(block));
+        });
+
         if (addBtn) {
             addBtn.addEventListener('click', function() {
                 const newQuestionBlock = document.createElement('div');
@@ -198,6 +262,17 @@
                     <div class="form-group">
                         <label class="form-label">Pergunta:</label>
                         <textarea class="form-control" name="pergunta" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">URL da Imagem (Opcional):</label>
+                        <input type="text" class="form-control" name="imagem_url">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Largura da Imagem (em % ou px - Opcional, Padrão: 100%):</label>
+                        <input type="text" class="form-control" name="imagem_width" value="100%">
+                    </div>
+                    <div class="image-preview-container">
+                        <img src="" alt="Pré-visualização da Imagem" style="max-width: 100%; height: auto; display: none;">
                     </div>
                     <div class="row">
                         <div class="col-md-6 form-group">
@@ -228,6 +303,11 @@
                     </div>
                 `;
                 container.appendChild(newQuestionBlock);
+                
+                const newUrlInput = newQuestionBlock.querySelector('input[name="imagem_url"]');
+                const newWidthInput = newQuestionBlock.querySelector('input[name="imagem_width"]');
+                newUrlInput.addEventListener('input', () => updateImagePreview(newQuestionBlock));
+                newWidthInput.addEventListener('input', () => updateImagePreview(newQuestionBlock));
             });
         }
         
