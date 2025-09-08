@@ -1,7 +1,7 @@
 [
     {
         "nome": "Astolfo",
-        "idade": 45,
+        "idade": 25,
         "curso": [
             "Linguagens de Programação"
         ],
@@ -28,6 +28,13 @@
         ],
         "horas_estudo": 6.5,
         "profile_pic": null,
-        "nascimento": "2005-07-14"
+        "nascimento": "2005-07-14",
+        "celular": "11968576855",
+        "cep": "02405-001",
+        "rua": "Rua Augusto Tolle",
+        "bairro": "Santana",
+        "cidade": "São Paulo",
+        "numero": "852",
+        "complemento": "Apto. 64"
     }
 ]

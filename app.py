@@ -1,20 +1,5 @@
-import os
-import re
-import random
-import time
-import json
-import io
-import pandas as pd
-from datetime import datetime, date
 from flask import Flask, render_template, request, redirect, url_for, Response, session, flash
 from functools import wraps
-from werkzeug.security import check_password_hash, generate_password_hash
-from werkzeug.utils import secure_filename
-from weasyprint import HTML
-import logging
-from logging.handlers import RotatingFileHandler
-
-# Importa as funções do seu módulo
 from funcoes.funcoes import (
     carregar_dados, salvar_dados, gerar_relatorio_dados,
     carregar_usuarios, salvar_usuarios, carregar_aulas, salvar_aulas,
@@ -22,6 +7,19 @@ from funcoes.funcoes import (
     carregar_resultados_provas, salvar_resultados_provas,
     buscar_resultados_por_prova_id, buscar_prova_por_id
 )
+import json
+from werkzeug.security import check_password_hash, generate_password_hash
+import pandas as pd
+from weasyprint import HTML
+import io
+from datetime import datetime, date
+import logging
+from logging.handlers import RotatingFileHandler
+import os
+import re
+import time
+import random
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = 'chave-secreta-para-o-projeto-unip-12345'
@@ -466,7 +464,14 @@ def gerenciar_alunos():
             "nome": nome,
             "nascimento": request.form['nascimento'],
             "curso": request.form.getlist('curso'),
-            "horas_estudo": float(request.form['horas_estudo'])
+            "horas_estudo": float(request.form['horas_estudo']),
+            "celular": request.form.get('celular'),
+            "cep": request.form.get('cep'),
+            "rua": request.form.get('rua'),
+            "bairro": request.form.get('bairro'),
+            "cidade": request.form.get('cidade'),
+            "numero": request.form.get('numero'),
+            "complemento": request.form.get('complemento')
         }
         alunos.append(novo_aluno)
         salvar_dados(alunos)
@@ -503,6 +508,13 @@ def editar_aluno(nome_do_aluno):
         aluno_para_editar['nascimento'] = request.form['nascimento']
         aluno_para_editar['curso'] = request.form.getlist('curso')
         aluno_para_editar['horas_estudo'] = float(request.form['horas_estudo'])
+        aluno_para_editar['celular'] = request.form.get('celular')
+        aluno_para_editar['cep'] = request.form.get('cep')
+        aluno_para_editar['rua'] = request.form.get('rua')
+        aluno_para_editar['bairro'] = request.form.get('bairro')
+        aluno_para_editar['cidade'] = request.form.get('cidade')
+        aluno_para_editar['numero'] = request.form.get('numero')
+        aluno_para_editar['complemento'] = request.form.get('complemento')
         salvar_dados(alunos)
         app.logger.info(f"Admin '{session['username']}' EDITOU o aluno '{nome_do_aluno}'.")
         flash(f"Aluno '{nome_do_aluno}' atualizado com sucesso!", 'success')
@@ -943,32 +955,23 @@ def view_logs():
 def exportar(formato):
     app.logger.info(f"Usuário '{session['username']}' EXPORTOU os dados para {formato.upper()}.")
     alunos = carregar_dados()
-    dados_relatorio = gerar_relatorio_dados()
-    
     if formato == 'pdf':
         try:
             from weasyprint import HTML
             theme_color = request.args.get('color', '#4a90e2')
+            dados_relatorio = gerar_relatorio_dados()
             data_atual = datetime.now().strftime("%d/%m/%Y")
-            
-            # Converte a lista de cursos para string para o PDF
-            alunos_para_pdf = alunos.copy()
-            for aluno in alunos_para_pdf:
-                aluno['curso'] = ', '.join(aluno.get('curso', []))
-            
-            html_renderizado = render_template('relatorio_pdf.html', alunos=alunos_para_pdf, dados=dados_relatorio, data_hoje=data_atual, theme_color=theme_color)
+            html_renderizado = render_template('relatorio_pdf.html', alunos=alunos, dados=dados_relatorio, data_hoje=data_atual, theme_color=theme_color)
             pdf = HTML(string=html_renderizado).write_pdf()
             return Response(pdf, mimetype='application/pdf', headers={'Content-Disposition': 'attachment;filename=relatorio_alunos.pdf'})
         except ImportError:
             flash("Biblioteca WeasyPrint não encontrada para gerar PDF.", "danger")
             return redirect(url_for('lista_alunos'))
-    
     if formato == 'excel':
         try:
             import pandas as pd
             import io
             df = pd.DataFrame(alunos)
-            df['curso'] = df['curso'].apply(lambda x: ', '.join(x) if isinstance(x, list) else x)
             output = io.BytesIO()
             writer = pd.ExcelWriter(output, engine='openpyxl')
             df.to_excel(writer, index=False, sheet_name='Alunos')
@@ -978,7 +981,6 @@ def exportar(formato):
         except ImportError:
             flash("Bibliotecas Pandas/OpenPyXL não encontradas para gerar Excel.", "danger")
             return redirect(url_for('lista_alunos'))
-    
     return redirect(url_for('lista_alunos'))
 
 if __name__ == '__main__':

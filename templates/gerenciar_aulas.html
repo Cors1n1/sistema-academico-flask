@@ -1,40 +1,159 @@
 {% extends "base.html" %}
-{% block title %}Gerenciar Aulas{% endblock %}
+{% block title %}Gerenciar Alunos{% endblock %}
 {% block content %}
 <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h1>Gerenciamento de Aulas</h1>
-        <a href="{{ url_for('criar_aula') }}" class="action-btn edit-btn" style="color: white; background-color: var(--success-color);">Criar Nova Aula</a>
-    </div>
+    <h1>Gerenciamento de Alunos</h1>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <h2 style="font-weight: 400; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-top: 30px;">Alunos Cadastrados</h2>
     <table>
         <thead>
             <tr>
-                <th>Título da Aula</th>
-                <th>Curso Associado</th>
-                <th style="width: 25%;">Ações</th>
+                <th>Nome</th>
+                <th>Idade</th>
+                <th>Curso</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
-            {% for aula in aulas %}
+            {% for aluno in alunos %}
             <tr>
-                <td>{{ aula.titulo }}</td>
-                <td>{{ aula.curso }}</td>
+                <td>{{ aluno.nome }}</td>
+                <td>{{ aluno.idade }}</td>
+                <td>{{ aluno.curso | join(', ') }}</td>
                 <td class="actions-cell">
-                    <a href="{{ url_for('editar_aula', aula_id=aula.id) }}" class="action-btn edit-btn">Editar</a>
-                    <a href="{{ url_for('deletar_aula', aula_id=aula.id) }}" 
-                       class="action-btn delete-btn" 
-                       onclick="return confirm('Tem certeza que deseja deletar esta aula?');">
+                    <a href="{{ url_for('editar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn edit-btn">Editar</a>
+                    <a href="{{ url_for('deletar_aluno', nome_do_aluno=aluno.nome) }}"
+                       class="action-btn delete-btn"
+                       onclick="return confirm('Tem certeza que deseja deletar este aluno e sua conta de login? Esta ação não pode ser desfeita.');">
                        Deletar
                     </a>
                 </td>
             </tr>
-            {% else %}
-            <tr>
-                <td colspan="3" class="no-data">Nenhuma aula cadastrada ainda.</td>
-            </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <h2 style="font-weight: 400; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-top: 50px;">Cadastrar Novo Aluno</h2>
+    <form method="post" action="{{ url_for('gerenciar_alunos') }}" style="margin-top: 20px;">
+        <div class="form-group">
+            <label for="nome">Nome Completo (será o username):</label>
+            <input type="text" id="nome" name="nome" required>
+        </div>
+        <div class="form-group">
+            <label for="nascimento">Data de Nascimento:</label>
+            <input type="date" id="nascimento" name="nascimento" required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Curso(s):</label>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" name="curso" value="Lógica de Programação"> Lógica de Programação
+                </label>
+                <label>
+                    <input type="checkbox" name="curso" value="Linguagens de Programação"> Linguagens de Programação
+                </label>
+                <label>
+                    <input type="checkbox" name="curso" value="Algorítimos e Estruturas de dados"> Algorítimos e Estruturas de dados
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="celular">Número de Celular:</label>
+            <input type="tel" id="celular" name="celular" placeholder="(XX) XXXXX-XXXX">
+        </div>
+        <div class="form-group">
+            <label for="cep">CEP:</label>
+            <input type="text" id="cep" name="cep" required>
+        </div>
+        <div class="form-group">
+            <label for="rua">Endereço (Rua):</label>
+            <input type="text" id="rua" name="rua" readonly>
+        </div>
+        <div class="form-group">
+            <label for="bairro">Bairro:</label>
+            <input type="text" id="bairro" name="bairro" readonly>
+        </div>
+        <div class="form-group">
+            <label for="cidade">Cidade:</label>
+            <input type="text" id="cidade" name="cidade" readonly>
+        </div>
+        <div class="form-group">
+            <label for="numero">Número:</label>
+            <input type="text" id="numero" name="numero" required>
+        </div>
+        <div class="form-group">
+            <label for="complemento">Complemento:</label>
+            <input type="text" id="complemento" name="complemento">
+        </div>
+         <div class="form-group">
+            <label for="horas_estudo">Média de Horas de Estudo (por dia):</label>
+            <input type="number" step="0.5" id="horas_estudo" name="horas_estudo" required min="0">
+        </div>
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 10px 0;">
+        <div class="form-group">
+            <label for="criar_login" style="flex-direction: row; align-items: center; gap: 10px;">
+                <input type="checkbox" id="criar_login" name="criar_login" style="width: auto;" onchange="toggleLoginFields()">
+                Criar conta de login para este aluno
+            </label>
+        </div>
+        <div id="login-fields" style="display: none; gap: 20px;">
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password">
+            </div>
+            <div class="form-group">
+                <label for="role">Permissão (Função):</label>
+                <select id="role" name="role">
+                    <option value="viewer">Visitante</option>
+                    <option value="admin">Administrador</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit">Adicionar Aluno</button>
+    </form>
 </div>
+<script>
+    function toggleLoginFields() {
+        const checkbox = document.getElementById('criar_login');
+        const loginFields = document.getElementById('login-fields');
+        const passwordField = document.getElementById('password');
+        if (checkbox.checked) {
+            loginFields.style.display = 'grid';
+            passwordField.required = true;
+        } else {
+            loginFields.style.display = 'none';
+            passwordField.required = false;
+        }
+    }
+
+    // Lógica para preenchimento automático do CEP
+    document.getElementById('cep').addEventListener('blur', function() {
+        const cep = this.value.replace(/\D/g, '');
+        if (cep.length === 8) {
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.erro) {
+                        document.getElementById('rua').value = data.logradouro;
+                        document.getElementById('bairro').value = data.bairro;
+                        document.getElementById('cidade').value = data.localidade;
+                    } else {
+                        alert('CEP não encontrado.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar o CEP:', error);
+                    alert('Erro ao buscar o CEP. Tente novamente.');
+                });
+        }
+    });
+</script>
 {% endblock %}
