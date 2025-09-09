@@ -21,6 +21,7 @@ pydyf==0.11.0
 pyphen==0.17.2
 python-dateutil==2.9.0.post0
 pytz==2025.2
+requests
 six==1.17.0
 tinycss2==1.4.0
 tinyhtml5==2.0.0

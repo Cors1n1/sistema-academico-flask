@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Assistente de IA{% endblock %}
+
+{% block content %}
+<div class="chat-container card">
+    <div class="chat-header">
+        <h1>Assistente de IA</h1>
+        <p>Como posso te ajudar hoje?</p>
+    </div>
+    
+    <div class="chat-messages" id="chat-messages">
+        <div class="message ia-message">
+            <span class="avatar ia-avatar"><i class="fas fa-robot"></i></span>
+            <div class="message-content">
+                <p>Olá! Sou seu assistente de estudo. Pode me fazer perguntas sobre os temas das suas aulas ou pedir para te ajudar com algum exercício.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="chat-input-area">
+        <form id="chat-form">
+            <input type="text" id="chat-input" placeholder="Digite sua pergunta..." required>
+            <button type="submit" id="send-btn" title="Enviar"><i class="fas fa-paper-plane"></i></button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('chat-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const inputElement = document.getElementById('chat-input');
+        const userMessage = inputElement.value;
+        
+        if (userMessage.trim() === '') {
+            return;
+        }
+        
+        appendMessage(userMessage, 'user');
+        inputElement.value = '';
+
+        fetch('{{ url_for("assistente_ia") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: userMessage })
+        })
+        .then(response => response.json())
+        .then(data => {
+            appendMessage(data.response, 'ia');
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            appendMessage('Desculpe, ocorreu um erro ao processar sua solicitação.', 'ia');
+        });
+    });
+
+    function appendMessage(message, sender) {
+        const chatMessages = document.getElementById('chat-messages');
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.classList.add(sender + '-message');
+
+        if (sender === 'ia') {
+            messageElement.innerHTML = `
+                <span class="avatar ia-avatar"><i class="fas fa-robot"></i></span>
+                <div class="message-content"><p>${message}</p></div>
+            `;
+        } else {
+            messageElement.innerHTML = `
+                <div class="message-content"><p>${message}</p></div>
+                <span class="avatar user-avatar"><i class="fas fa-user"></i></span>
+            `;
+        }
+        
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Rola para o final
+    }
+</script>
+{% endblock %}

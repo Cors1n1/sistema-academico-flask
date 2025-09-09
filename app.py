@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, Response, session, flash
+from flask import Flask, render_template, request, redirect, url_for, Response, session, flash, jsonify
 from functools import wraps
 from funcoes.funcoes import (
     carregar_dados, salvar_dados, gerar_relatorio_dados,
@@ -20,6 +20,7 @@ import re
 import time
 import random
 from werkzeug.utils import secure_filename
+import requests
 
 app = Flask(__name__)
 app.secret_key = 'chave-secreta-para-o-projeto-unip-12345'
@@ -91,6 +92,7 @@ def index():
         {'id': 'exercicios', 'url': url_for('lista_exercicios'), 'icon': 'fas fa-pencil-alt', 'title': 'Exercícios', 'desc': 'Acesse e responda aos exercícios de avaliação do seu curso.'},
         {'id': 'provas', 'url': url_for('lista_provas'), 'icon': 'fas fa-list-alt', 'title': 'Fazer Provas', 'desc': 'Acesse as provas do seu curso para avaliação do seu progresso.'},
         {'id': 'boletim', 'url': url_for('meu_boletim'), 'icon': 'fas fa-clipboard-list', 'title': 'Meu Boletim', 'desc': 'Acesse seu histórico de resultados em todas as provas.', 'role': 'viewer'},
+        {'id': 'assistente_ia', 'url': url_for('assistente_ia'), 'icon': 'fas fa-robot', 'title': 'Assistente de IA', 'desc': 'Tire suas dúvidas e aprofunde seus conhecimentos com a ajuda da nossa IA.'},
         {'id': 'gerenciar_alunos', 'url': url_for('gerenciar_alunos'), 'icon': 'fas fa-user-cog', 'title': 'Gerenciar Alunos', 'desc': 'Adicione, edite e delete alunos e suas contas de acesso.', 'role': 'admin'},
         {'id': 'gerenciar_aulas', 'url': url_for('gerenciar_aulas'), 'icon': 'fas fa-book-open', 'title': 'Gerenciar Aulas', 'desc': 'Crie, edite e organize o conteúdo das aulas para os alunos.', 'role': 'admin'},
         {'id': 'gerenciar_exercicios', 'url': url_for('gerenciar_exercicios'), 'icon': 'fas fa-tasks', 'title': 'Gerenciar Exercícios', 'desc': 'Crie, edite e organize os exercícios de avaliação.', 'role': 'admin'},
@@ -982,6 +984,48 @@ def exportar(formato):
             flash("Bibliotecas Pandas/OpenPyXL não encontradas para gerar Excel.", "danger")
             return redirect(url_for('lista_alunos'))
     return redirect(url_for('lista_alunos'))
+
+# --- ROTA ASSISTENTE DE IA ---
+@app.route('/assistente_ia', methods=['GET', 'POST'])
+@login_required
+def assistente_ia():
+    if request.method == 'POST':
+        user_message = request.json.get('message', '').lower()
+        response_text = ""
+        
+        # Implementação da API de IA real (Google Generative AI API)
+        try:
+            api_key = "AIzaSyAuo-XIDTOzDRXdWfYqb53FLIVYeJki8JY"
+            
+            # Endpoint para a Gemini API usando o modelo gemini-2.0-flash
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+            
+            # Payload para a requisição
+            payload = {
+                "contents": [
+                    {
+                        "parts": [{"text": user_message}]
+                    }
+                ]
+            }
+            
+            response = requests.post(url, json=payload)
+            response.raise_for_status()  # Levanta um erro para status de resposta HTTP ruins
+            
+            response_data = response.json()
+            response_text = response_data['candidates'][0]['content']['parts'][0]['text']
+            
+        except requests.exceptions.RequestException as req_err:
+            response_text = f"Desculpe, houve um erro na comunicação com a API de IA. Detalhes: {req_err}"
+        except (KeyError, IndexError) as parse_err:
+            response_text = f"Desculpe, a resposta da API de IA não pôde ser interpretada. Detalhes: {parse_err}. Resposta completa da API: {response.text}"
+        except Exception as e:
+            response_text = f"Ocorreu um erro inesperado ao usar a IA. Erro: {str(e)}"
+        
+        return jsonify({'response': response_text})
+    
+    return render_template('assistente_ia.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

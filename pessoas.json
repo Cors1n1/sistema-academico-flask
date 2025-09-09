@@ -29,12 +29,12 @@
         "horas_estudo": 6.5,
         "profile_pic": null,
         "nascimento": "2005-07-14",
-        "celular": "11968576855",
-        "cep": "02405-001",
-        "rua": "Rua Augusto Tolle",
-        "bairro": "Santana",
-        "cidade": "São Paulo",
-        "numero": "852",
-        "complemento": "Apto. 64"
+        "celular": "",
+        "cep": "",
+        "rua": "",
+        "bairro": "",
+        "cidade": "",
+        "numero": "",
+        "complemento": ""
     }
 ]

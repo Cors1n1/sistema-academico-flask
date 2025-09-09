@@ -39,6 +39,8 @@
                 {% else %}
                     <li><a href="{{ url_for('meu_boletim') }}" class="{{ 'active' if request.path == '/meu_boletim' else '' }}">Meu Boletim</a></li>
                 {% endif %}
+                
+                <li><a href="{{ url_for('assistente_ia') }}" class="{{ 'active' if request.path == '/assistente_ia' else '' }}">Assistente de IA</a></li>
 
                 <li><a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a></li>
                 

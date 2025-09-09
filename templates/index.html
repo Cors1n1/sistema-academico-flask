@@ -48,6 +48,12 @@
             <h2>{{ card.title }}</h2>
             <p>{{ card.desc }}</p>
         </a>
+    {% elif card.id == 'assistente_ia' %}
+        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
+            <i class="{{ card.icon }}"></i>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.desc }}</p>
+        </a>
     {% elif card.id == 'gerenciar_alunos' and session.get('role') == 'admin' %}
         <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
             <i class="{{ card.icon }}"></i>
