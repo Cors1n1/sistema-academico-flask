@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistema Acadêmico</title>
+    <title>Redefinir Senha - Sistema Acadêmico</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root {
             --primary-color: #4e73df;
@@ -39,7 +38,7 @@
             transition: background-color 0.3s, color 0.3s;
             position: relative;
         }
-        .login-card {
+        .card {
             background-color: var(--surface-color);
             padding: 40px;
             border-radius: 10px;
@@ -52,6 +51,10 @@
         }
         h1 {
             color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        p {
+            color: var(--secondary-text-color);
             margin-bottom: 30px;
         }
         .form-group {
@@ -78,7 +81,7 @@
             outline: none;
             border-color: var(--primary-color);
         }
-        button[type="submit"] {
+        .action-btn {
             width: 100%;
             padding: 12px;
             background-color: var(--primary-color);
@@ -89,8 +92,10 @@
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.3s, transform 0.2s;
+            text-decoration: none;
+            display: inline-block;
         }
-        button[type="submit"]:hover {
+        .action-btn:hover {
             opacity: 0.9;
             transform: translateY(-2px);
         }
@@ -110,17 +115,6 @@
             color: #28a745;
             background-color: rgba(40, 167, 69, 0.1);
             border-color: rgba(40, 167, 69, 0.3);
-        }
-        .forgot-password-link {
-            display: block;
-            margin-top: 15px;
-            font-size: 0.9em;
-            color: var(--primary-color);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        .forgot-password-link:hover {
-            color: var(--secondary-text-color);
         }
         #theme-toggle {
             position: absolute;
@@ -143,8 +137,9 @@
 </head>
 <body>
     <button id="theme-toggle">Alterar Tema</button>
-    <div class="login-card">
-        <h1>Acesso ao Sistema</h1>
+    <div class="card">
+        <h1>Redefinir Senha</h1>
+        <p>Por favor, insira e confirme sua nova senha.</p>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -154,38 +149,25 @@
         {% endwith %}
         <form method="post">
             <div class="form-group">
-                <label for="username">Usuário</label>
-                <input type="text" id="username" name="username" required>
+                <label for="nova_senha">Nova Senha:</label>
+                <input type="password" id="nova_senha" name="nova_senha" required>
             </div>
             <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" name="password" required>
+                <label for="confirmar_nova_senha">Confirmar Nova Senha:</label>
+                <input type="password" id="confirmar_nova_senha" name="confirmar_nova_senha" required>
             </div>
-            <button type="submit">Entrar</button>
+            <button type="submit" class="action-btn save-btn">Redefinir Senha</button>
         </form>
-        <a href="{{ url_for('esqueci_a_senha') }}" class="forgot-password-link">Esqueci minha senha?</a>
     </div>
     <script>
         const themeToggle = document.getElementById('theme-toggle');
         const body = document.body;
         function applyTheme(theme) {
-            if (theme === 'dark') {
-                body.classList.add('dark-mode');
-                themeToggle.textContent = 'Modo Claro ☀️';
-            } else {
-                body.classList.remove('dark-mode');
-                themeToggle.textContent = 'Modo Escuro 🌙';
-            }
+            if (theme === 'dark') { body.classList.add('dark-mode'); themeToggle.textContent = 'Modo Claro ☀️'; }
+            else { body.classList.remove('dark-mode'); themeToggle.textContent = 'Modo Escuro 🌙'; }
         }
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            applyTheme(savedTheme);
-        });
-        themeToggle.addEventListener('click', () => {
-            const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
-            applyTheme(newTheme);
-            localStorage.setItem('theme', newTheme);
-        });
+        document.addEventListener('DOMContentLoaded', () => { const savedTheme = localStorage.getItem('theme') || 'light'; applyTheme(savedTheme); });
+        themeToggle.addEventListener('click', () => { const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark'; applyTheme(newTheme); localStorage.setItem('theme', newTheme); });
     </script>
 </body>
 </html>

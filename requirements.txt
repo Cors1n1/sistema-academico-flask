@@ -6,6 +6,7 @@ colorama==0.4.6
 cssselect2==0.8.0
 et_xmlfile==2.0.0
 Flask==3.1.2
+Flask-Mail==0.9.1
 fonttools==4.59.2
 gunicorn==23.0.0
 itsdangerous==2.2.0
@@ -21,6 +22,7 @@ pydyf==0.11.0
 pyphen==0.17.2
 python-dateutil==2.9.0.post0
 pytz==2025.2
+PyJWT==2.8.0
 requests
 six==1.17.0
 tinycss2==1.4.0

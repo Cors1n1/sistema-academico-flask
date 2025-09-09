@@ -2,7 +2,8 @@ import json
 import os
 import random
 import string
-from datetime import datetime
+from datetime import datetime, timedelta
+import jwt
 
 # --- FUNÇÕES DE ALUNOS ---
 def carregar_dados():
@@ -79,6 +80,26 @@ def carregar_usuarios():
 def salvar_usuarios(usuarios):
     with open('usuarios.json', 'w', encoding='utf-8') as f:
         json.dump(usuarios, f, ensure_ascii=False, indent=4)
+
+def gerar_senha_aleatoria(tamanho=8):
+    caracteres = string.ascii_letters + string.digits
+    return ''.join(random.choice(caracteres) for i in range(tamanho))
+
+def gerar_token_recuperacao(username, secret_key, expiration=3600):
+    payload = {
+        'user_id': username,
+        'exp': datetime.utcnow() + timedelta(seconds=expiration)
+    }
+    return jwt.encode(payload, secret_key, algorithm='HS256')
+
+def verificar_token_recuperacao(token, secret_key):
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        return payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return 'expired'  # Token expirou
+    except jwt.InvalidTokenError:
+        return None      # Token inválido
 
 # --- FUNÇÕES DE AULAS ---
 

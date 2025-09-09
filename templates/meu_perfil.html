@@ -94,6 +94,9 @@
                         <div class="value">{{ session.role | capitalize }}</div>
                     </div>
                 </div>
+                <div style="margin-top: 20px;">
+                    <a href="{{ url_for('alterar_senha') }}" class="action-btn edit-btn">Alterar Senha</a>
+                </div>
             </div>
         </div>
     {% else %}

@@ -5,8 +5,10 @@ from funcoes.funcoes import (
     carregar_usuarios, salvar_usuarios, carregar_aulas, salvar_aulas,
     carregar_exercicios, salvar_exercicios, carregar_provas, salvar_provas,
     carregar_resultados_provas, salvar_resultados_provas,
-    buscar_resultados_por_prova_id, buscar_prova_por_id
+    buscar_resultados_por_prova_id, buscar_prova_por_id,
+    gerar_senha_aleatoria, gerar_token_recuperacao, verificar_token_recuperacao
 )
+from flask_mail import Mail, Message
 import json
 from werkzeug.security import check_password_hash, generate_password_hash
 import pandas as pd
@@ -28,6 +30,15 @@ UPLOAD_FOLDER = 'static/uploads/profile_pics'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Configurações do Flask-Mail (Exemplo usando Gmail)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'sistema.academico.pim@gmail.com'  # Substitua pelo seu e-mail
+app.config['MAIL_PASSWORD'] = 'zjvx fqac ofeo msfe'    # Sua senha de app
+app.config['MAIL_DEFAULT_SENDER'] = 'sistema.academico.pim@gmail.com' # Substitua pelo seu e-mail
+mail = Mail(app)
 
 # CONFIGURAÇÃO DO LOG
 handler = RotatingFileHandler('app.log', maxBytes=100000, backupCount=3, encoding='utf-8')
@@ -80,6 +91,85 @@ def logout():
     app.logger.info(f"Usuário '{session['username']}' fez logout.")
     session.clear()
     return redirect(url_for('login'))
+
+@app.route('/esqueci_a_senha', methods=['GET', 'POST'])
+def esqueci_a_senha():
+    if request.method == 'POST':
+        username = request.form['username']
+        alunos = carregar_dados()
+        aluno_correspondente = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
+        
+        if aluno_correspondente and aluno_correspondente.get('email'):
+            token = gerar_token_recuperacao(username, app.secret_key)
+            
+            usuarios = carregar_usuarios()
+            user_to_update = next((u for u in usuarios if u['username'] == username), None)
+            if user_to_update:
+                user_to_update['reset_token'] = token
+                salvar_usuarios(usuarios)
+
+            link_redefinicao = url_for('redefinir_senha', token=token, _external=True)
+            
+            msg = Message('Redefinição de Senha do Sistema Acadêmico', recipients=[aluno_correspondente['email']])
+            msg.body = f'''
+Olá {aluno_correspondente.get('nome')},
+
+Recebemos uma solicitação para redefinir a senha da sua conta.
+Para prosseguir, clique no link abaixo. Ele expirará em 1 hora.
+
+{link_redefinicao}
+
+Se você não solicitou esta redefinição, por favor, ignore este e-mail.
+Sua senha permanecerá a mesma.
+
+Atenciosamente,
+Equipe do Sistema Acadêmico
+'''
+            try:
+                mail.send(msg)
+                flash(f'Um link de redefinição de senha foi enviado para o e-mail de "{username}".', 'success')
+                app.logger.info(f"E-mail de recuperação de senha enviado para '{username}'.")
+            except Exception as e:
+                flash('Não foi possível enviar o e-mail de redefinição de senha. Por favor, verifique as configurações.', 'danger')
+                app.logger.error(f"Erro ao enviar e-mail de recuperação para '{username}': {e}")
+        else:
+            flash('Usuário ou e-mail não encontrado no sistema.', 'danger')
+        
+        return redirect(url_for('login'))
+    return render_template('esqueci_a_senha.html')
+
+@app.route('/redefinir_senha/<token>', methods=['GET', 'POST'])
+def redefinir_senha(token):
+    username = verificar_token_recuperacao(token, app.secret_key)
+    
+    if username == 'expired':
+        flash('O token de redefinição de senha expirou. Por favor, solicite uma nova redefinição.', 'danger')
+        return redirect(url_for('esqueci_a_senha'))
+    
+    usuarios = carregar_usuarios()
+    user = next((u for u in usuarios if u['username'] == username), None)
+
+    if not user or user.get('reset_token') != token:
+        flash('O token de redefinição de senha é inválido.', 'danger')
+        return redirect(url_for('esqueci_a_senha'))
+
+    if request.method == 'POST':
+        nova_senha = request.form['nova_senha']
+        confirmar_nova_senha = request.form['confirmar_nova_senha']
+        
+        if nova_senha != confirmar_nova_senha:
+            flash('A nova senha e a confirmação não coincidem.', 'danger')
+            return redirect(url_for('redefinir_senha', token=token))
+        
+        user['password_hash'] = generate_password_hash(nova_senha)
+        user.pop('reset_token', None)
+        salvar_usuarios(usuarios)
+        
+        flash('Sua senha foi redefinida com sucesso! Por favor, faça login com a nova senha.', 'success')
+        app.logger.info(f"Senha do usuário '{username}' redefinida com sucesso.")
+        return redirect(url_for('login'))
+
+    return render_template('redefinir_senha.html', token=token)
 
 # --- ROTAS DA APLICAÇÃO GERAL ---
 @app.route('/')
@@ -183,6 +273,7 @@ def remover_foto_perfil():
         flash('Nenhuma foto de perfil encontrada para remover.', 'warning')
         
     return redirect(url_for('meu_perfil'))
+
 
 @app.route('/lista_alunos')
 @login_required
@@ -868,7 +959,7 @@ def exportar_boletim(formato):
             import pandas as pd
             import io
             df = pd.DataFrame([
-                {'Data': r['data'], 'Prova': r['titulo_prova'], 'Curso': r['curso'], 'Pontuação': f"{r['pontuacao']}/{r['total_questoes']}"}
+                {'Usuário': r['usuario'], 'Pontuação': f"{r['pontuacao']}/{r['total_questoes']}", 'Data': r['data']}
                 for r in resultados
             ])
             output = io.BytesIO()
@@ -876,7 +967,7 @@ def exportar_boletim(formato):
             df.to_excel(writer, index=False, sheet_name='Boletim')
             writer.close()
             output.seek(0)
-            return Response(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', headers={'Content-Disposition': f'attachment;filename=boletim_{username}.xlsx'})
+            return Response(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', headers={'Content-Disposition': f'attachment;filename=resultados_prova_{prova_id}.xlsx'})
         except ImportError:
             flash("Bibliotecas Pandas/OpenPyXL não encontradas para gerar Excel.", "danger")
             return redirect(url_for('meu_boletim'))
@@ -985,7 +1076,6 @@ def exportar(formato):
             return redirect(url_for('lista_alunos'))
     return redirect(url_for('lista_alunos'))
 
-# --- ROTA ASSISTENTE DE IA ---
 @app.route('/assistente_ia', methods=['GET', 'POST'])
 @login_required
 def assistente_ia():

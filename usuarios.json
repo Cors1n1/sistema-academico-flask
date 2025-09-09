@@ -6,7 +6,7 @@
     },
     {
         "username": "Victor",
-        "password_hash": "scrypt:32768:8:1$Tf8VJFI1p6R4WikS$b4aa4d68f8e635471c6a2a17af0e8860832c1a747bd977f66c52116a6f10bae543ede24d9d671e4c948ed28fbb82c28533aa2756e34ebdb81079b8aea4ac8e63",
+        "password_hash": "scrypt:32768:8:1$CcXhMKvbAr3X3JpB$f1df92ed6fa72729b8d776fc64a776eefb0a044afeb853186cb49b42d9d503079eeabe8f45c9d5df01246e9f347e1778126066c411dd1922d6e1c588adbedc13",
         "role": "admin"
     },
     {

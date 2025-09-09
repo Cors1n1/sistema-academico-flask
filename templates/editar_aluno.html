@@ -13,6 +13,10 @@
             <input type="date" id="nascimento" name="nascimento" required value="{{ aluno.nascimento }}">
         </div>
         <div class="form-group">
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" value="{{ aluno.email if aluno.email }}">
+        </div>
+        <div class="form-group">
             <label for="celular">Número de Celular:</label>
             <input type="tel" id="celular" name="celular" placeholder="(XX) XXXXX-XXXX" value="{{ aluno.celular if aluno.celular }}">
         </div>
@@ -68,6 +72,14 @@
                 <option value="viewer" {% if usuario.role == 'viewer' %}selected{% endif %}>Visitante</option>
                 <option value="admin" {% if usuario.role == 'admin' %}selected{% endif %}>Administrador</option>
             </select>
+        </div>
+        <div class="form-group">
+            <label for="nova_senha">Nova Senha (opcional):</label>
+            <input type="password" id="nova_senha" name="nova_senha">
+        </div>
+        <div class="form-group">
+            <label for="confirmar_nova_senha">Confirmar Nova Senha:</label>
+            <input type="password" id="confirmar_nova_senha" name="confirmar_nova_senha">
         </div>
         {% endif %}
         
