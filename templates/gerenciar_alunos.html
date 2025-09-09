@@ -29,12 +29,12 @@
                 <td>{{ aluno.idade }}</td>
                 <td>{{ aluno.curso | join(', ') }}</td>
                 <td class="actions-cell">
-                    <a href="{{ url_for('editar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn edit-btn">Editar</a>
-                    <a href="{{ url_for('deletar_aluno', nome_do_aluno=aluno.nome) }}"
-                       class="action-btn delete-btn"
-                       onclick="return confirm('Tem certeza que deseja deletar este aluno e sua conta de login? Esta ação não pode ser desfeita.');">
-                       Deletar
-                    </a>
+                    {% if session.get('role') == 'admin' %}
+                        <a href="{{ url_for('editar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn edit-btn">Editar</a>
+                        <a href="{{ url_for('deletar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn delete-btn" onclick="return confirm('Tem certeza que deseja deletar este aluno e sua conta de login? Esta ação não pode ser desfeita.');">Deletar</a>
+                    {% else %}
+                        <span>Acesso restrito</span>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
@@ -55,7 +55,7 @@
             <label for="email">E-mail (opcional, para recuperação de senha):</label>
             <input type="email" id="email" name="email">
         </div>
-        <div class="form-group">
+        <div class="form-group" id="curso_field">
             <label class="form-label">Curso(s):</label>
             <div class="checkbox-group">
                 <label>
@@ -97,26 +97,21 @@
             <label for="complemento">Complemento:</label>
             <input type="text" id="complemento" name="complemento">
         </div>
-         <div class="form-group">
+         <div class="form-group" id="horas_estudo_field">
             <label for="horas_estudo">Média de Horas de Estudo (por dia):</label>
             <input type="number" step="0.5" id="horas_estudo" name="horas_estudo" required min="0">
         </div>
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 10px 0;">
-        <div class="form-group">
-            <label for="criar_login" style="flex-direction: row; align-items: center; gap: 10px;">
-                <input type="checkbox" id="criar_login" name="criar_login" style="width: auto;" onchange="toggleLoginFields()">
-                Criar conta de login para este aluno
-            </label>
-        </div>
-        <div id="login-fields" style="display: none; gap: 20px;">
+        <div id="login-fields" style="display: grid; gap: 20px;">
             <div class="form-group">
                 <label for="password">Senha:</label>
-                <input type="password" id="password" name="password">
+                <input type="password" id="password" name="password" required>
             </div>
             <div class="form-group">
                 <label for="role">Permissão (Função):</label>
-                <select id="role" name="role">
-                    <option value="viewer">Visitante</option>
+                <select id="role" name="role" required onchange="handleRoleChange(this)">
+                    <option value="aluno">Aluno</option>
+                    <option value="professor">Professor</option>
                     <option value="admin">Administrador</option>
                 </select>
             </div>
@@ -125,16 +120,35 @@
     </form>
 </div>
 <script>
-    function toggleLoginFields() {
-        const checkbox = document.getElementById('criar_login');
-        const loginFields = document.getElementById('login-fields');
-        const passwordField = document.getElementById('password');
-        if (checkbox.checked) {
-            loginFields.style.display = 'grid';
-            passwordField.required = true;
-        } else {
-            loginFields.style.display = 'none';
-            passwordField.required = false;
+    function handleRoleChange(selectElement) {
+        const role = selectElement.value;
+        const horasEstudoField = document.getElementById('horas_estudo_field');
+        const cursoField = document.getElementById('curso_field');
+        
+        if (role === 'admin') {
+            if (horasEstudoField) {
+                horasEstudoField.style.display = 'none';
+                horasEstudoField.querySelector('input').removeAttribute('required');
+            }
+            if (cursoField) {
+                cursoField.style.display = 'none';
+            }
+        } else if (role === 'professor') {
+            if (horasEstudoField) {
+                horasEstudoField.style.display = 'none';
+                horasEstudoField.querySelector('input').removeAttribute('required');
+            }
+            if (cursoField) {
+                cursoField.style.display = 'block';
+            }
+        } else { // aluno
+            if (horasEstudoField) {
+                horasEstudoField.style.display = 'block';
+                horasEstudoField.querySelector('input').required = true;
+            }
+            if (cursoField) {
+                cursoField.style.display = 'block';
+            }
         }
     }
 

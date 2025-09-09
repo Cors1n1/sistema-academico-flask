@@ -1,22 +1,17 @@
 [
     {
-        "username": "visitante",
-        "password_hash": "pbkdf2:sha256:600000$s2jK9zL1xYk8uH4c$c1f9c1e4f9f9f9e4f9f9f9e4f9f9f9e4f9f9f9e4f9f9f9e4f9f9f9e4f9f9f9e4",
-        "role": "viewer"
-    },
-    {
         "username": "Victor",
-        "password_hash": "scrypt:32768:8:1$CcXhMKvbAr3X3JpB$f1df92ed6fa72729b8d776fc64a776eefb0a044afeb853186cb49b42d9d503079eeabe8f45c9d5df01246e9f347e1778126066c411dd1922d6e1c588adbedc13",
+        "password_hash": "scrypt:32768:8:1$CyGCeF5PQBBviHeS$df7c82c07ed44f9ff291c83a54eb174a1c29d9c9d2188c9b99a7f084566fff960994f6e8d04f461ca6403796fd8cd9584eac14617721d6237fbe6fbd648c920f",
         "role": "admin"
     },
     {
-        "username": "Kleber",
-        "password_hash": "scrypt:32768:8:1$pXdCbYwlLhhtspvN$b60a2d8cb2ec7efb46759cdc5fb9f719c618b5c65e370737c1f1dd25150b6f41c4bb715b3f0aea3daabe969e19e71154c7ca2851b71aa2300adfe32c0c812566",
-        "role": "viewer"
+        "username": "Aluno",
+        "password_hash": "scrypt:32768:8:1$zRMvcqaoz1SCKylv$f7978d4b5a784239e29120d7124353aa6d5263fe7224ae5b10d157dcc8b8f1eb9938253cb5d94e94efc2c70dc2080751da17f2c7ce9abe646701e39651ddb867",
+        "role": "aluno"
     },
     {
-        "username": "Astolfo",
-        "password_hash": "scrypt:32768:8:1$9lEyZ0Q4wRC3qGRP$8130a0deadee416fd53121a48a0dee7a87150cd4929a6830d90c361a3095a0123cb998bcec41a99e7d13207fdaaf90ebf5e5913bbcb517e68d16fbd464fed79f",
-        "role": "viewer"
+        "username": "Professor",
+        "password_hash": "scrypt:32768:8:1$JHjpZ0EtrUNBZl5D$76294a61ae9eea10e1586b2f330a4d40ac0a25cad6184246a0d3fb784a3e107eb73780b9d6e02115eec0fa7b319b95e0cbe150f548f1b221abbc7e2cc420d779",
+        "role": "professor"
     }
 ]

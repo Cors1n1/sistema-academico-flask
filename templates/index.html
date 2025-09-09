@@ -7,6 +7,9 @@
     {% if session.get('role') == 'admin' %}
         <h1>Painel de Gerenciamento e Ensino</h1>
         <p>Como administrador, sua função é gerenciar e organizar o conteúdo para a turma. Comece por aqui para administrar o sistema.</p>
+    {% elif session.get('role') == 'professor' %}
+        <h1>Painel de Ensino</h1>
+        <p>Como professor, sua função é gerenciar e organizar o conteúdo para a turma. Comece por aqui para administrar o sistema.</p>
     {% else %}
         <h1>Bem-vindo ao Sistema Acadêmico</h1>
         <p>Pronto para aprender? Aqui você pode acessar suas aulas, exercícios e provas. Escolha uma opção para começar sua jornada.</p>
@@ -18,85 +21,11 @@
 </div>
 <div class="action-grid" id="action-grid">
     {% for card in cards %}
-    {% if card.id == 'aulas' %}
-        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
-            <i class="{{ card.icon }}"></i>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.desc }}</p>
-        </a>
-    {% elif card.id == 'turma' %}
-        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
-            <i class="{{ card.icon }}"></i>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.desc }}</p>
-        </a>
-    {% elif card.id == 'exercicios' %}
-        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
-            <i class="{{ card.icon }}"></i>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.desc }}</p>
-        </a>
-    {% elif card.id == 'provas' %}
-        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
-            <i class="{{ card.icon }}"></i>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.desc }}</p>
-        </a>
-    {% elif card.id == 'boletim' and session.get('role') != 'admin' %}
-        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
-            <i class="{{ card.icon }}"></i>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.desc }}</p>
-        </a>
-    {% elif card.id == 'assistente_ia' %}
-        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
-            <i class="{{ card.icon }}"></i>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.desc }}</p>
-        </a>
-    {% elif card.id == 'gerenciar_alunos' and session.get('role') == 'admin' %}
-        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
-            <i class="{{ card.icon }}"></i>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.desc }}</p>
-        </a>
-    {% elif card.id == 'gerenciar_aulas' and session.get('role') == 'admin' %}
-        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
-            <i class="{{ card.icon }}"></i>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.desc }}</p>
-        </a>
-    {% elif card.id == 'gerenciar_exercicios' and session.get('role') == 'admin' %}
-        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
-            <i class="{{ card.icon }}"></i>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.desc }}</p>
-        </a>
-    {% elif card.id == 'gerenciar_provas' and session.get('role') == 'admin' %}
-        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
-            <i class="{{ card.icon }}"></i>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.desc }}</p>
-        </a>
-    {% elif card.id == 'gerenciar_resultados' and session.get('role') == 'admin' %}
-        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
-            <i class="{{ card.icon }}"></i>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.desc }}</p>
-        </a>
-    {% elif card.id == 'relatorio' %}
-        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
-            <i class="{{ card.icon }}"></i>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.desc }}</p>
-        </a>
-    {% elif card.id == 'logs' and session.get('role') == 'admin' %}
-        <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
-            <i class="{{ card.icon }}"></i>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.desc }}</p>
-        </a>
-    {% endif %}
+    <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
+        <i class="{{ card.icon }}"></i>
+        <h2>{{ card.title }}</h2>
+        <p>{{ card.desc }}</p>
+    </a>
     {% endfor %}
 </div>
 

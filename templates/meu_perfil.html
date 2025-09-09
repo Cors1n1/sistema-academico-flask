@@ -13,6 +13,7 @@
         align-items: center; font-size: 5em; font-weight: 700;
         border: 4px solid var(--surface-color);
         box-shadow: 0 4px 12px var(--shadow-color);
+        overflow: hidden; /* Garante que a imagem não vaze do círculo */
     }
     .profile-avatar-container img {
         width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
@@ -34,6 +35,39 @@
         box-sizing: border-box;
     }
     .upload-form button { margin-top: 15px; }
+
+    /* Estilos adicionais para o novo layout de perfil */
+    .user-profile-info {
+        background-color: var(--card-bg-color);
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px var(--shadow-color);
+        border: 1px solid var(--border-color);
+    }
+    .user-profile-info h2 {
+        font-size: 2.2em;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    .list-group {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .list-group-item {
+        background-color: transparent;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-color);
+    }
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+    .profile-pic-lg {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+    }
 </style>
 
 <div class="card">
@@ -45,66 +79,70 @@
         {% endif %}
     {% endwith %}
 
-    {% if aluno %}
-        <div class="profile-card">
-            <div class="profile-sidebar">
-                <div class="profile-avatar-container">
-                    {% if aluno.profile_pic %}
-                        <img src="{{ url_for('static', filename='uploads/profile_pics/' + aluno.profile_pic) }}" alt="Foto de Perfil">
-                    {% else %}
-                        <span>{{ aluno.nome[0] | upper }}</span>
-                    {% endif %}
-                </div>
-                
-                <form method="post" enctype="multipart/form-data" class="upload-form">
-                    <label for="profile_pic">Alterar Foto</label>
-                    <input type="file" name="profile_pic" id="profile_pic" accept="image/png, image/jpeg, image/gif" required>
-                    <button type="submit" class="action-btn save-btn">Salvar Foto</button>
-                </form>
-                {% if aluno.profile_pic %}
-                <form method="post" action="{{ url_for('remover_foto_perfil') }}" style="margin-top: 10px;">
-                    <button type="submit" class="action-btn delete-btn" onclick="return confirm('Tem certeza que deseja remover a foto de perfil?');">Remover Foto</button>
-                </form>
+    <div class="profile-card">
+        <div class="profile-sidebar">
+            <div class="profile-avatar-container">
+                {% if aluno and aluno.profile_pic %}
+                    <img src="{{ url_for('static', filename='uploads/profile_pics/' + aluno.profile_pic) }}" alt="Foto de Perfil">
+                {% else %}
+                    <span>{{ session.username[0] | upper }}</span>
                 {% endif %}
             </div>
+            
+            <form method="post" enctype="multipart/form-data" class="upload-form">
+                <label for="profile_pic">Alterar Foto</label>
+                <input type="file" name="profile_pic" id="profile_pic" accept="image/png, image/jpeg, image/gif">
+                <button type="submit" class="action-btn save-btn">Salvar Foto</button>
+            </form>
+            {% if aluno and aluno.profile_pic %}
+            <form method="post" action="{{ url_for('remover_foto_perfil') }}" style="margin-top: 10px;">
+                <button type="submit" class="action-btn delete-btn" onclick="return confirm('Tem certeza que deseja remover a foto de perfil?');">Remover Foto</button>
+            </form>
+            {% endif %}
+        </div>
 
-            <div class="profile-info">
-                <h2>{{ aluno.nome }}</h2>
-                <div class="info-grid">
+        <div class="profile-info">
+            <h2>{{ aluno.nome if aluno else session.username }}</h2>
+            <div class="info-grid">
+                {% if aluno %}
                     <div class="info-item">
                         <div class="label">Data de Nascimento</div>
-                        <div class="value">{{ aluno.nascimento }}</div>
+                        <div class="value">{{ aluno.nascimento if aluno.nascimento else 'Não informado' }}</div>
                     </div>
-                    <div class="info-item">
-                        <div class="label">Curso(s)</div>
-                        <div class="value">
-                            <ul class="course-list">
-                            {% for curso in aluno.curso %}
-                                <li>{{ curso }}</li>
-                            {% endfor %}
-                            </ul>
+                    {% if aluno.curso %}
+                        <div class="info-item">
+                            <div class="label">Curso(s)</div>
+                            <div class="value">
+                                <ul class="course-list">
+                                {% for curso in aluno.curso %}
+                                    <li>{{ curso }}</li>
+                                {% endfor %}
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="label">Média de Estudo</div>
-                        <div class="value">{{ aluno.horas_estudo }} horas/dia</div>
-                    </div>
+                    {% endif %}
                     <div class="info-item">
                         <div class="label">Permissão</div>
                         <div class="value">{{ session.role | capitalize }}</div>
                     </div>
-                </div>
-                <div style="margin-top: 20px;">
-                    <a href="{{ url_for('alterar_senha') }}" class="action-btn edit-btn">Alterar Senha</a>
-                </div>
+                    {% if session.get('role') == 'aluno' and aluno.horas_estudo is not none %}
+                        <div class="info-item">
+                            <div class="label">Média de Estudo</div>
+                            <div class="value">{{ aluno.horas_estudo }} horas/dia</div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="info-item">
+                        <div class="label">Permissão</div>
+                        <div class="value">{{ session.role | capitalize }}</div>
+                    </div>
+                    <p class="no-data" style="grid-column: 1 / -1;">Não foi encontrado um perfil de aluno correspondente ao seu usuário.</p>
+                {% endif %}
+            </div>
+            <div style="margin-top: 20px;">
+                <a href="{{ url_for('alterar_senha') }}" class="action-btn edit-btn">Alterar Senha</a>
             </div>
         </div>
-    {% else %}
-        <h1>Perfil de Usuário</h1>
-        <p class="no-data">Não foi encontrado um perfil de aluno correspondente ao seu usuário ({{ session.username }}).</p>
-        {% if session.get('role') == 'admin' %}
-            <p><strong>Nota para o Admin:</strong> Para que um perfil de aluno apareça aqui, o 'nome' do aluno no cadastro deve ser idêntico ao 'username' do usuário.</p>
-        {% endif %}
-    {% endif %}
+    </div>
 </div>
 {% endblock %}

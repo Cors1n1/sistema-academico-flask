@@ -69,7 +69,8 @@
         <div class="form-group">
             <label for="role">Permissão (Função):</label>
             <select id="role" name="role">
-                <option value="viewer" {% if usuario.role == 'viewer' %}selected{% endif %}>Visitante</option>
+                <option value="aluno" {% if usuario.role == 'aluno' %}selected{% endif %}>Aluno</option>
+                <option value="professor" {% if usuario.role == 'professor' %}selected{% endif %}>Professor</option>
                 <option value="admin" {% if usuario.role == 'admin' %}selected{% endif %}>Administrador</option>
             </select>
         </div>

@@ -36,6 +36,16 @@
                             <li><a href="{{ url_for('gerenciar_resultados_provas') }}" class="{{ 'active' if 'gerenciar_resultados_provas' in request.path or 'ver_resultado_prova' in request.path else '' }}">Resultados Provas</a></li>
                         </ul>
                     </li>
+                {% elif session.get('role') == 'professor' %}
+                    <li class="nav-dropdown">
+                        <a href="#" class="nav-dropdown-toggle">Gerenciar <i class="fas fa-caret-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ url_for('gerenciar_aulas') }}" class="{{ 'active' if 'gerenciar_aulas' in request.path else '' }}">Aulas</a></li>
+                            <li><a href="{{ url_for('gerenciar_exercicios') }}" class="{{ 'active' if 'gerenciar_exercicios' in request.path or 'criar_exercicio' in request.path or 'editar_exercicio' in request.path else '' }}">Exercícios</a></li>
+                            <li><a href="{{ url_for('gerenciar_provas') }}" class="{{ 'active' if 'gerenciar_provas' in request.path or 'criar_prova' in request.path or 'editar_prova' in request.path else '' }}">Provas</a></li>
+                            <li><a href="{{ url_for('gerenciar_resultados_provas') }}" class="{{ 'active' if 'gerenciar_resultados_provas' in request.path or 'ver_resultado_prova' in request.path else '' }}">Resultados Provas</a></li>
+                        </ul>
+                    </li>
                 {% else %}
                     <li><a href="{{ url_for('meu_boletim') }}" class="{{ 'active' if request.path == '/meu_boletim' else '' }}">Meu Boletim</a></li>
                 {% endif %}

@@ -1,41 +1,54 @@
 [
     {
-        "nome": "Astolfo",
-        "idade": 25,
-        "curso": [
-            "Linguagens de Programação"
-        ],
-        "horas_estudo": 9.0,
-        "nascimento": "2000-04-14"
-    },
-    {
-        "nome": "Kleber",
-        "idade": 45,
+        "nome": "Aluno",
+        "nascimento": "2005-07-14",
         "curso": [
             "Lógica de Programação",
             "Linguagens de Programação",
             "Algorítimos e Estruturas de dados"
         ],
         "horas_estudo": 10.0,
-        "nascimento": "1980-04-12",
-        "profile_pic": null
+        "celular": "",
+        "cep": "",
+        "rua": "",
+        "bairro": "",
+        "cidade": "",
+        "numero": "",
+        "complemento": "",
+        "idade": 20
+    },
+    {
+        "nome": "Professor",
+        "nascimento": "2005-07-14",
+        "curso": [
+            "Lógica de Programação",
+            "Linguagens de Programação",
+            "Algorítimos e Estruturas de dados"
+        ],
+        "horas_estudo": 10.0,
+        "celular": "",
+        "cep": "",
+        "rua": "",
+        "bairro": "",
+        "cidade": "",
+        "numero": "",
+        "complemento": "",
+        "idade": 20
     },
     {
         "nome": "Victor",
         "idade": 20,
-        "curso": [
-            "Lógica de Programação"
-        ],
+        "curso": [],
         "horas_estudo": 6.5,
         "profile_pic": null,
-        "nascimento": "2005-07-14",
-        "celular": "11968576855",
-        "cep": "02405-001",
-        "rua": "Rua Augusto Tolle",
-        "bairro": "Santana",
-        "cidade": "São Paulo",
-        "numero": "852",
-        "complemento": "Apto. 64",
+        "nascimento": "",
+        "celular": "",
+        "cep": "",
+        "rua": "",
+        "bairro": "",
+        "cidade": "",
+        "numero": "",
+        "complemento": "",
         "email": "victorcorsini2@gmail.com"
     }
 ]

@@ -29,24 +29,35 @@ def carregar_dados():
     except (json.JSONDecodeError, FileNotFoundError):
         return []
 
+def carregar_alunos():
+    """Carrega apenas os dados de 'pessoas' que correspondem a usuários com a role 'aluno'."""
+    todos_usuarios = carregar_usuarios()
+    usuarios_alunos = {u['username'] for u in todos_usuarios if u.get('role') == 'aluno'}
+    
+    todas_pessoas = carregar_dados()
+    # Filtra as pessoas para incluir apenas aquelas que são alunos
+    alunos_filtrados = [p for p in todas_pessoas if p.get('nome') in usuarios_alunos]
+    
+    return sorted(alunos_filtrados, key=lambda x: x.get('nome', ''))
+
 def salvar_dados(pessoas):
     with open("pessoas.json", "w", encoding="utf-8") as f:
         json.dump(pessoas, f, ensure_ascii=False, indent=4)
 
 def gerar_relatorio_dados():
-    pessoas = carregar_dados()
-    if not pessoas: return {"total_alunos": 0, "media_idades": "0.0", "media_horas": "0.0", "total_cursos": 0, "alunos_por_curso": {}, "faixas_idade": {}}
+    alunos = carregar_alunos()
+    if not alunos: return {"total_alunos": 0, "media_idades": "0.0", "media_horas": "0.0", "total_cursos": 0, "alunos_por_curso": {}, "faixas_idade": {}}
 
-    total_alunos = len(pessoas)
-    idades_validas = [p.get('idade') for p in pessoas if p.get('idade') is not None]
+    total_alunos = len(alunos)
+    idades_validas = [p.get('idade') for p in alunos if p.get('idade') is not None]
     soma_idades = sum(idades_validas)
-    soma_horas = sum(p.get('horas_estudo', 0) for p in pessoas)
+    soma_horas = sum(p.get('horas_estudo', 0) for p in alunos)
 
     media_idades = soma_idades / len(idades_validas) if idades_validas else 0
     media_horas = soma_horas / total_alunos if total_alunos > 0 else 0
 
     todos_cursos = []
-    for p in pessoas:
+    for p in alunos:
         todos_cursos.extend(p.get('curso', []))
     cursos_unicos = sorted(list(set(todos_cursos)))
 
@@ -78,7 +89,7 @@ def carregar_usuarios():
         return []
 
 def salvar_usuarios(usuarios):
-    with open('usuarios.json', 'w', encoding='utf-8') as f:
+    with open('usuarios.json', 'w', encoding="utf-8") as f:
         json.dump(usuarios, f, ensure_ascii=False, indent=4)
 
 def gerar_senha_aleatoria(tamanho=8):

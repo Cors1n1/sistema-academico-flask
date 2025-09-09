@@ -6,7 +6,7 @@ from funcoes.funcoes import (
     carregar_exercicios, salvar_exercicios, carregar_provas, salvar_provas,
     carregar_resultados_provas, salvar_resultados_provas,
     buscar_resultados_por_prova_id, buscar_prova_por_id,
-    gerar_senha_aleatoria, gerar_token_recuperacao, verificar_token_recuperacao
+    gerar_senha_aleatoria, gerar_token_recuperacao, verificar_token_recuperacao, carregar_alunos
 )
 from flask_mail import Mail, Message
 import json
@@ -35,8 +35,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'sistema.academico.pim@gmail.com'  # Substitua pelo seu e-mail
-app.config['MAIL_PASSWORD'] = 'zjvx fqac ofeo msfe'    # Sua senha de app
+app.config['MAIL_USERNAME'] = 'sistema.academico.pim@gmail.com' # Substitua pelo seu e-mail
+app.config['MAIL_PASSWORD'] = 'zjvx fqac ofeo msfe' # Sua senha de app
 app.config['MAIL_DEFAULT_SENDER'] = 'sistema.academico.pim@gmail.com' # Substitua pelo seu e-mail
 mail = Mail(app)
 
@@ -54,11 +54,11 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-def permission_required(role):
+def permission_required(roles):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if session.get('role') != role:
+            if session.get('role') not in roles:
                 flash('Você não tem permissão para aceder a esta página.', 'danger')
                 return redirect(url_for('index'))
             return f(*args, **kwargs)
@@ -171,6 +171,34 @@ def redefinir_senha(token):
 
     return render_template('redefinir_senha.html', token=token)
 
+@app.route('/alterar_senha', methods=['GET', 'POST'])
+@login_required
+def alterar_senha():
+    if request.method == 'POST':
+        username = session.get('username')
+        senha_atual = request.form['senha_atual']
+        nova_senha = request.form['nova_senha']
+        confirmar_nova_senha = request.form['confirmar_nova_senha']
+
+        usuarios = carregar_usuarios()
+        user = next((u for u in usuarios if u['username'] == username), None)
+
+        if not user or not check_password_hash(user.get('password_hash', ''), senha_atual):
+            flash('A senha atual está incorreta.', 'danger')
+            return redirect(url_for('alterar_senha'))
+        
+        if nova_senha != confirmar_nova_senha:
+            flash('A nova senha e a confirmação não coincidem.', 'danger')
+            return redirect(url_for('alterar_senha'))
+
+        user['password_hash'] = generate_password_hash(nova_senha)
+        salvar_usuarios(usuarios)
+        flash('Sua senha foi alterada com sucesso!', 'success')
+        app.logger.info(f"Senha do usuário '{username}' alterada com sucesso.")
+        return redirect(url_for('meu_perfil'))
+
+    return render_template('alterar_senha.html')
+
 # --- ROTAS DA APLICAÇÃO GERAL ---
 @app.route('/')
 @login_required
@@ -181,31 +209,39 @@ def index():
         {'id': 'turma', 'url': url_for('lista_alunos'), 'icon': 'fas fa-users', 'title': 'Ver Turma', 'desc': 'Visualize os colegas de turma e seus cursos.'},
         {'id': 'exercicios', 'url': url_for('lista_exercicios'), 'icon': 'fas fa-pencil-alt', 'title': 'Exercícios', 'desc': 'Acesse e responda aos exercícios de avaliação do seu curso.'},
         {'id': 'provas', 'url': url_for('lista_provas'), 'icon': 'fas fa-list-alt', 'title': 'Fazer Provas', 'desc': 'Acesse as provas do seu curso para avaliação do seu progresso.'},
-        {'id': 'boletim', 'url': url_for('meu_boletim'), 'icon': 'fas fa-clipboard-list', 'title': 'Meu Boletim', 'desc': 'Acesse seu histórico de resultados em todas as provas.', 'role': 'viewer'},
+        {'id': 'boletim', 'url': url_for('meu_boletim'), 'icon': 'fas fa-clipboard-list', 'title': 'Meu Boletim', 'desc': 'Acesse seu histórico de resultados em todas as provas.', 'role': 'aluno'},
         {'id': 'assistente_ia', 'url': url_for('assistente_ia'), 'icon': 'fas fa-robot', 'title': 'Assistente de IA', 'desc': 'Tire suas dúvidas e aprofunde seus conhecimentos com a ajuda da nossa IA.'},
         {'id': 'gerenciar_alunos', 'url': url_for('gerenciar_alunos'), 'icon': 'fas fa-user-cog', 'title': 'Gerenciar Alunos', 'desc': 'Adicione, edite e delete alunos e suas contas de acesso.', 'role': 'admin'},
-        {'id': 'gerenciar_aulas', 'url': url_for('gerenciar_aulas'), 'icon': 'fas fa-book-open', 'title': 'Gerenciar Aulas', 'desc': 'Crie, edite e organize o conteúdo das aulas para os alunos.', 'role': 'admin'},
-        {'id': 'gerenciar_exercicios', 'url': url_for('gerenciar_exercicios'), 'icon': 'fas fa-tasks', 'title': 'Gerenciar Exercícios', 'desc': 'Crie, edite e organize os exercícios de avaliação.', 'role': 'admin'},
-        {'id': 'gerenciar_provas', 'url': url_for('gerenciar_provas'), 'icon': 'fas fa-clipboard-check', 'title': 'Gerenciar Provas', 'desc': 'Crie, edite e delete provas para os cursos.', 'role': 'admin'},
-        {'id': 'gerenciar_resultados', 'url': url_for('gerenciar_resultados_provas'), 'icon': 'fas fa-file-invoice', 'title': 'Resultados das Provas', 'desc': 'Monitore os resultados de todas as provas realizadas.', 'role': 'admin'},
+        {'id': 'gerenciar_aulas', 'url': url_for('gerenciar_aulas'), 'icon': 'fas fa-book-open', 'title': 'Gerenciar Aulas', 'desc': 'Crie, edite e organize o conteúdo das aulas para os alunos.', 'role': 'admin_e_professor'},
+        {'id': 'gerenciar_exercicios', 'url': url_for('gerenciar_exercicios'), 'icon': 'fas fa-tasks', 'title': 'Gerenciar Exercícios', 'desc': 'Crie, edite e organize os exercícios de avaliação.', 'role': 'admin_e_professor'},
+        {'id': 'gerenciar_provas', 'url': url_for('gerenciar_provas'), 'icon': 'fas fa-clipboard-check', 'title': 'Gerenciar Provas', 'desc': 'Crie, edite e delete provas para os cursos.', 'role': 'admin_e_professor'},
+        {'id': 'gerenciar_resultados', 'url': url_for('gerenciar_resultados_provas'), 'icon': 'fas fa-file-invoice', 'title': 'Resultados das Provas', 'desc': 'Monitore os resultados de todas as provas realizadas.', 'role': 'admin_e_professor'},
         {'id': 'relatorio', 'url': url_for('relatorio'), 'icon': 'fas fa-chart-pie', 'title': 'Gerar Relatório', 'desc': 'Acesse as estatísticas importantes do sistema.'},
         {'id': 'logs', 'url': url_for('view_logs'), 'icon': 'fas fa-clipboard-list', 'title': 'Ver Logs', 'desc': 'Monitore as atividades registradas no sistema.', 'role': 'admin'},
     ]
 
-    # Filtra os cards com base na role do usuário
-    if session.get('role') == 'admin':
+    # Lógica de filtragem dos cards por role
+    user_role = session.get('role')
+    if user_role == 'admin':
         visible_cards = all_cards
-    else:
-        visible_cards = [card for card in all_cards if card.get('role') != 'admin']
+    elif user_role == 'professor':
+        visible_cards = [
+            card for card in all_cards
+            if card.get('role') in ['admin_e_professor', None] or card.get('id', '').startswith('gerenciar_')
+        ]
+        visible_cards.extend([
+            card for card in all_cards
+            if card.get('id') in ['aulas', 'exercicios', 'provas'] and card not in visible_cards
+        ])
+    else: # aluno
+        visible_cards = [card for card in all_cards if card.get('role') not in ['admin', 'professor'] and not card.get('id', '').startswith('gerenciar_')]
 
+    
     # Pega a ordem salva na sessão, se existir
     card_order = session.get('card_order')
     if card_order:
-        # Cria um dicionário para busca rápida dos cards
         card_dict = {card['id']: card for card in visible_cards}
-        # Reordena a lista de cards visíveis de acordo com a ordem salva
         ordered_cards = [card_dict[card_id] for card_id in card_order if card_id in card_dict]
-        # Adiciona cards que não estavam na ordem salva (caso novos cards tenham sido adicionados)
         existing_card_ids = {card['id'] for card in ordered_cards}
         for card in visible_cards:
             if card['id'] not in existing_card_ids:
@@ -233,8 +269,8 @@ def reset_card_order():
 @login_required
 def meu_perfil():
     username = session.get('username')
-    alunos = carregar_dados()
-    aluno_correspondente = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
+    todos_dados = carregar_dados()
+    aluno_correspondente = next((aluno for aluno in todos_dados if aluno.get('nome') == username), None)
 
     if request.method == 'POST':
         if 'profile_pic' in request.files:
@@ -243,13 +279,12 @@ def meu_perfil():
                 filename = secure_filename(f"{username}_{file.filename}")
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
-
                 if aluno_correspondente:
                     aluno_correspondente['profile_pic'] = filename
-                    salvar_dados(alunos)
+                    salvar_dados(todos_dados)
                     flash('Foto de perfil atualizada com sucesso!', 'success')
                 else:
-                    flash('Perfil de aluno não encontrado para salvar a foto.', 'danger')
+                    flash('Perfil de usuário não encontrado para salvar a foto.', 'danger')
         return redirect(url_for('meu_perfil'))
 
     return render_template('meu_perfil.html', aluno=aluno_correspondente)
@@ -258,8 +293,8 @@ def meu_perfil():
 @login_required
 def remover_foto_perfil():
     username = session.get('username')
-    alunos = carregar_dados()
-    aluno_correspondente = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
+    todos_dados = carregar_dados()
+    aluno_correspondente = next((aluno for aluno in todos_dados if aluno.get('nome') == username), None)
 
     if aluno_correspondente and aluno_correspondente.get('profile_pic'):
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], aluno_correspondente['profile_pic'])
@@ -267,7 +302,7 @@ def remover_foto_perfil():
             os.remove(filepath)
             
         aluno_correspondente['profile_pic'] = None
-        salvar_dados(alunos)
+        salvar_dados(todos_dados)
         flash('Foto de perfil removida com sucesso!', 'success')
     else:
         flash('Nenhuma foto de perfil encontrada para remover.', 'warning')
@@ -278,22 +313,47 @@ def remover_foto_perfil():
 @app.route('/lista_alunos')
 @login_required
 def lista_alunos():
-    todos_alunos = carregar_dados()
-    if session.get('role') == 'admin':
-        return render_template('lista_alunos.html', alunos=todos_alunos)
+    if session.get('role') in ['admin', 'professor']:
+        alunos_por_curso = {}
+        todos_alunos = carregar_alunos()
+        for aluno in todos_alunos:
+            cursos = aluno.get('curso', [])
+            if not cursos:
+                if "Sem Curso Definido" not in alunos_por_curso:
+                    alunos_por_curso["Sem Curso Definido"] = []
+                alunos_por_curso["Sem Curso Definido"].append(aluno)
+            else:
+                for curso in cursos:
+                    if curso not in alunos_por_curso:
+                        alunos_por_curso[curso] = []
+                    alunos_por_curso[curso].append(aluno)
+        
+        return render_template('lista_alunos.html', alunos_por_curso=alunos_por_curso)
     else:
         username = session.get('username')
+        todos_alunos = carregar_alunos()
         alunos_do_usuario = [aluno for aluno in todos_alunos if aluno.get('nome') == username]
         if alunos_do_usuario:
             cursos_do_aluno = alunos_do_usuario[0].get('curso')
-            # Filtra todos os alunos que estão em pelo menos um dos cursos do aluno logado
             colegas_de_turma = [
                 aluno for aluno in todos_alunos
                 if any(curso in aluno.get('curso', []) for curso in cursos_do_aluno)
             ]
-            return render_template('lista_alunos.html', alunos=colegas_de_turma)
+            alunos_por_curso = {}
+            for aluno in colegas_de_turma:
+                cursos = aluno.get('curso', [])
+                if not cursos:
+                    if "Sem Curso Definido" not in alunos_por_curso:
+                        alunos_por_curso["Sem Curso Definido"] = []
+                    alunos_por_curso["Sem Curso Definido"].append(aluno)
+                else:
+                    for curso in cursos:
+                        if curso not in alunos_por_curso:
+                            alunos_por_curso[curso] = []
+                        alunos_por_curso[curso].append(aluno)
+            return render_template('lista_alunos.html', alunos_por_curso=alunos_por_curso)
         else:
-            return render_template('lista_alunos.html', alunos=[])
+            return render_template('lista_alunos.html', alunos_por_curso={})
 
 # --- ROTAS DE AULAS ---
 @app.route('/aulas')
@@ -301,13 +361,13 @@ def lista_alunos():
 def lista_aulas():
     todas_as_aulas = carregar_aulas()
     aulas_por_curso = {}
-    if session.get('role') == 'admin':
+    if session.get('role') in ['admin', 'professor']:
         for aula in todas_as_aulas:
             curso = aula.get('curso')
             if curso not in aulas_por_curso:
                 aulas_por_curso[curso] = []
             aulas_por_curso[curso].append(aula)
-    else:
+    else: # aluno
         username = session.get('username')
         alunos = carregar_dados()
         aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
@@ -329,7 +389,7 @@ def ver_aula(aula_id):
         flash('Aula não encontrada.', 'danger')
         return redirect(url_for('lista_aulas'))
 
-    if session.get('role') != 'admin':
+    if session.get('role') not in ['admin', 'professor']:
         username = session.get('username')
         alunos = carregar_dados()
         aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
@@ -346,13 +406,13 @@ def lista_exercicios():
     todos_exercicios = carregar_exercicios()
     exercicios_por_curso = {}
 
-    if session.get('role') == 'admin':
+    if session.get('role') in ['admin', 'professor']:
         for exercicio in todos_exercicios:
             curso = exercicio.get('curso', 'Sem Curso')
             if curso not in exercicios_por_curso:
                 exercicios_por_curso[curso] = []
             exercicios_por_curso[curso].append(exercicio)
-    else:
+    else: # aluno
         username = session.get('username')
         alunos = carregar_dados()
         aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
@@ -376,14 +436,13 @@ def ver_exercicio(exercicio_id):
         flash('Exercício não encontrado.', 'danger')
         return redirect(url_for('lista_exercicios'))
 
-    if session.get('role') != 'admin':
+    if session.get('role') not in ['admin', 'professor']:
         username = session.get('username')
         alunos = carregar_dados()
         aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
         if not aluno_atual or exercicio_selecionado.get('curso') not in aluno_atual.get('curso', []):
             flash('Você não tem permissão para ver este exercício.', 'danger')
             return redirect(url_for('lista_exercicios'))
-
     return render_template('ver_exercicio.html', exercicio=exercicio_selecionado)
 
 @app.route('/corrigir_exercicio/<exercicio_id>', methods=['POST'])
@@ -417,13 +476,13 @@ def lista_provas():
     provas_realizadas = {res['prova_id'] for res in resultados_anteriores if res['usuario'] == session.get('username')}
     hoje = datetime.now().date()
 
-    if session.get('role') == 'admin':
+    if session.get('role') in ['admin', 'professor']:
         for prova in todas_as_provas:
             curso = prova.get('curso', 'Sem Curso')
             if curso not in provas_por_curso:
                 provas_por_curso[curso] = []
             provas_por_curso[curso].append(prova)
-    else:
+    else: # aluno
         username = session.get('username')
         alunos = carregar_dados()
         aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
@@ -468,7 +527,7 @@ def ver_prova(prova_id):
     resultados_anteriores = carregar_resultados_provas()
     prova_ja_feita = any(res['prova_id'] == prova_id and res['usuario'] == session.get('username') for res in resultados_anteriores)
     
-    if session.get('role') != 'admin':
+    if session.get('role') not in ['admin', 'professor']:
         username = session.get('username')
         alunos = carregar_dados()
         aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
@@ -543,21 +602,33 @@ def corrigir_prova(prova_id):
 # --- ROTAS DE GERENCIAMENTO (ADMIN) DE ALUNOS E AULAS ---
 @app.route('/gerenciar_alunos', methods=['GET', 'POST'])
 @login_required
-@permission_required('admin')
+@permission_required(['admin']) # Apenas admins podem gerenciar alunos
 def gerenciar_alunos():
     if request.method == 'POST':
         nome = request.form['nome']
-        alunos = carregar_dados()
-        usuarios = carregar_usuarios()
-        if any(aluno.get('nome') == nome for aluno in alunos) or any(u.get('username') == nome for u in usuarios):
+        
+        # Carrega a lista completa de pessoas e usuários para a checagem de unicidade
+        todas_pessoas = carregar_dados()
+        todos_usuarios = carregar_usuarios()
+        
+        if any(p.get('nome') == nome for p in todas_pessoas) or any(u.get('username') == nome for u in todos_usuarios):
             flash(f"O nome '{nome}' já está em uso como aluno ou usuário. Tente outro.", 'danger')
             return redirect(url_for('gerenciar_alunos'))
+        
+        role = request.form['role']
+        horas_estudo = None
+        curso = []
+        if role == 'aluno':
+            horas_estudo = float(request.form['horas_estudo'])
+            curso = request.form.getlist('curso')
+        elif role == 'professor':
+            curso = request.form.getlist('curso')
         
         novo_aluno = {
             "nome": nome,
             "nascimento": request.form['nascimento'],
-            "curso": request.form.getlist('curso'),
-            "horas_estudo": float(request.form['horas_estudo']),
+            "curso": curso,
+            "horas_estudo": horas_estudo,
             "celular": request.form.get('celular'),
             "cep": request.form.get('cep'),
             "rua": request.form.get('rua'),
@@ -566,23 +637,21 @@ def gerenciar_alunos():
             "numero": request.form.get('numero'),
             "complemento": request.form.get('complemento')
         }
-        alunos.append(novo_aluno)
-        salvar_dados(alunos)
+        todas_pessoas.append(novo_aluno)
+        salvar_dados(todas_pessoas)
         app.logger.info(f"Admin '{session['username']}' ADICIONOU o aluno '{nome}'.")
         flash(f"Aluno '{nome}' cadastrado com sucesso!", 'success')
 
-        if 'criar_login' in request.form:
-            password = request.form['password']
-            role = request.form['role']
-            if not password:
-                flash('A senha é obrigatória ao criar um login.', 'danger')
-                return redirect(url_for('gerenciar_alunos'))
-            password_hash = generate_password_hash(password)
-            novo_usuario = { "username": nome, "password_hash": password_hash, "role": role }
-            usuarios.append(novo_usuario)
-            salvar_usuarios(usuarios)
-            app.logger.info(f"Admin '{session['username']}' CRIOU a conta de login para '{nome}'.")
-            flash(f"Conta de login para '{nome}' criada com sucesso!", 'success')
+        password = request.form['password']
+        if not password:
+            flash('A senha é obrigatória ao criar um login.', 'danger')
+            return redirect(url_for('gerenciar_alunos'))
+        password_hash = generate_password_hash(password)
+        novo_usuario = { "username": nome, "password_hash": password_hash, "role": role }
+        todos_usuarios.append(novo_usuario)
+        salvar_usuarios(todos_usuarios)
+        app.logger.info(f"Admin '{session['username']}' CRIOU a conta de login para '{nome}'.")
+        flash(f"Conta de login para '{nome}' criada com sucesso!", 'success')
         
         return redirect(url_for('gerenciar_alunos'))
 
@@ -591,16 +660,26 @@ def gerenciar_alunos():
 
 @app.route('/editar_aluno/<nome_do_aluno>', methods=['GET', 'POST'])
 @login_required
-@permission_required('admin')
+@permission_required(['admin']) # Apenas admins podem editar alunos
 def editar_aluno(nome_do_aluno):
-    alunos = carregar_dados()
-    aluno_para_editar = next((aluno for aluno in alunos if aluno.get('nome') == nome_do_aluno), None)
+    todos_dados = carregar_dados()
+    aluno_para_editar = next((aluno for aluno in todos_dados if aluno.get('nome') == nome_do_aluno), None)
     if not aluno_para_editar: return redirect(url_for('gerenciar_alunos'))
     
     if request.method == 'POST':
         aluno_para_editar['nascimento'] = request.form['nascimento']
-        aluno_para_editar['curso'] = request.form.getlist('curso')
-        aluno_para_editar['horas_estudo'] = float(request.form['horas_estudo'])
+        
+        role = request.form['role']
+        if role == 'aluno':
+            aluno_para_editar['horas_estudo'] = float(request.form['horas_estudo'])
+            aluno_para_editar['curso'] = request.form.getlist('curso')
+        elif role == 'professor':
+            aluno_para_editar['horas_estudo'] = None
+            aluno_para_editar['curso'] = request.form.getlist('curso')
+        else: # admin
+            aluno_para_editar['horas_estudo'] = None
+            aluno_para_editar['curso'] = []
+            
         aluno_para_editar['celular'] = request.form.get('celular')
         aluno_para_editar['cep'] = request.form.get('cep')
         aluno_para_editar['rua'] = request.form.get('rua')
@@ -608,7 +687,7 @@ def editar_aluno(nome_do_aluno):
         aluno_para_editar['cidade'] = request.form.get('cidade')
         aluno_para_editar['numero'] = request.form.get('numero')
         aluno_para_editar['complemento'] = request.form.get('complemento')
-        salvar_dados(alunos)
+        salvar_dados(todos_dados)
         app.logger.info(f"Admin '{session['username']}' EDITOU o aluno '{nome_do_aluno}'.")
         flash(f"Aluno '{nome_do_aluno}' atualizado com sucesso!", 'success')
         
@@ -629,7 +708,7 @@ def editar_aluno(nome_do_aluno):
 
 @app.route('/deletar_aluno/<nome_do_aluno>')
 @login_required
-@permission_required('admin')
+@permission_required(['admin'])
 def deletar_aluno(nome_do_aluno):
     alunos = carregar_dados()
     alunos_filtrados = [aluno for aluno in alunos if aluno.get('nome') != nome_do_aluno]
@@ -646,14 +725,14 @@ def deletar_aluno(nome_do_aluno):
 
 @app.route('/gerenciar_aulas')
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def gerenciar_aulas():
     aulas = carregar_aulas()
     return render_template('gerenciar_aulas.html', aulas=aulas)
 
 @app.route('/criar_aula', methods=['GET', 'POST'])
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def criar_aula():
     if request.method == 'POST':
         aulas = carregar_aulas()
@@ -674,7 +753,7 @@ def criar_aula():
 
 @app.route('/editar_aula/<aula_id>', methods=['GET', 'POST'])
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def editar_aula(aula_id):
     aulas = carregar_aulas()
     aula_para_editar = next((a for a in aulas if a.get('id') == aula_id), None)
@@ -694,7 +773,7 @@ def editar_aula(aula_id):
 
 @app.route('/deletar_aula/<aula_id>')
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def deletar_aula(aula_id):
     aulas = carregar_aulas()
     aula_deletada = next((a for a in aulas if a.get('id') == aula_id), None)
@@ -708,14 +787,14 @@ def deletar_aula(aula_id):
 # --- ROTAS DE GERENCIAMENTO (ADMIN) DE EXERCÍCIOS ---
 @app.route('/gerenciar_exercicios')
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def gerenciar_exercicios():
     exercicios = carregar_exercicios()
     return render_template('gerenciar_exercicios.html', exercicios=exercicios)
 
 @app.route('/criar_exercicio', methods=['GET', 'POST'])
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def criar_exercicio():
     if request.method == 'POST':
         exercicios = carregar_exercicios()
@@ -753,13 +832,13 @@ def criar_exercicio():
 
 @app.route('/editar_exercicio/<exercicio_id>', methods=['GET', 'POST'])
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def editar_exercicio(exercicio_id):
     exercicios = carregar_exercicios()
     exercicio_para_editar = next((ex for ex in exercicios if ex.get('id') == exercicio_id), None)
     if not exercicio_para_editar:
         return redirect(url_for('gerenciar_exercicios'))
-    
+
     if request.method == 'POST':
         # Coleta apenas os dados do formulário de edição de um único exercício
         exercicio_para_editar['curso'] = request.form.get('curso')
@@ -782,7 +861,7 @@ def editar_exercicio(exercicio_id):
 
 @app.route('/deletar_exercicio/<exercicio_id>')
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def deletar_exercicio(exercicio_id):
     exercicios = carregar_exercicios()
     exercicio_deletado = next((ex for ex in exercicios if ex.get('id') == exercicio_id), None)
@@ -797,14 +876,14 @@ def deletar_exercicio(exercicio_id):
 # --- ROTAS DE GERENCIAMENTO (ADMIN) DE PROVAS ---
 @app.route('/gerenciar_provas')
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def gerenciar_provas():
     provas = carregar_provas()
     return render_template('gerenciar_provas.html', provas=provas)
 
 @app.route('/criar_prova', methods=['GET', 'POST'])
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def criar_prova():
     if request.method == 'POST':
         provas = carregar_provas()
@@ -850,7 +929,7 @@ def criar_prova():
 
 @app.route('/editar_prova/<prova_id>', methods=['GET', 'POST'])
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def editar_prova(prova_id):
     provas = carregar_provas()
     prova_para_editar = next((p for p in provas if p.get('id') == prova_id), None)
@@ -894,7 +973,7 @@ def editar_prova(prova_id):
 
 @app.route('/deletar_prova/<prova_id>')
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def deletar_prova(prova_id):
     provas = carregar_provas()
     prova_deletada = next((p for p in provas if p.get('id') == prova_id), None)
@@ -908,14 +987,14 @@ def deletar_prova(prova_id):
 # --- ROTAS DE RESULTADOS DE PROVAS ---
 @app.route('/gerenciar_resultados_provas')
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def gerenciar_resultados_provas():
     resultados = carregar_resultados_provas()
     return render_template('gerenciar_resultados_provas.html', resultados=resultados)
 
 @app.route('/ver_resultado_prova/<resultado_id>')
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def ver_resultado_prova(resultado_id):
     resultados = carregar_resultados_provas()
     resultado_selecionado = next((r for r in resultados if r.get('id') == resultado_id), None)
@@ -967,7 +1046,7 @@ def exportar_boletim(formato):
             df.to_excel(writer, index=False, sheet_name='Boletim')
             writer.close()
             output.seek(0)
-            return Response(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', headers={'Content-Disposition': f'attachment;filename=resultados_prova_{prova_id}.xlsx'})
+            return Response(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', headers={'Content-Disposition': f'attachment;filename=boletim_{username}.xlsx'})
         except ImportError:
             flash("Bibliotecas Pandas/OpenPyXL não encontradas para gerar Excel.", "danger")
             return redirect(url_for('meu_boletim'))
@@ -976,7 +1055,7 @@ def exportar_boletim(formato):
 
 @app.route('/exportar_resultados_prova/<prova_id>/<formato>')
 @login_required
-@permission_required('admin')
+@permission_required(['admin', 'professor'])
 def exportar_resultados_prova(prova_id, formato):
     prova = buscar_prova_por_id(prova_id)
     if not prova:
@@ -1029,7 +1108,7 @@ def relatorio():
 
 @app.route('/logs')
 @login_required
-@permission_required('admin')
+@permission_required(['admin'])
 def view_logs():
     log_entries = []
     log_pattern = re.compile(r'(\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2}) - (\w+) - (.*)', re.DOTALL)
@@ -1047,7 +1126,7 @@ def view_logs():
 @login_required
 def exportar(formato):
     app.logger.info(f"Usuário '{session['username']}' EXPORTOU os dados para {formato.upper()}.")
-    alunos = carregar_dados()
+    alunos = carregar_alunos()
     if formato == 'pdf':
         try:
             from weasyprint import HTML
@@ -1083,14 +1162,9 @@ def assistente_ia():
         user_message = request.json.get('message', '').lower()
         response_text = ""
         
-        # Implementação da API de IA real (Google Generative AI API)
         try:
             api_key = "AIzaSyAuo-XIDTOzDRXdWfYqb53FLIVYeJki8JY"
-            
-            # Endpoint para a Gemini API usando o modelo gemini-2.0-flash
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
-            
-            # Payload para a requisição
             payload = {
                 "contents": [
                     {
@@ -1098,13 +1172,10 @@ def assistente_ia():
                     }
                 ]
             }
-            
             response = requests.post(url, json=payload)
-            response.raise_for_status()  # Levanta um erro para status de resposta HTTP ruins
-            
+            response.raise_for_status()
             response_data = response.json()
             response_text = response_data['candidates'][0]['content']['parts'][0]['text']
-            
         except requests.exceptions.RequestException as req_err:
             response_text = f"Desculpe, houve um erro na comunicação com a API de IA. Detalhes: {req_err}"
         except (KeyError, IndexError) as parse_err:
