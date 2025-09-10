@@ -6,15 +6,15 @@
     --primary-color-dark-default: #8da4e1;
     --primary-color: var(--custom-primary-color, var(--primary-color-light-default));
     --primary-rgb: 78, 115, 223;
-    --background-color: #e6f0fa;
-    --surface-color: #f0f8ff;
-    --card-bg-color: #ffffff;
+    --background-color: #f7f9fc; /* Fundo mais claro e suave */
+    --surface-color: #ffffff;    /* Cor da barra de navegação e botões */
+    --card-bg-color: #ffffff;    /* Fundo dos cartões, mantido branco para contraste */
     --text-color: #333333;
     --secondary-text-color: #6c757d;
-    --border-color: #dee2e6;
+    --border-color: #e0e6ed;     /* Borda mais suave */
     --shadow-color: rgba(0, 0, 0, 0.08);
     --transition-speed: 0.3s;
-    --table-row-even-bg: #f5f8fa;
+    --table-row-even-bg: #f7f9fc; /* Fundo de tabela par, para combinar com o novo background */
     --success-color: #2ecc71;
     --danger-color: #e74c3c;
 }
@@ -102,17 +102,22 @@ h3 { font-size: 1.5em; }
     align-items: center;
     border-bottom: 1px solid var(--border-color);
     transition: background-color var(--transition-speed), border-color var(--transition-speed);
+    flex-wrap: wrap;
 }
 .navbar .logo a {
     font-size: 1.6em;
     font-weight: 700;
     color: var(--primary-color);
     text-decoration: none;
+    white-space: nowrap; /* Impede que o texto do logo quebre */
 }
 .nav-links {
     display: flex;
     align-items: center;
     gap: 25px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    flex: 1; /* Permite que os links ocupem o espaço restante */
 }
 .main-menu {
     display: flex;
@@ -120,6 +125,7 @@ h3 { font-size: 1.5em; }
     margin: 0;
     padding: 0;
     align-items: center;
+    flex-wrap: wrap;
 }
 .main-menu li a {
     color: var(--secondary-text-color);
@@ -128,6 +134,7 @@ h3 { font-size: 1.5em; }
     border-radius: 8px;
     font-weight: 500;
     transition: all var(--transition-speed);
+    white-space: nowrap; /* Impede que o texto do botão quebre */
 }
 .main-menu li a:hover,
 .main-menu li a.active {
@@ -139,6 +146,8 @@ h3 { font-size: 1.5em; }
     align-items: center;
     gap: 15px;
     margin-left: 20px;
+    flex-wrap: wrap;
+    white-space: nowrap;
 }
 .nav-user-link {
     color: var(--text-color);
@@ -154,6 +163,7 @@ h3 { font-size: 1.5em; }
     font-weight: 600 !important;
     color: var(--danger-color) !important;
     padding: 5px 10px;
+    white-space: nowrap;
 }
 .logout-btn:hover {
     transform: translateY(-2px) scale(1.05) !important;
@@ -173,6 +183,7 @@ h3 { font-size: 1.5em; }
     display: flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
 }
 #theme-toggle:hover {
     filter: brightness(1.1);
@@ -299,6 +310,7 @@ h3 { font-size: 1.5em; }
     color: white; 
     text-shadow: 0 2px 4px rgba(0,0,0,0.25); 
     animation: fadeInUp 0.8s ease-out; 
+    word-wrap: break-word; /* Adicionado para evitar que o texto vaze */
 }
 .hub-hero p { 
     font-size: 1.3em; 
@@ -379,6 +391,7 @@ table {
     border-collapse: collapse; 
     margin-top: 20px; 
     font-size: 0.9em;
+    word-wrap: break-word; /* Quebra palavras longas em tabelas */
 }
 tr { 
     transition: background-color 0.2s ease; 
@@ -429,6 +442,7 @@ tr:hover a {
     text-align: center; 
     border: 1px solid transparent; 
     color: white; /* Garante que o texto seja sempre branco */
+    white-space: nowrap;
 }
 .action-btn:hover { 
     transform: translateY(-3px); 
@@ -459,6 +473,7 @@ tr:hover a {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
 }
 .action-btn.export-btn:hover {
     background-color: #2c3e50;
@@ -514,7 +529,7 @@ button[type="submit"] {
     color: white; 
     padding: 12px; 
     border: none;
-    border-radius: 8px; 
+    border-radius: 8-px; 
     font-size: 1.1em; 
     font-weight: 600; 
     cursor: pointer;
@@ -1104,32 +1119,32 @@ body.dark-mode .cancel-btn {
     transform: translateY(-3px);
     box-shadow: 0 4px 8px var(--shadow-color);
 }
-.flash-message {
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    border: 1px solid;
-    animation: fadeInUp 0.5s;
+.flash-message { 
+    padding: 15px; 
+    margin-bottom: 20px; 
+    border-radius: 8px; 
+    border: 1px solid; 
+    animation: fadeInUp 0.5s; 
 }
-.flash-message.danger {
-    color: #c0392b;
-    background-color: #fcebeb;
-    border-color: #e74c3c;
+.flash-message.danger { 
+    color: #c0392b; 
+    background-color: #fcebeb; 
+    border-color: #e74c3c; 
 }
-.flash-message.success {
-    color: #27ae60;
-    background-color: #e9f5ee;
-    border-color: #2ecc71;
+.flash-message.success { 
+    color: #27ae60; 
+    background-color: #e9f5ee; 
+    border-color: #2ecc71; 
 }
-body.dark-mode .flash-message.danger {
-    color: #e74c3c;
-    background-color: rgba(231, 76, 60, 0.1);
-    border-color: #c0392b;
+body.dark-mode .flash-message.danger { 
+    color: #e74c3c; 
+    background-color: rgba(231, 76, 60, 0.1); 
+    border-color: #c0392b; 
 }
-body.dark-mode .flash-message.success {
-    color: #2ecc71;
-    background-color: rgba(46, 204, 113, 0.1);
-    border-color: #27ae60;
+body.dark-mode .flash-message.success { 
+    color: #2ecc71; 
+    background-color: rgba(46, 204, 113, 0.1); 
+    border-color: #27ae60; 
 }
 
 /* ==========================================================================

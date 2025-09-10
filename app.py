@@ -37,7 +37,7 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'sistema.academico.pim@gmail.com' # Substitua pelo seu e-mail
 app.config['MAIL_PASSWORD'] = 'zjvx fqac ofeo msfe' # Sua senha de app
-app.config['MAIL_DEFAULT_SENDER'] = 'sistema.academico.pim@gmail.com' # Substitua pelo seu e-mail
+app.config['MAIL_DEFAULT_SENDER'] = 'sistema.academico.pim@gmail.com' 
 mail = Mail(app)
 
 # CONFIGURAÇÃO DO LOG
