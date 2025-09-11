@@ -1,0 +1,56 @@
+[
+    {
+        "id": "PRIMEIRA_PROVA",
+        "titulo": "Iniciado",
+        "descricao": "Completou a sua primeira prova.",
+        "icone": "fa-play-circle"
+    },
+    {
+        "id": "DESTAQUE",
+        "titulo": "Destaque da Turma",
+        "descricao": "Obteve uma pontuação acima de 90% numa prova.",
+        "icone": "fa-star"
+    },
+    {
+        "id": "PERFECCIONISTA",
+        "titulo": "Perfeccionista",
+        "descricao": "Obteve uma pontuação de 100% numa prova.",
+        "icone": "fa-bullseye"
+    },
+    {
+        "id": "ESPECIALISTA_LOGICA",
+        "titulo": "Especialista em Lógica",
+        "descricao": "Completou todas as provas do curso de Lógica de Programação.",
+        "icone": "fa-lightbulb"
+    },
+    {
+        "id": "ESPECIALISTA_LINGUAGENS",
+        "titulo": "Poliglota",
+        "descricao": "Completou todas as provas do curso de Linguagens de Programação.",
+        "icone": "fa-code"
+    },
+    {
+        "id": "ESPECIALISTA_ESTRUTURAS",
+        "titulo": "Arquiteto de Dados",
+        "descricao": "Completou todas as provas do curso de Algoritmos e Estruturas de Dados.",
+        "icone": "fa-sitemap"
+    },
+    {
+        "id": "MARATONISTA",
+        "titulo": "Maratonista",
+        "descricao": "Completou 3 provas.",
+        "icone": "fa-running"
+    },
+    {
+        "id": "CONSISTENCIA",
+        "titulo": "Consistência é a Chave",
+        "descricao": "Manteve uma média geral acima de 75% após 5 provas.",
+        "icone": "fa-chart-line"
+    },
+    {
+        "id": "MULTITAREFA",
+        "titulo": "Multitarefa",
+        "descricao": "Completou pelo menos uma prova em cada curso disponível.",
+        "icone": "fa-brain"
+    }
+]

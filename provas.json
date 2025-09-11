@@ -4,7 +4,7 @@
         "titulo": "Aula 01",
         "curso": "Lógica de Programação",
         "data_inicio": "2025-09-08",
-        "data_fim": "2025-09-08",
+        "data_fim": "2025-09-30",
         "tempo_limite": "60",
         "questoes": [
             {

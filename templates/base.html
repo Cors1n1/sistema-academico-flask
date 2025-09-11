@@ -11,11 +11,11 @@
     {% block head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar">
+    <nav class="navbar" role="navigation" aria-label="Menu Principal">
         <div class="logo"><a href="{{ url_for('index') }}">Sistema Acadêmico</a></div>
         
-        <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu">
-            <i class="fas fa-bars"></i>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="main-menu">
+            <i class="fas fa-bars" aria-hidden="true"></i>
         </button>
 
         <div class="nav-links">
@@ -24,10 +24,11 @@
                 <li><a href="{{ url_for('lista_alunos') }}" class="{{ 'active' if 'lista_alunos' in request.path else '' }}">Ver Turma</a></li>
                 <li><a href="{{ url_for('lista_exercicios') }}" class="{{ 'active' if 'lista_exercicios' in request.path or 'exercicio' in request.path else '' }}">Exercícios</a></li>
                 <li><a href="{{ url_for('lista_provas') }}" class="{{ 'active' if 'provas' in request.path else '' }}">Provas</a></li>
+                <li><a href="{{ url_for('ranking') }}" class="{{ 'active' if request.path == '/ranking' else '' }}">Ranking</a></li>
 
                 {% if session.get('role') == 'admin' %}
                     <li class="nav-dropdown">
-                        <a href="#" class="nav-dropdown-toggle">Gerenciar <i class="fas fa-caret-down"></i></a>
+                        <a href="#" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">Gerenciar <i class="fas fa-caret-down" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ url_for('gerenciar_alunos') }}" class="{{ 'active' if 'gerenciar_alunos' in request.path else '' }}">Alunos</a></li>
                             <li><a href="{{ url_for('gerenciar_aulas') }}" class="{{ 'active' if 'gerenciar_aulas' in request.path else '' }}">Aulas</a></li>
@@ -38,7 +39,7 @@
                     </li>
                 {% elif session.get('role') == 'professor' %}
                     <li class="nav-dropdown">
-                        <a href="#" class="nav-dropdown-toggle">Gerenciar <i class="fas fa-caret-down"></i></a>
+                        <a href="#" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">Gerenciar <i class="fas fa-caret-down" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ url_for('gerenciar_aulas') }}" class="{{ 'active' if 'gerenciar_aulas' in request.path else '' }}">Aulas</a></li>
                             <li><a href="{{ url_for('gerenciar_exercicios') }}" class="{{ 'active' if 'gerenciar_exercicios' in request.path or 'criar_exercicio' in request.path or 'editar_exercicio' in request.path else '' }}">Exercícios</a></li>
@@ -48,6 +49,7 @@
                     </li>
                 {% else %}
                     <li><a href="{{ url_for('meu_boletim') }}" class="{{ 'active' if request.path == '/meu_boletim' else '' }}">Meu Boletim</a></li>
+                    <li><a href="{{ url_for('meu_progresso') }}" class="{{ 'active' if request.path == '/meu_progresso' else '' }}">Meu Progresso</a></li>
                 {% endif %}
                 
                 <li><a href="{{ url_for('assistente_ia') }}" class="{{ 'active' if request.path == '/assistente_ia' else '' }}">Assistente de IA</a></li>
@@ -63,30 +65,35 @@
                 <a href="{{ url_for('meu_perfil') }}" class="nav-user-link">
                     <span>Bem-vindo(a), <strong>{{ session.username }}</strong>!</span>
                 </a>
+                 {% if session.get('role') == 'aluno' %}
+                <a href="{{ url_for('minhas_conquistas') }}" title="Minhas Conquistas" style="color: var(--primary-color); margin-left: 10px;">
+                    <i class="fas fa-medal"></i>
+                </a>
+                {% endif %}
                 <a href="{{ url_for('logout') }}" class="logout-btn">Sair</a>
-                <button id="theme-toggle">Alterar Tema</button>
+                <button id="theme-toggle" aria-label="Alterar tema de cores">Alterar Tema</button>
                 <div class="theme-customizer">
-                    <button id="customizer-toggle-btn" title="Personalizar Tema">
-                        <i class="fas fa-palette"></i>
+                    <button id="customizer-toggle-btn" title="Personalizar Tema" aria-label="Abrir painel de personalização de tema">
+                        <i class="fas fa-palette" aria-hidden="true"></i>
                     </button>
                     <div id="customizer-panel" class="customizer-panel">
                         <h4>Cor do Tema</h4>
                         <div class="color-swatches">
-                            <div class="swatch" style="background-color: #4a90e2;" data-color="#4a90e2"></div>
-                            <div class="swatch" style="background-color: #50b878;" data-color="#50b878"></div>
-                            <div class="swatch" style="background-color: #f5a623;" data-color="#f5a623"></div>
-                            <div class="swatch" style="background-color: #e57373;" data-color="#e57373"></div>
-                            <div class="swatch" style="background-color: #9013fe;" data-color="#9013fe"></div>
+                            <div class="swatch" style="background-color: #4a90e2;" data-color="#4a90e2" aria-label="Selecionar cor azul"></div>
+                            <div class="swatch" style="background-color: #50b878;" data-color="#50b878" aria-label="Selecionar cor verde"></div>
+                            <div class="swatch" style="background-color: #f5a623;" data-color="#f5a623" aria-label="Selecionar cor amarela"></div>
+                            <div class="swatch" style="background-color: #e57373;" data-color="#e57373" aria-label="Selecionar cor vermelha"></div>
+                            <div class="swatch" style="background-color: #9013fe;" data-color="#9013fe" aria-label="Selecionar cor roxa"></div>
                         </div>
                         <div class="custom-color-section">
                             <label for="theme-color-picker">Customizada</label>
-                            <input type="color" id="theme-color-picker">
+                            <input type="color" id="theme-color-picker" aria-label="Seletor de cor customizada">
                         </div>
                         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
                         <div class="setting-row">
                             <label for="gradient-toggle">Fundo Animado</label>
                             <label class="switch">
-                                <input type="checkbox" id="gradient-toggle">
+                                <input type="checkbox" id="gradient-toggle" role="switch">
                                 <span class="slider round"></span>
                             </label>
                         </div>
@@ -98,7 +105,7 @@
         </div>
     </nav>
 
-    <main class="container">
+    <main class="container" role="main">
         {% block content %}{% endblock %}
     </main>
 
@@ -172,17 +179,18 @@
             // Responsive menu toggle
             if(menuToggle && navLinks) {
                 menuToggle.addEventListener('click', () => {
-                    navLinks.classList.toggle('active');
+                    const isExpanded = navLinks.classList.toggle('active');
+                    menuToggle.setAttribute('aria-expanded', isExpanded);
                 });
             }
             
             // Dropdown menu toggle
             navDropdowns.forEach(dropdown => {
-                dropdown.addEventListener('click', (event) => {
-                    if (event.target.closest('.nav-dropdown-toggle')) {
-                        event.preventDefault();
-                        dropdown.classList.toggle('active');
-                    }
+                const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+                toggle.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const isExpanded = dropdown.classList.toggle('active');
+                    toggle.setAttribute('aria-expanded', isExpanded);
                 });
             });
 

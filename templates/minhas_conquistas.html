@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Minhas Conquistas{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">Minhas Conquistas</h1>
+    </div>
+    <div class="card-body">
+        <p>Aqui estão todas as medalhas que você pode ganhar. As coloridas são as que você já desbloqueou. Continue a esforçar-se para ganhar todas!</p>
+        
+        <div class="achievements-grid">
+            {% for conquista in todas_conquistas %}
+                {% set unlocked_info = conquistas_aluno.get(conquista.id) %}
+                <div class="achievement-card {% if unlocked_info %}unlocked{% else %}locked{% endif %}">
+                    <div class="achievement-icon">
+                        <i class="fas {{ conquista.icone }}"></i>
+                        {% if not unlocked_info %}
+                            <i class="fas fa-lock lock-overlay"></i>
+                        {% endif %}
+                    </div>
+                    <div class="achievement-info">
+                        <h3 class="achievement-title">{{ conquista.titulo }}</h3>
+                        <p class="achievement-desc">{{ conquista.descricao }}</p>
+                        {% if unlocked_info %}
+                            <p class="achievement-date">
+                                <i class="fas fa-check-circle"></i> Desbloqueado em: {{ unlocked_info.data }}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

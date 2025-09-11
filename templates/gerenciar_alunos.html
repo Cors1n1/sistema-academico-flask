@@ -43,6 +43,7 @@
 
     <h2 style="font-weight: 400; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-top: 50px;">Cadastrar Novo Aluno</h2>
     <form method="post" action="{{ url_for('gerenciar_alunos') }}" style="margin-top: 20px;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label for="nome">Nome Completo (será o username):</label>
             <input type="text" id="nome" name="nome" required>

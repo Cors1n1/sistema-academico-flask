@@ -20,6 +20,7 @@
     
     <div class="chat-input-area">
         <form id="chat-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="text" id="chat-input" placeholder="Digite sua pergunta..." required>
             <button type="submit" id="send-btn" title="Enviar"><i class="fas fa-paper-plane"></i></button>
         </form>
@@ -27,6 +28,8 @@
 </div>
 
 <script>
+    const csrfToken = "{{ csrf_token() }}";
+
     document.getElementById('chat-form').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -44,6 +47,7 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
             },
             body: JSON.stringify({ message: userMessage })
         })

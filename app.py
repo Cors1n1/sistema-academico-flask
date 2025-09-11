@@ -6,7 +6,8 @@ from funcoes.funcoes import (
     carregar_exercicios, salvar_exercicios, carregar_provas, salvar_provas,
     carregar_resultados_provas, salvar_resultados_provas,
     buscar_resultados_por_prova_id, buscar_prova_por_id,
-    gerar_senha_aleatoria, gerar_token_recuperacao, verificar_token_recuperacao, carregar_alunos
+    gerar_senha_aleatoria, gerar_token_recuperacao, verificar_token_recuperacao, carregar_alunos,
+    verificar_e_atribuir_conquistas, carregar_conquistas_definidas, calcular_ranking_por_curso
 )
 from flask_mail import Mail, Message
 import json
@@ -23,28 +24,39 @@ import time
 import random
 from werkzeug.utils import secure_filename
 import requests
+from dotenv import load_dotenv
+from flask_wtf.csrf import CSRFProtect
+
+# Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = 'chave-secreta-para-o-projeto-unip-12345'
+
+# Inicializa a proteção CSRF
+csrf = CSRFProtect(app)
+
 UPLOAD_FOLDER = 'static/uploads/profile_pics'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Configurações do Flask-Mail (Exemplo usando Gmail)
+# Configurações do Flask-Mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'sistema.academico.pim@gmail.com' # Substitua pelo seu e-mail
-app.config['MAIL_PASSWORD'] = 'zjvx fqac ofeo msfe' # Sua senha de app
-app.config['MAIL_DEFAULT_SENDER'] = 'sistema.academico.pim@gmail.com' 
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
 mail = Mail(app)
 
-# CONFIGURAÇÃO DO LOG
-handler = RotatingFileHandler('app.log', maxBytes=100000, backupCount=3, encoding='utf-8')
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
-app.logger.addHandler(handler)
-app.logger.setLevel(logging.INFO)
+# CONFIGURAÇÃO DO LOG - CORRIGIDO PARA EVITAR ERRO DE PERMISSÃO
+if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+    handler = RotatingFileHandler('app.log', maxBytes=100000, backupCount=3, encoding='utf-8')
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
+    handler.setFormatter(formatter)
+    app.logger.addHandler(handler)
+    app.logger.setLevel(logging.INFO)
 
 # DECORATORS DE PERMISSÃO
 def login_required(f):
@@ -533,7 +545,7 @@ def ver_prova(prova_id):
         aluno_atual = next((aluno for aluno in alunos if aluno.get('nome') == username), None)
         if not aluno_atual or prova_selecionada.get('curso') not in aluno_atual.get('curso', []):
             flash('Você não tem permissão para ver esta prova.', 'danger')
-            return redirect(url_for('lista_provas'))
+            return redirect(url_for('lista_aulas'))
         
         if prova_ja_feita:
             flash('Você já realizou esta prova.', 'warning')
@@ -593,6 +605,12 @@ def corrigir_prova(prova_id):
     salvar_resultados_provas(resultados)
     app.logger.info(f"Usuário '{session['username']}' concluiu a prova '{prova_selecionada['titulo']}' com pontuação {pontuacao}/{total_questoes}.")
     
+    # --- NOVO CÓDIGO DE GAMIFICAÇÃO ---
+    novas_conquistas = verificar_e_atribuir_conquistas(session['username'])
+    for conquista in novas_conquistas:
+        flash(f'🎉 Nova Conquista Desbloqueada: {conquista["titulo"]}!', 'success')
+    # --- FIM DO NOVO CÓDIGO ---
+
     return render_template('resultado_prova.html', 
                            prova=prova_selecionada,
                            pontuacao=pontuacao,
@@ -660,16 +678,17 @@ def gerenciar_alunos():
 
 @app.route('/editar_aluno/<nome_do_aluno>', methods=['GET', 'POST'])
 @login_required
-@permission_required(['admin']) # Apenas admins podem editar alunos
+@permission_required(['admin'])
 def editar_aluno(nome_do_aluno):
     todos_dados = carregar_dados()
     aluno_para_editar = next((aluno for aluno in todos_dados if aluno.get('nome') == nome_do_aluno), None)
-    if not aluno_para_editar: return redirect(url_for('gerenciar_alunos'))
-    
+    if not aluno_para_editar:
+        return redirect(url_for('gerenciar_alunos'))
+
     if request.method == 'POST':
         aluno_para_editar['nascimento'] = request.form['nascimento']
         
-        role = request.form['role']
+        role = request.form.get('role')
         if role == 'aluno':
             aluno_para_editar['horas_estudo'] = float(request.form['horas_estudo'])
             aluno_para_editar['curso'] = request.form.getlist('curso')
@@ -679,7 +698,7 @@ def editar_aluno(nome_do_aluno):
         else: # admin
             aluno_para_editar['horas_estudo'] = None
             aluno_para_editar['curso'] = []
-            
+
         aluno_para_editar['celular'] = request.form.get('celular')
         aluno_para_editar['cep'] = request.form.get('cep')
         aluno_para_editar['rua'] = request.form.get('rua')
@@ -1149,7 +1168,7 @@ def exportar(formato):
             df.to_excel(writer, index=False, sheet_name='Alunos')
             writer.close()
             output.seek(0)
-            return Response(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', headers={'Content-Disposition': 'attachment;filename=relatorio_alunos.xlsx'})
+            return Response(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', headers={'Content-Disposition': f'attachment;filename=relatorio_alunos.xlsx'})
         except ImportError:
             flash("Bibliotecas Pandas/OpenPyXL não encontradas para gerar Excel.", "danger")
             return redirect(url_for('lista_alunos'))
@@ -1163,8 +1182,12 @@ def assistente_ia():
         response_text = ""
         
         try:
-            api_key = "AIzaSyAuo-XIDTOzDRXdWfYqb53FLIVYeJki8JY"
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+            api_key = os.getenv("GEMINI_API_KEY")
+            if not api_key:
+                return jsonify({'response': 'Chave de API do Gemini não configurada.'}), 500
+            
+            # URL CORRIGIDA: Utilizando o modelo gemini-1.5-flash
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
             payload = {
                 "contents": [
                     {
@@ -1186,6 +1209,92 @@ def assistente_ia():
         return jsonify({'response': response_text})
     
     return render_template('assistente_ia.html')
+
+# --- ROTAS DE GAMIFICAÇÃO ---
+@app.route('/minhas_conquistas')
+@login_required
+def minhas_conquistas():
+    username = session.get('username')
+    
+    # Carrega os dados do aluno
+    pessoas = carregar_dados()
+    aluno = next((p for p in pessoas if p.get('nome') == username), None)
+    
+    # Carrega todas as conquistas definidas e as que o aluno já tem
+    todas_conquistas = carregar_conquistas_definidas()
+    conquistas_aluno = {c['id']: c for c in aluno.get('conquistas', [])}
+    
+    return render_template('minhas_conquistas.html', 
+                           todas_conquistas=todas_conquistas, 
+                           conquistas_aluno=conquistas_aluno)
+
+@app.route('/ranking')
+@login_required
+def ranking():
+    rankings = calcular_ranking_por_curso()
+    return render_template('ranking.html', rankings=rankings)
+
+@app.route('/meu_progresso')
+@login_required
+def meu_progresso():
+    username = session.get('username')
+    todos_resultados = carregar_resultados_provas()
+    resultados_aluno = [r for r in todos_resultados if r.get('usuario') == username]
+
+    # Prepara os dados para o dashboard
+    dados_dashboard = {
+        'kpis': {
+            'media_geral': 0,
+            'provas_realizadas': len(resultados_aluno)
+        },
+        'desempenho_cursos': [],
+        'atividades_recentes': []
+    }
+
+    if resultados_aluno:
+        cursos = {}
+        total_pontos_geral = 0
+        total_questoes_geral = 0
+
+        for res in resultados_aluno:
+            curso = res.get('curso', 'Geral')
+            pontos = res.get('pontuacao', 0)
+            questoes = res.get('total_questoes', 0)
+
+            total_pontos_geral += pontos
+            total_questoes_geral += questoes
+
+            if curso not in cursos:
+                cursos[curso] = {'total_pontos': 0, 'total_questoes': 0}
+            cursos[curso]['total_pontos'] += pontos
+            cursos[curso]['total_questoes'] += questoes
+        
+        # Calcula a média de acertos por curso
+        for curso, data in cursos.items():
+            if data['total_questoes'] > 0:
+                media = (data['total_pontos'] / data['total_questoes']) * 100
+                dados_dashboard['desempenho_cursos'].append({
+                    'curso': curso,
+                    'media': round(media)
+                })
+
+        # Calcula a média geral
+        if total_questoes_geral > 0:
+            media_geral = (total_pontos_geral / total_questoes_geral) * 100
+            dados_dashboard['kpis']['media_geral'] = round(media_geral, 2)
+
+        # Prepara a lista de atividades recentes (as últimas 5)
+        resultados_ordenados = sorted(resultados_aluno, key=lambda x: datetime.strptime(x['data'], "%d/%m/%Y %H:%M:%S"), reverse=True)
+        for res in resultados_ordenados[:5]:
+            score_percent = (res['pontuacao'] / res['total_questoes'] * 100) if res['total_questoes'] > 0 else 0
+            dados_dashboard['atividades_recentes'].append({
+                'titulo': res['titulo_prova'],
+                'data': res['data'].split(' ')[0],
+                'pontuacao': f"{res['pontuacao']}/{res['total_questoes']}",
+                'score_percent': round(score_percent)
+            })
+
+    return render_template('meu_progresso.html', dados=dados_dashboard)
 
 
 if __name__ == '__main__':

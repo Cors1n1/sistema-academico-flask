@@ -4,6 +4,7 @@
 <div class="card">
     <h1>Editar Aluno: {{ aluno.nome }}</h1>
     <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label>Nome do Aluno (não pode ser alterado)</label>
             <input type="text" value="{{ aluno.nome }}" readonly disabled>

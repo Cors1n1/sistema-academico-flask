@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Ranking da Turma{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">Ranking da Turma</h1>
+    </div>
+    <div class="card-body">
+        <p>Veja a sua posição e a dos seus colegas em cada curso com base na média de acertos em todas as provas.</p>
+        
+        {% if rankings %}
+            {% for curso, ranking in rankings.items() %}
+                <div class="course-section">
+                    <h2 class="course-title mt-4">{{ curso }}</h2>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mt-3 ranking-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">Posição</th>
+                                    <th>Aluno</th>
+                                    <th>Média Geral</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for aluno in ranking %}
+                                    <tr class="rank-{{ loop.index }}">
+                                        <td class="rank-position">
+                                            {% if loop.index == 1 %}
+                                                <i class="fas fa-trophy gold"></i>
+                                            {% elif loop.index == 2 %}
+                                                <i class="fas fa-trophy silver"></i>
+                                            {% elif loop.index == 3 %}
+                                                <i class="fas fa-trophy bronze"></i>
+                                            {% else %}
+                                                {{ loop.index }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ aluno.nome }}</td>
+                                        <td><strong>{{ aluno.media }}%</strong></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-data">Ainda não há dados suficientes para gerar o ranking. Realize algumas provas para começar!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

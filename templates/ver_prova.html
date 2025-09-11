@@ -4,7 +4,7 @@
 <div class="card">
     {% if prova %}
         <h1>{{ prova.titulo }}</h1>
-        <p style="font-style: italic; color: var(--secondary-color);">Curso: {{ prova.curso }}</p>
+        <p style="font-style: italic; color: var(--secondary-text-color);">Curso: {{ prova.curso }}</p>
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
         
         <div id="timer-container" style="text-align: right; margin-bottom: 10px;">
@@ -12,6 +12,7 @@
         </div>
         
         <form id="prova-form" action="{{ url_for('corrigir_prova', prova_id=prova.id) }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             {% for questao in prova.questoes %}
             <div class="exercicio-item mb-4 p-3 border rounded">
                 <h5>{{ loop.index }}. {{ questao.pergunta }}</h5>

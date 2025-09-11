@@ -1,7 +1,7 @@
 [
     {
         "username": "Victor",
-        "password_hash": "scrypt:32768:8:1$CyGCeF5PQBBviHeS$df7c82c07ed44f9ff291c83a54eb174a1c29d9c9d2188c9b99a7f084566fff960994f6e8d04f461ca6403796fd8cd9584eac14617721d6237fbe6fbd648c920f",
+        "password_hash": "scrypt:32768:8:1$Cq96bdS5tStWHJa7$b90baf66422756675f0aff729c00b250cfa5f31ed27a722d4793e85ef8299ca20c745454253fad8020b9960c86b3d93bc2398bb0aafa42a526e8535e99a63c49",
         "role": "admin"
     },
     {

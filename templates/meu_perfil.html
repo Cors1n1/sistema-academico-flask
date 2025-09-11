@@ -90,12 +90,14 @@
             </div>
             
             <form method="post" enctype="multipart/form-data" class="upload-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <label for="profile_pic">Alterar Foto</label>
                 <input type="file" name="profile_pic" id="profile_pic" accept="image/png, image/jpeg, image/gif">
                 <button type="submit" class="action-btn save-btn">Salvar Foto</button>
             </form>
             {% if aluno and aluno.profile_pic %}
             <form method="post" action="{{ url_for('remover_foto_perfil') }}" style="margin-top: 10px;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="action-btn delete-btn" onclick="return confirm('Tem certeza que deseja remover a foto de perfil?');">Remover Foto</button>
             </form>
             {% endif %}

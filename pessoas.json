@@ -15,7 +15,8 @@
         "cidade": "",
         "numero": "",
         "complemento": "",
-        "idade": 20
+        "idade": 20,
+        "conquistas": []
     },
     {
         "nome": "Professor",
@@ -37,7 +38,7 @@
     },
     {
         "nome": "Victor",
-        "idade": 20,
+        "idade": null,
         "curso": [],
         "horas_estudo": 6.5,
         "profile_pic": null,

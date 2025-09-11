@@ -200,3 +200,126 @@ def buscar_resultados_por_prova_id(prova_id):
 def buscar_prova_por_id(prova_id):
     provas = carregar_provas()
     return next((p for p in provas if p.get('id') == prova_id), None)
+
+# --- FUNÇÕES DE GAMIFICAÇÃO ---
+
+def carregar_conquistas_definidas():
+    """Carrega a lista de todas as conquistas possíveis a partir de conquistas.json."""
+    if not os.path.exists("conquistas.json"): return []
+    try:
+        with open("conquistas.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return []
+
+def verificar_e_atribuir_conquistas(username):
+    """Verifica todas as conquistas para um determinado aluno e as atribui se os critérios forem cumpridos."""
+    
+    # Carregar todos os dados necessários
+    pessoas = carregar_dados()
+    aluno = next((p for p in pessoas if p.get('nome') == username), None)
+    if not aluno: return []
+
+    resultados = [r for r in carregar_resultados_provas() if r.get('usuario') == username]
+    todas_as_provas = carregar_provas()
+    conquistas_definidas = carregar_conquistas_definidas()
+
+    if 'conquistas' not in aluno:
+        aluno['conquistas'] = []
+
+    conquistas_desbloqueadas_nesta_verificacao = []
+    ids_conquistas_aluno = {c['id'] for c in aluno['conquistas']}
+
+    # Lógica de verificação para cada conquista
+    for conquista in conquistas_definidas:
+        if conquista['id'] in ids_conquistas_aluno:
+            continue # Já possui esta conquista, pular
+
+        conquista_ganha = False
+        
+        # 1. Primeira Prova
+        if conquista['id'] == 'PRIMEIRA_PROVA' and len(resultados) >= 1:
+            conquista_ganha = True
+
+        # 2. Destaque da Turma (>90%)
+        if conquista['id'] == 'DESTAQUE':
+            for r in resultados:
+                if r['total_questoes'] > 0 and (r['pontuacao'] / r['total_questoes']) * 100 > 90:
+                    conquista_ganha = True
+                    break
+        
+        # 3. Perfeccionista (100%)
+        if conquista['id'] == 'PERFECCIONISTA':
+            for r in resultados:
+                if r['total_questoes'] > 0 and r['pontuacao'] == r['total_questoes']:
+                    conquista_ganha = True
+                    break
+        
+        # 4. Maratonista (3 provas)
+        if conquista['id'] == 'MARATONISTA' and len(resultados) >= 3:
+            conquista_ganha = True
+
+        # 5. Especialista em Curso (completou todas as provas de um curso)
+        cursos_para_verificar = {
+            'ESPECIALISTA_LOGICA': 'Lógica de Programação',
+            'ESPECIALISTA_LINGUAGENS': 'Linguagens de Programação',
+            'ESPECIALISTA_ESTRUTURAS': 'Algorítimos e Estruturas de dados'
+        }
+        if conquista['id'] in cursos_para_verificar:
+            nome_curso = cursos_para_verificar[conquista['id']]
+            ids_provas_curso = {p['id'] for p in todas_as_provas if p['curso'] == nome_curso}
+            ids_provas_realizadas_pelo_aluno = {r['prova_id'] for r in resultados}
+            
+            if ids_provas_curso and ids_provas_curso.issubset(ids_provas_realizadas_pelo_aluno):
+                conquista_ganha = True
+
+        # Se ganhou uma conquista, adiciona à lista do aluno
+        if conquista_ganha:
+            nova_conquista = {
+                "id": conquista['id'],
+                "titulo": conquista['titulo'],
+                "data": datetime.now().strftime("%d/%m/%Y")
+            }
+            aluno['conquistas'].append(nova_conquista)
+            conquistas_desbloqueadas_nesta_verificacao.append(conquista)
+
+    # Salva os dados atualizados do aluno
+    salvar_dados(pessoas)
+    return conquistas_desbloqueadas_nesta_verificacao
+
+def calcular_ranking_por_curso():
+    """Calcula a média de acertos de todos os alunos e os classifica por curso."""
+    alunos = carregar_alunos()
+    resultados = carregar_resultados_provas()
+    
+    # Dicionário para armazenar as pontuações dos alunos
+    pontuacoes = {aluno['nome']: {'total_pontos': 0, 'total_questoes': 0, 'cursos': aluno.get('curso', [])} for aluno in alunos}
+
+    # Calcula o total de pontos e questões para cada aluno
+    for res in resultados:
+        username = res.get('usuario')
+        if username in pontuacoes:
+            pontuacoes[username]['total_pontos'] += res.get('pontuacao', 0)
+            pontuacoes[username]['total_questoes'] += res.get('total_questoes', 0)
+
+    # Dicionário para agrupar os rankings por curso
+    ranking_por_curso = {}
+
+    # Calcula a média e organiza os alunos nos rankings dos seus respectivos cursos
+    for username, data in pontuacoes.items():
+        if data['total_questoes'] > 0:
+            media = round((data['total_pontos'] / data['total_questoes']) * 100, 2)
+            aluno_info = {
+                'nome': username,
+                'media': media
+            }
+            for curso in data['cursos']:
+                if curso not in ranking_por_curso:
+                    ranking_por_curso[curso] = []
+                ranking_por_curso[curso].append(aluno_info)
+
+    # Ordena cada ranking de curso pela média
+    for curso in ranking_por_curso:
+        ranking_por_curso[curso] = sorted(ranking_por_curso[curso], key=lambda x: x['media'], reverse=True)
+
+    return ranking_por_curso

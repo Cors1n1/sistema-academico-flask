@@ -11,6 +11,7 @@
     <h1>{{ 'Editar Aula' if aula else 'Criar Nova Aula' }}</h1>
 
     <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label for="titulo">Título da Aula:</label>
             <input type="text" id="titulo" name="titulo" required value="{{ aula.titulo if aula else '' }}">

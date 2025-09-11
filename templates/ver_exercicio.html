@@ -4,10 +4,11 @@
 <div class="card">
     {% if exercicio %}
         <h1>Exercício</h1>
-        <p style="font-style: italic; color: var(--secondary-color);">Curso: {{ exercicio.curso }}</p>
+        <p style="font-style: italic; color: var(--secondary-text-color);">Curso: {{ exercicio.curso }}</p>
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
         
         <form action="{{ url_for('corrigir_exercicio', exercicio_id=exercicio.id) }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="exercicio-item mb-4 p-3 border rounded">
                 <h5>{{ exercicio.pergunta }}</h5>
                 {% if exercicio.imagem_url %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Meu Progresso{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">Dashboard de Desempenho</h1>
+    </div>
+    <div class="card-body">
+        {% if dados.kpis.provas_realizadas > 0 %}
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background-color: #4e73df;"><i class="fas fa-bullseye"></i></div>
+                    <div class="kpi-info">
+                        <div class="kpi-value">{{ dados.kpis.media_geral }}%</div>
+                        <div class="kpi-label">Média Geral de Acerto</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background-color: #f6c23e;"><i class="fas fa-list-check"></i></div>
+                    <div class="kpi-info">
+                        <div class="kpi-value">{{ dados.kpis.provas_realizadas }}</div>
+                        <div class="kpi-label">Total de Provas Realizadas</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="course-performance-container" style="margin-top: 50px;">
+                <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Desempenho por Curso</h3>
+                <div class="performance-list">
+                    {% for item in dados.desempenho_cursos %}
+                    <div class="performance-item">
+                        <span class="performance-label">{{ item.curso }}</span>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: {{ item.media }}%;"></div>
+                            <span class="progress-bar-label">{{ item.media }}%</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="recent-activity-container" style="margin-top: 50px;">
+                <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Resultados Recentes</h3>
+                <table style="margin-top: 20px;">
+                    <thead>
+                        <tr>
+                            <th>Prova</th>
+                            <th>Data</th>
+                            <th>Pontuação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for atividade in dados.atividades_recentes %}
+                        <tr>
+                            <td>{{ atividade.titulo }}</td>
+                            <td>{{ atividade.data }}</td>
+                            <td><strong>{{ atividade.pontuacao }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="no-data">Você ainda não tem resultados de provas para que o seu progresso possa ser exibido.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
