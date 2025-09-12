@@ -3,71 +3,150 @@
 {% block title %}Hub Principal - Sistema Acadêmico{% endblock %}
 
 {% block content %}
-<div class="hub-hero" id="hub-hero">
-    {% if session.get('role') == 'admin' %}
-        <h1>Painel de Gerenciamento e Ensino</h1>
-        <p>Como administrador, sua função é gerenciar e organizar o conteúdo para a turma. Comece por aqui para administrar o sistema.</p>
-    {% elif session.get('role') == 'professor' %}
-        <h1>Painel de Ensino</h1>
-        <p>Como professor, sua função é gerenciar e organizar o conteúdo para a turma. Comece por aqui para administrar o sistema.</p>
-    {% else %}
-        <h1>Bem-vindo ao Sistema Acadêmico</h1>
-        <p>Pronto para aprender? Aqui você pode acessar suas aulas, exercícios e provas. Escolha uma opção para começar sua jornada.</p>
-    {% endif %}
+<div class="main-header">
+    <div class="main-header-content">
+        <h1>Bem-vindo(a), {{ session.username }}!</h1>
+        <p>Pronto(a) para começar sua jornada de aprendizado?</p>
+    </div>
 </div>
 
-<div class="action-grid-header">
-    <button id="reset-order-btn" class="action-btn cancel-btn">Resetar Ordem</button>
+<div class="content-wrapper">
+    <div class="main-content">
+        <section class="dashboard-hub">
+            {% if session.get('role') == 'aluno' %}
+                <a href="{{ url_for('lista_aulas') }}" class="hub-card">
+                    <i class="fas fa-book-reader"></i>
+                    <h3>Aulas Disponíveis</h3>
+                </a>
+                <a href="{{ url_for('lista_exercicios') }}" class="hub-card">
+                    <i class="fas fa-pencil-alt"></i>
+                    <h3>Faça os Exercícios</h3>
+                </a>
+                <a href="{{ url_for('meu_progresso') }}" class="hub-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Ver Meu Progresso</h3>
+                </a>
+                <a href="{{ url_for('ranking') }}" class="hub-card">
+                    <i class="fas fa-trophy"></i>
+                    <h3>Ranking da Turma</h3>
+                </a>
+                <a href="{{ url_for('meu_boletim') }}" class="hub-card">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>Meu Boletim</h3>
+                </a>
+                <a href="{{ url_for('assistente_ia') }}" class="hub-card">
+                    <i class="fas fa-robot"></i>
+                    <h3>Assistente de IA</h3>
+                </a>
+                <a href="{{ url_for('forum') }}" class="hub-card">
+                    <i class="fas fa-comments"></i>
+                    <h3>Fórum de Dúvidas</h3>
+                </a>
+                <a href="{{ url_for('lista_alunos') }}" class="hub-card">
+                    <i class="fas fa-users"></i>
+                    <h3>Ver Turma</h3>
+                </a>
+            {% elif session.get('role') == 'professor' %}
+                <a href="{{ url_for('gerenciar_aulas') }}" class="hub-card">
+                    <i class="fas fa-book-open"></i>
+                    <h3>Gerenciar Aulas</h3>
+                </a>
+                <a href="{{ url_for('dashboard_professor') }}" class="hub-card">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <h3>Ver Dashboard</h3>
+                </a>
+                <a href="{{ url_for('gerenciar_provas') }}" class="hub-card">
+                    <i class="fas fa-clipboard-check"></i>
+                    <h3>Gerenciar Provas</h3>
+                </a>
+                <a href="{{ url_for('gerenciar_exercicios') }}" class="hub-card">
+                    <i class="fas fa-tasks"></i>
+                    <h3>Gerenciar Exercícios</h3>
+                </a>
+                <a href="{{ url_for('gerenciar_resultados_provas') }}" class="hub-card">
+                    <i class="fas fa-file-invoice"></i>
+                    <h3>Resultados Provas</h3>
+                </a>
+                <a href="{{ url_for('lista_alunos') }}" class="hub-card">
+                    <i class="fas fa-users"></i>
+                    <h3>Ver Turma</h3>
+                </a>
+                <a href="{{ url_for('forum') }}" class="hub-card">
+                    <i class="fas fa-comments"></i>
+                    <h3>Fórum de Dúvidas</h3>
+                </a>
+                <a href="{{ url_for('assistente_ia') }}" class="hub-card">
+                    <i class="fas fa-robot"></i>
+                    <h3>Assistente de IA</h3>
+                </a>
+            {% elif session.get('role') == 'admin' %}
+                <a href="{{ url_for('gerenciar_alunos') }}" class="hub-card">
+                    <i class="fas fa-user-cog"></i>
+                    <h3>Gerenciar Alunos</h3>
+                </a>
+                <a href="{{ url_for('relatorio') }}" class="hub-card">
+                    <i class="fas fa-chart-pie"></i>
+                    <h3>Relatórios Detalhados</h3>
+                </a>
+                <a href="{{ url_for('view_logs') }}" class="hub-card">
+                    <i class="fas fa-history"></i>
+                    <h3>Ver Logs do Sistema</h3>
+                </a>
+                <a href="{{ url_for('gerenciar_aulas') }}" class="hub-card">
+                    <i class="fas fa-book-open"></i>
+                    <h3>Gerenciar Aulas</h3>
+                </a>
+                <a href="{{ url_for('gerenciar_exercicios') }}" class="hub-card">
+                    <i class="fas fa-tasks"></i>
+                    <h3>Gerenciar Exercícios</h3>
+                </a>
+                <a href="{{ url_for('gerenciar_provas') }}" class="hub-card">
+                    <i class="fas fa-clipboard-check"></i>
+                    <h3>Gerenciar Provas</h3>
+                </a>
+                <a href="{{ url_for('gerenciar_resultados_provas') }}" class="hub-card">
+                    <i class="fas fa-file-invoice"></i>
+                    <h3>Resultados Provas</h3>
+                </a>
+                <a href="{{ url_for('forum') }}" class="hub-card">
+                    <i class="fas fa-comments"></i>
+                    <h3>Fórum de Dúvidas</h3>
+                </a>
+                <a href="{{ url_for('assistente_ia') }}" class="hub-card">
+                    <i class="fas fa-robot"></i>
+                    <h3>Assistente de IA</h3>
+                </a>
+            {% endif %}
+        </section>
+    </div>
+
+    <aside class="activity-sidebar">
+        {% if session.get('role') == 'aluno' and aluno %}
+            <h3>Minhas Conquistas Recentes</h3>
+            <div class="achievements-list">
+                {% for conquista in aluno.get('conquistas', []) | reverse | slice(5) %}
+                <div class="achievement-item">
+                    <i class="fas fa-medal"></i>
+                    <div class="achievement-info">
+                        <strong>{{ conquista.titulo }}</strong>
+                        <small>Desbloqueado em {{ conquista.data }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% elif session.get('role') == 'admin' %}
+            <h3>Últimas Atividades (Logs)</h3>
+            <div class="log-feed">
+                <div class="log-item">
+                    <strong>INFO:</strong> Usuário 'admin' fez login.
+                    <small>12/09/2025 10:50</small>
+                </div>
+                <div class="log-item">
+                    <strong>WARNING:</strong> Login falhou para 'visitante'.
+                    <small>12/09/2025 10:45</small>
+                </div>
+            </div>
+        {% endif %}
+    </aside>
 </div>
-<div class="action-grid" id="action-grid">
-    {% for card in cards %}
-    <a href="{{ card.url }}" class="action-card" data-card="{{ card.id }}">
-        <i class="{{ card.icon }}"></i>
-        <h2>{{ card.title }}</h2>
-        <p>{{ card.desc }}</p>
-    </a>
-    {% endfor %}
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const grid = document.getElementById('action-grid');
-        const resetButton = document.getElementById('reset-order-btn');
-
-        // Inicializa a biblioteca Sortable.js
-        new Sortable(grid, {
-            animation: 150,
-            ghostClass: 'ghost-item',
-            onEnd: function (evt) {
-                const newOrder = Array.from(grid.children).map(card => card.dataset.card);
-                
-                // Envia a nova ordem para o servidor via fetch
-                fetch('{{ url_for("save_card_order") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ order: newOrder }),
-                });
-            },
-        });
-
-        // Adiciona o evento de clique para o botão de reset
-        if (resetButton) {
-            resetButton.addEventListener('click', function() {
-                // Envia uma requisição para a nova rota de reset no Flask
-                fetch('{{ url_for("reset_card_order") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }).then(response => {
-                    if (response.ok) {
-                        window.location.reload(); // Recarrega a página para aplicar a ordem padrão
-                    }
-                });
-            });
-        }
-    });
-</script>
 {% endblock %}

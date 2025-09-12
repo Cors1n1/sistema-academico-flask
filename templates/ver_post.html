@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.titulo }}{% endblock %}
+
+{% block head %}
+    <style>
+        .post-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .post-header h1 {
+            font-size: 2.2em;
+            margin: 0 0 5px 0;
+            color: var(--primary-color);
+        }
+
+        .post-meta {
+            font-size: 0.9em;
+            color: var(--secondary-text-color);
+            margin: 0;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .post-content {
+            padding: 20px 0;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+        
+        .comment-section {
+            margin-top: 40px;
+        }
+
+        .comment-section h2 {
+            font-size: 1.8em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .comment-card {
+            background-color: var(--surface-color);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+        
+        .comment-card:hover {
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+
+        .comment-meta {
+            font-size: 0.85em;
+            color: var(--secondary-text-color);
+            margin-bottom: 5px;
+        }
+        
+        .comment-meta strong {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .comment-card p {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .comment-form {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .comment-form h3 {
+            margin-top: 0;
+            font-size: 1.5em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .comment-form textarea {
+            min-height: 120px;
+        }
+        
+        .action-btn.save-btn {
+            margin-top: 20px;
+            width: auto;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    {% if post %}
+        <div class="post-header">
+            <h1>{{ post.titulo }}</h1>
+            <div class="post-meta">
+                <span>Curso: <strong>{{ post.curso }}</strong></span>
+                <span>Por: <strong>{{ post.autor }}</strong></span>
+                <span>Em: <strong>{{ post.data }}</strong></span>
+            </div>
+        </div>
+
+        <div class="post-content">
+            <p>{{ post.conteudo }}</p>
+        </div>
+
+        <div class="comment-section">
+            <h2>Comentários ({{ post.respostas | length }})</h2>
+            {% for resposta in post.respostas %}
+            <div class="comment-card">
+                <div class="comment-meta">
+                    <strong>{{ resposta.autor }}</strong> em {{ resposta.data }}
+                </div>
+                <p>{{ resposta.conteudo }}</p>
+            </div>
+            {% endfor %}
+
+            <div class="comment-form">
+                <h3>Adicionar um Comentário</h3>
+                <form method="post" action="{{ url_for('ver_post', post_id=post.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <label for="comentario">Seu comentário:</label>
+                        <textarea id="comentario" name="comentario" class="form-control" required></textarea>
+                    </div>
+                    <button type="submit" class="action-btn save-btn">Enviar Comentário</button>
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <p class="no-data">Tópico de discussão não encontrado.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+[
+    {
+        "id": "1757644216",
+        "autor": "Aluno",
+        "titulo": "teste",
+        "curso": "Lógica de Programação",
+        "conteudo": "teste",
+        "data": "11/09/2025 23:30",
+        "visualizacoes": 11,
+        "respostas": []
+    },
+    {
+        "id": "1757642261",
+        "autor": "Aluno",
+        "titulo": "Aula 01",
+        "curso": "Lógica de Programação",
+        "conteudo": "Ajuda\r\n",
+        "data": "11/09/2025 22:57",
+        "visualizacoes": 19,
+        "respostas": [
+            {
+                "autor": "Aluno",
+                "conteudo": "sim\r\n",
+                "data": "11/09/2025 23:02"
+            },
+            {
+                "autor": "Aluno",
+                "conteudo": "sim\r\n",
+                "data": "11/09/2025 23:02"
+            }
+        ]
+    }
+]

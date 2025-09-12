@@ -16,7 +16,28 @@
         "numero": "",
         "complemento": "",
         "idade": 20,
-        "conquistas": []
+        "conquistas": [
+            {
+                "id": "PRIMEIRA_PROVA",
+                "titulo": "Iniciado",
+                "data": "11/09/2025"
+            },
+            {
+                "id": "DESTAQUE",
+                "titulo": "Destaque da Turma",
+                "data": "11/09/2025"
+            },
+            {
+                "id": "PERFECCIONISTA",
+                "titulo": "Perfeccionista",
+                "data": "11/09/2025"
+            },
+            {
+                "id": "ESPECIALISTA_LOGICA",
+                "titulo": "Especialista em Lógica",
+                "data": "11/09/2025"
+            }
+        ]
     },
     {
         "nome": "Professor",

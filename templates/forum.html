@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Fórum de Dúvidas{% endblock %}
+
+{% block head %}
+    <style>
+        .forum-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .forum-header-info h1 {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+        }
+
+        .forum-header-info p {
+            font-size: 1em;
+            color: var(--secondary-text-color);
+            margin: 0;
+        }
+
+        /* Estilos para o link de criar tópico */
+        .create-topic-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+            color: var(--text-color);
+            margin-bottom: 40px;
+            transition: all 0.2s ease-in-out;
+            padding: 10px 0;
+        }
+
+        .create-topic-link:hover {
+            transform: translateX(10px);
+            color: var(--primary-color);
+        }
+
+        .create-topic-link i {
+            font-size: 2.5em;
+            color: var(--primary-color);
+        }
+
+        .create-topic-content h2 {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .create-topic-content p {
+            font-size: 0.9em;
+            color: var(--secondary-text-color);
+            margin: 5px 0 0 0;
+        }
+
+        /* --- Estilos para a Lista de Tópicos (Aprimorados) --- */
+
+        .course-section {
+            margin-bottom: 40px;
+        }
+
+        .course-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .post-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            text-align: left; /* Garante alinhamento à esquerda */
+        }
+
+        .post-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            border-color: var(--primary-color);
+        }
+
+        .post-card-main-info {
+            flex-grow: 1;
+            margin-right: 20px;
+        }
+
+        .post-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 0 0 5px 0;
+        }
+
+        .post-preview {
+            font-size: 0.9em;
+            color: var(--secondary-text-color);
+            margin: 0;
+        }
+
+        .post-card-meta {
+            text-align: right;
+            font-size: 0.9em;
+            white-space: nowrap;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .post-card-author {
+            font-size: 1em; /* Ajuste para ter o mesmo tamanho da data */
+            color: var(--secondary-text-color);
+        }
+
+        .post-card-author .author-name {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .post-card-date {
+            font-style: italic;
+            color: var(--secondary-text-color);
+        }
+        
+        .post-card-stats {
+            display: flex;
+            justify-content: flex-end; /* Alinha os ícones à direita */
+            gap: 15px; /* Adiciona espaço entre os ícones */
+            margin-top: 10px;
+        }
+
+        .post-card-stats i {
+            margin-right: 5px;
+            color: var(--primary-color); /* Destaca a cor dos ícones */
+        }
+        
+        @media (max-width: 768px) {
+            .post-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .post-card-main-info {
+                width: 100%;
+                margin-right: 0;
+            }
+            .post-card-meta {
+                width: 100%;
+                text-align: left;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                border-top: 1px dashed var(--border-color);
+                padding-top: 15px;
+            }
+            .post-card-stats {
+                justify-content: flex-start;
+                margin-top: 0;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="forum-header">
+        <div class="forum-header-info">
+            <h1>Fórum de Dúvidas</h1>
+            <p>Participe das discussões e ajude seus colegas.</p>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <a href="{{ url_for('novo_post') }}" class="create-topic-link">
+        <i class="fas fa-plus-circle"></i>
+        <div class="create-topic-content">
+            <h2>Criar um Novo Tópico</h2>
+            <p>Clique aqui para iniciar uma nova discussão.</p>
+        </div>
+    </a>
+
+    {% if posts_por_curso %}
+        {% for curso, posts in posts_por_curso.items() %}
+        <div class="course-section">
+            <h2 class="course-title">{{ curso }}</h2>
+            {% for post in posts %}
+            <a href="{{ url_for('ver_post', post_id=post.id) }}" class="post-card">
+                <div class="post-card-main-info">
+                    <h3 class="post-title">{{ post.titulo }}</h3>
+                    <p class="post-preview">{{ post.conteudo[:100] }}...</p>
+                </div>
+                <div class="post-card-meta">
+                    <div class="post-card-author">
+                        Por: <span class="author-name">{{ post.autor }}</span>
+                    </div>
+                    <div class="post-card-date">{{ post.data }}</div>
+                    <div class="post-card-stats">
+                        <span><i class="fas fa-comments"></i> {{ post.respostas | length }}</span>
+                        <span><i class="fas fa-eye"></i> {{ post.visualizacoes }}</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-data">Nenhum tópico de discussão criado ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}

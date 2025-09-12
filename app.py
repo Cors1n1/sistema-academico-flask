@@ -7,7 +7,10 @@ from funcoes.funcoes import (
     carregar_resultados_provas, salvar_resultados_provas,
     buscar_resultados_por_prova_id, buscar_prova_por_id,
     gerar_senha_aleatoria, gerar_token_recuperacao, verificar_token_recuperacao, carregar_alunos,
-    verificar_e_atribuir_conquistas, carregar_conquistas_definidas, calcular_ranking_por_curso
+    verificar_e_atribuir_conquistas, carregar_conquistas_definidas, calcular_ranking_por_curso,
+    calcular_media_horas_estudo_por_curso, calcular_progresso_por_curso_e_topico,
+    calcular_media_notas_por_prova, identificar_questoes_criticas, identificar_alunos_com_baixo_desempenho,
+    carregar_forum, salvar_forum, buscar_post_por_id
 )
 from flask_mail import Mail, Message
 import json
@@ -15,7 +18,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import pandas as pd
 from weasyprint import HTML
 import io
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import logging
 from logging.handlers import RotatingFileHandler
 import os
@@ -26,15 +29,25 @@ from werkzeug.utils import secure_filename
 import requests
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
+from flask_socketio import SocketIO, emit
+from collections import defaultdict
+
 
 # Carrega as variáveis de ambiente do arquivo .env
-load_dotenv()
+# Adicionei o caminho explícito para garantir que o arquivo seja encontrado.
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+dotenv_path = BASE_DIR / '.env'
+load_dotenv(dotenv_path)
 
 app = Flask(__name__)
 app.secret_key = 'chave-secreta-para-o-projeto-unip-12345'
 
 # Inicializa a proteção CSRF
 csrf = CSRFProtect(app)
+
+# Inicializa o SocketIO
+socketio = SocketIO(app)
 
 UPLOAD_FOLDER = 'static/uploads/profile_pics'
 if not os.path.exists(UPLOAD_FOLDER):
@@ -215,52 +228,13 @@ def alterar_senha():
 @app.route('/')
 @login_required
 def index():
-    # Define a lista completa de cards
-    all_cards = [
-        {'id': 'aulas', 'url': url_for('lista_aulas'), 'icon': 'fas fa-graduation-cap', 'title': 'Acessar Aulas', 'desc': 'Veja todo o material de estudo e as aulas preparadas para o seu curso.'},
-        {'id': 'turma', 'url': url_for('lista_alunos'), 'icon': 'fas fa-users', 'title': 'Ver Turma', 'desc': 'Visualize os colegas de turma e seus cursos.'},
-        {'id': 'exercicios', 'url': url_for('lista_exercicios'), 'icon': 'fas fa-pencil-alt', 'title': 'Exercícios', 'desc': 'Acesse e responda aos exercícios de avaliação do seu curso.'},
-        {'id': 'provas', 'url': url_for('lista_provas'), 'icon': 'fas fa-list-alt', 'title': 'Fazer Provas', 'desc': 'Acesse as provas do seu curso para avaliação do seu progresso.'},
-        {'id': 'boletim', 'url': url_for('meu_boletim'), 'icon': 'fas fa-clipboard-list', 'title': 'Meu Boletim', 'desc': 'Acesse seu histórico de resultados em todas as provas.', 'role': 'aluno'},
-        {'id': 'assistente_ia', 'url': url_for('assistente_ia'), 'icon': 'fas fa-robot', 'title': 'Assistente de IA', 'desc': 'Tire suas dúvidas e aprofunde seus conhecimentos com a ajuda da nossa IA.'},
-        {'id': 'gerenciar_alunos', 'url': url_for('gerenciar_alunos'), 'icon': 'fas fa-user-cog', 'title': 'Gerenciar Alunos', 'desc': 'Adicione, edite e delete alunos e suas contas de acesso.', 'role': 'admin'},
-        {'id': 'gerenciar_aulas', 'url': url_for('gerenciar_aulas'), 'icon': 'fas fa-book-open', 'title': 'Gerenciar Aulas', 'desc': 'Crie, edite e organize o conteúdo das aulas para os alunos.', 'role': 'admin_e_professor'},
-        {'id': 'gerenciar_exercicios', 'url': url_for('gerenciar_exercicios'), 'icon': 'fas fa-tasks', 'title': 'Gerenciar Exercícios', 'desc': 'Crie, edite e organize os exercícios de avaliação.', 'role': 'admin_e_professor'},
-        {'id': 'gerenciar_provas', 'url': url_for('gerenciar_provas'), 'icon': 'fas fa-clipboard-check', 'title': 'Gerenciar Provas', 'desc': 'Crie, edite e delete provas para os cursos.', 'role': 'admin_e_professor'},
-        {'id': 'gerenciar_resultados', 'url': url_for('gerenciar_resultados_provas'), 'icon': 'fas fa-file-invoice', 'title': 'Resultados das Provas', 'desc': 'Monitore os resultados de todas as provas realizadas.', 'role': 'admin_e_professor'},
-        {'id': 'relatorio', 'url': url_for('relatorio'), 'icon': 'fas fa-chart-pie', 'title': 'Gerar Relatório', 'desc': 'Acesse as estatísticas importantes do sistema.'},
-        {'id': 'logs', 'url': url_for('view_logs'), 'icon': 'fas fa-clipboard-list', 'title': 'Ver Logs', 'desc': 'Monitore as atividades registradas no sistema.', 'role': 'admin'},
-    ]
+    # Carrega o perfil do aluno para a barra de conquistas
+    aluno = None
+    if session.get('role') == 'aluno':
+        todos_alunos = carregar_dados()
+        aluno = next((p for p in todos_alunos if p.get('nome') == session.get('username')), None)
 
-    # Lógica de filtragem dos cards por role
-    user_role = session.get('role')
-    if user_role == 'admin':
-        visible_cards = all_cards
-    elif user_role == 'professor':
-        visible_cards = [
-            card for card in all_cards
-            if card.get('role') in ['admin_e_professor', None] or card.get('id', '').startswith('gerenciar_')
-        ]
-        visible_cards.extend([
-            card for card in all_cards
-            if card.get('id') in ['aulas', 'exercicios', 'provas'] and card not in visible_cards
-        ])
-    else: # aluno
-        visible_cards = [card for card in all_cards if card.get('role') not in ['admin', 'professor'] and not card.get('id', '').startswith('gerenciar_')]
-
-    
-    # Pega a ordem salva na sessão, se existir
-    card_order = session.get('card_order')
-    if card_order:
-        card_dict = {card['id']: card for card in visible_cards}
-        ordered_cards = [card_dict[card_id] for card_id in card_order if card_id in card_dict]
-        existing_card_ids = {card['id'] for card in ordered_cards}
-        for card in visible_cards:
-            if card['id'] not in existing_card_ids:
-                ordered_cards.append(card)
-        visible_cards = ordered_cards
-
-    return render_template('index.html', cards=visible_cards)
+    return render_template('index.html', aluno=aluno)
 
 @app.route('/save_card_order', methods=['POST'])
 @login_required
@@ -297,6 +271,14 @@ def meu_perfil():
                     flash('Foto de perfil atualizada com sucesso!', 'success')
                 else:
                     flash('Perfil de usuário não encontrado para salvar a foto.', 'danger')
+        
+        # Lógica para salvar a meta de estudo
+        meta_estudo = request.form.get('meta_estudo')
+        if meta_estudo and aluno_correspondente:
+            aluno_correspondente['meta_estudo'] = float(meta_estudo)
+            salvar_dados(todos_dados)
+            flash('Meta de estudo atualizada com sucesso!', 'success')
+            
         return redirect(url_for('meu_perfil'))
 
     return render_template('meu_perfil.html', aluno=aluno_correspondente)
@@ -325,6 +307,8 @@ def remover_foto_perfil():
 @app.route('/lista_alunos')
 @login_required
 def lista_alunos():
+    search_query = request.args.get('search_query', '').lower()
+    
     if session.get('role') in ['admin', 'professor']:
         alunos_por_curso = {}
         todos_alunos = carregar_alunos()
@@ -339,9 +323,7 @@ def lista_alunos():
                     if curso not in alunos_por_curso:
                         alunos_por_curso[curso] = []
                     alunos_por_curso[curso].append(aluno)
-        
-        return render_template('lista_alunos.html', alunos_por_curso=alunos_por_curso)
-    else:
+    else: # aluno
         username = session.get('username')
         todos_alunos = carregar_alunos()
         alunos_do_usuario = [aluno for aluno in todos_alunos if aluno.get('nome') == username]
@@ -363,9 +345,23 @@ def lista_alunos():
                         if curso not in alunos_por_curso:
                             alunos_por_curso[curso] = []
                         alunos_por_curso[curso].append(aluno)
-            return render_template('lista_alunos.html', alunos_por_curso=alunos_por_curso)
         else:
             return render_template('lista_alunos.html', alunos_por_curso={})
+
+    # Lógica de filtragem
+    if search_query:
+        for curso, alunos_list in list(alunos_por_curso.items()):
+            filtered_alunos = [
+                aluno for aluno in alunos_list
+                if search_query in aluno.get('nome', '').lower() or
+                   any(search_query in c.lower() for c in aluno.get('curso', []))
+            ]
+            if filtered_alunos:
+                alunos_por_curso[curso] = filtered_alunos
+            else:
+                del alunos_por_curso[curso]
+
+    return render_template('lista_alunos.html', alunos_por_curso=alunos_por_curso)
 
 # --- ROTAS DE AULAS ---
 @app.route('/aulas')
@@ -518,7 +514,7 @@ def lista_provas():
                     
                     if curso_do_aluno not in provas_por_curso:
                         provas_por_curso[curso_do_aluno] = []
-                    provas_por_curso[curso_do_aluno].extend(provas_do_curso)
+                    provas_por_curso[curso_do_aluno].append(prova)
 
     return render_template('provas.html', provas_por_curso=provas_por_curso)
 
@@ -609,6 +605,8 @@ def corrigir_prova(prova_id):
     novas_conquistas = verificar_e_atribuir_conquistas(session['username'])
     for conquista in novas_conquistas:
         flash(f'🎉 Nova Conquista Desbloqueada: {conquista["titulo"]}!', 'success')
+        socketio.emit('nova_conquista', {'usuario': session['username'], 'titulo': conquista['titulo']})
+
     # --- FIM DO NOVO CÓDIGO ---
 
     return render_template('resultado_prova.html', 
@@ -712,13 +710,12 @@ def editar_aluno(nome_do_aluno):
         
         if 'role' in request.form:
             usuarios = carregar_usuarios()
-            for user in usuarios:
-                if user.get('username') == nome_do_aluno:
-                    user['role'] = request.form['role']
-                    salvar_usuarios(usuarios)
-                    app.logger.info(f"Admin '{session['username']}' ALTEROU a permissão de '{nome_do_aluno}'.")
-                    flash(f"Permissão do usuário '{nome_do_aluno}' atualizada.", 'success')
-                    break
+            usuario_correspondente = next((u for u in usuarios if u.get('username') == nome_do_aluno), None)
+            if usuario_correspondente:
+                usuario_correspondente['role'] = request.form['role']
+                salvar_usuarios(usuarios)
+                app.logger.info(f"Admin '{session['username']}' ALTEROU a permissão de '{nome_do_aluno}'.")
+                flash(f"Permissão do usuário '{nome_do_aluno}' atualizada.", 'success')
         return redirect(url_for('gerenciar_alunos'))
 
     usuarios = carregar_usuarios()
@@ -766,6 +763,7 @@ def criar_aula():
         salvar_aulas(aulas)
         flash('Aula criada com sucesso!', 'success')
         app.logger.info(f"Admin '{session['username']}' CRIOU a aula '{nova_aula['titulo']}'.")
+        socketio.emit('nova_aula_ou_prova', {'titulo': nova_aula['titulo'], 'tipo': 'aula'}, broadcast=True)
         return redirect(url_for('gerenciar_aulas'))
         
     return render_template('criar_editar_aula.html', aula=None)
@@ -941,6 +939,7 @@ def criar_prova():
         salvar_provas(provas)
         flash('Prova criada com sucesso!', 'success')
         app.logger.info(f"Admin '{session['username']}' CRIOU a prova '{nova_prova['titulo']}'.")
+        socketio.emit('nova_aula_ou_prova', {'titulo': nova_prova['titulo'], 'tipo': 'prova'}, broadcast=True)
         return redirect(url_for('gerenciar_provas'))
     
     return render_template('criar_editar_prova.html', prova=None)
@@ -1056,6 +1055,7 @@ def exportar_boletim(formato):
         try:
             import pandas as pd
             import io
+            from openpyxl import Workbook
             df = pd.DataFrame([
                 {'Usuário': r['usuario'], 'Pontuação': f"{r['pontuacao']}/{r['total_questoes']}", 'Data': r['data']}
                 for r in resultados
@@ -1164,7 +1164,7 @@ def exportar(formato):
             import io
             df = pd.DataFrame(alunos)
             output = io.BytesIO()
-            writer = pd.ExcelWriter(output, engine='openpyxl')
+            writer = pd.ExcelWriter(output, engine='openyxl')
             df.to_excel(writer, index=False, sheet_name='Alunos')
             writer.close()
             output.seek(0)
@@ -1174,45 +1174,134 @@ def exportar(formato):
             return redirect(url_for('lista_alunos'))
     return redirect(url_for('lista_alunos'))
 
-@app.route('/assistente_ia', methods=['GET', 'POST'])
+@app.route('/assistente_ia')
 @login_required
 def assistente_ia():
-    if request.method == 'POST':
-        user_message = request.json.get('message', '').lower()
-        response_text = ""
-        
-        try:
-            api_key = os.getenv("GEMINI_API_KEY")
-            if not api_key:
-                return jsonify({'response': 'Chave de API do Gemini não configurada.'}), 500
-            
-            # URL CORRIGIDA: Utilizando o modelo gemini-1.5-flash
+    return render_template('assistente_ia.html')
+
+@socketio.on('enviar_mensagem')
+@login_required
+def handle_message(data):
+    user_message = data['message']
+    username = session['username']
+    
+    # Adiciona a mensagem do usuário ao chat para o remetente
+    emit('receber_mensagem', {'user': username, 'message': user_message}, room=request.sid)
+
+    # Lógica para chamar a API da IA e obter a resposta
+    response_text = ""
+    try:
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            response_text = 'Chave de API do Gemini não configurada.'
+        else:
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+            
+            # NOVO PAYLOAD COM INSTRUÇÕES PARA A IA SER CONCISA
             payload = {
                 "contents": [
                     {
-                        "parts": [{"text": user_message}]
+                        "parts": [
+                            {"text": "Instruções: Responda de forma concisa e utilize listas ou parágrafos curtos para facilitar a leitura. Use emojis quando apropriado. O usuário perguntou:"},
+                            {"text": user_message}
+                        ]
                     }
                 ]
             }
+
             response = requests.post(url, json=payload)
             response.raise_for_status()
             response_data = response.json()
             response_text = response_data['candidates'][0]['content']['parts'][0]['text']
-        except requests.exceptions.RequestException as req_err:
-            response_text = f"Desculpe, houve um erro na comunicação com a API de IA. Detalhes: {req_err}"
-        except (KeyError, IndexError) as parse_err:
-            response_text = f"Desculpe, a resposta da API de IA não pôde ser interpretada. Detalhes: {parse_err}. Resposta completa da API: {response.text}"
-        except Exception as e:
-            response_text = f"Ocorreu um erro inesperado ao usar a IA. Erro: {str(e)}"
-        
-        return jsonify({'response': response_text})
+    except requests.exceptions.RequestException as req_err:
+        response_text = f"Desculpe, houve um erro na comunicação com a API de IA. Detalhes: {req_err}"
+    except (KeyError, IndexError) as parse_err:
+        response_text = f"Desculpe, a resposta da API de IA não pôde ser interpretada. Detalhes: {parse_err}. Resposta completa da API: {response.text}"
+    except Exception as e:
+        response_text = f"Ocorreu um erro inesperado ao usar a IA. Erro: {str(e)}"
     
-    return render_template('assistente_ia.html')
+    # Emite a resposta da IA de volta apenas para o remetente
+    emit('receber_mensagem', {'user': 'IA', 'message': response_text}, room=request.sid)
+
+# --- ROTAS DO FÓRUM ---
+@app.route('/forum', methods=['GET'])
+@login_required
+def forum():
+    posts = carregar_forum()
+    
+    posts_por_curso = defaultdict(list)
+    for post in posts:
+        posts_por_curso[post.get('curso', 'Sem Curso')].append(post)
+        
+    return render_template('forum.html', posts_por_curso=posts_por_curso)
+
+@app.route('/novo_post', methods=['GET', 'POST'])
+@login_required
+def novo_post():
+    if request.method == 'POST':
+        posts = carregar_forum()
+        novo_post = {
+            "id": str(int(time.time())),
+            "autor": session['username'],
+            "titulo": request.form['titulo'],
+            "curso": request.form['curso'],
+            "conteudo": request.form['conteudo'],
+            "data": datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "visualizacoes": 0,
+            "respostas": []
+        }
+        posts.insert(0, novo_post)
+        salvar_forum(posts)
+        flash('Tópico publicado com sucesso!', 'success')
+        return redirect(url_for('forum'))
+    
+    return render_template('novo_post.html')
+
+@app.route('/ver_post/<post_id>', methods=['GET', 'POST'])
+@login_required
+def ver_post(post_id):
+    post = buscar_post_por_id(post_id)
+    if not post:
+        flash('Tópico não encontrado.', 'danger')
+        return redirect(url_for('forum'))
+
+    if request.method == 'POST':
+        posts = carregar_forum()
+        for p in posts:
+            if p['id'] == post_id:
+                p['respostas'].append({
+                    "autor": session['username'],
+                    "conteudo": request.form['comentario'],
+                    "data": datetime.now().strftime("%d/%m/%Y %H:%M")
+                })
+                break
+        salvar_forum(posts)
+        flash('Comentário adicionado com sucesso!', 'success')
+        return redirect(url_for('ver_post', post_id=post_id))
+
+    posts = carregar_forum()
+    for p in posts:
+        if p['id'] == post_id:
+            p['visualizacoes'] += 1
+            break
+    salvar_forum(posts)
+
+    return render_template('ver_post.html', post=post)
+
+@app.route('/deletar_post/<post_id>', methods=['POST'])
+@login_required
+@permission_required(['admin', 'professor'])
+def deletar_post(post_id):
+    posts = carregar_forum()
+    posts_filtrados = [p for p in posts if p.get('id') != post_id]
+    salvar_forum(posts_filtrados)
+    flash('Tópico deletado com sucesso.', 'success')
+    return redirect(url_for('forum'))
 
 # --- ROTAS DE GAMIFICAÇÃO ---
 @app.route('/minhas_conquistas')
 @login_required
+@permission_required(['aluno'])
 def minhas_conquistas():
     username = session.get('username')
     
@@ -1222,33 +1311,44 @@ def minhas_conquistas():
     
     # Carrega todas as conquistas definidas e as que o aluno já tem
     todas_conquistas = carregar_conquistas_definidas()
-    conquistas_aluno = {c['id']: c for c in aluno.get('conquistas', [])}
+    conquistas_aluno = {c['id']: c for c in aluno.get('conquistas', [])} if aluno else {}
     
     return render_template('minhas_conquistas.html', 
                            todas_conquistas=todas_conquistas, 
-                           conquistas_aluno=conquistas_aluno)
+                           conquistas_aluno=conquistas_aluno,
+                           aluno=aluno)
 
 @app.route('/ranking')
 @login_required
+@permission_required(['aluno'])
 def ranking():
     rankings = calcular_ranking_por_curso()
     return render_template('ranking.html', rankings=rankings)
 
 @app.route('/meu_progresso')
 @login_required
+@permission_required(['aluno'])
 def meu_progresso():
     username = session.get('username')
     todos_resultados = carregar_resultados_provas()
     resultados_aluno = [r for r in todos_resultados if r.get('usuario') == username]
-
+    alunos_todos = carregar_alunos()
+    aluno_atual = next((aluno for aluno in alunos_todos if aluno.get('nome') == username), None)
+    
+    # Chama a nova função para pegar dados de progresso por curso/tópico
+    progresso_por_curso = calcular_progresso_por_curso_e_topico(username)
+    
     # Prepara os dados para o dashboard
     dados_dashboard = {
         'kpis': {
             'media_geral': 0,
-            'provas_realizadas': len(resultados_aluno)
+            'provas_realizadas': len(resultados_aluno),
+            'horas_estudo': aluno_atual.get('horas_estudo', 0) if aluno_atual else 0
         },
         'desempenho_cursos': [],
-        'atividades_recentes': []
+        'atividades_recentes': [],
+        'progresso_por_curso': progresso_por_curso,
+        'media_turma_horas': {}
     }
 
     if resultados_aluno:
@@ -1278,6 +1378,10 @@ def meu_progresso():
                     'media': round(media)
                 })
 
+                # Novo: Calcula a média de horas de estudo da turma
+                media_turma = calcular_media_horas_estudo_por_curso(curso)
+                dados_dashboard['media_turma_horas'][curso] = round(media_turma, 1)
+
         # Calcula a média geral
         if total_questoes_geral > 0:
             media_geral = (total_pontos_geral / total_questoes_geral) * 100
@@ -1294,8 +1398,60 @@ def meu_progresso():
                 'score_percent': round(score_percent)
             })
 
-    return render_template('meu_progresso.html', dados=dados_dashboard)
+    return render_template('meu_progresso.html', dados=dados_dashboard, aluno=aluno_atual)
+
+# --- NOVA ROTA PARA O DASHBOARD DO PROFESSOR ---
+@app.route('/dashboard_professor')
+@login_required
+@permission_required(['professor', 'admin'])
+def dashboard_professor():
+    provas = carregar_provas()
+    resultados = carregar_resultados_provas()
+    alunos = carregar_alunos()
+    
+    dados = {
+        'media_geral_turma': 0,
+        'total_provas': len(provas),
+        'media_horas_estudo_turma': 0,
+        'media_notas_provas': [],
+        'provas_dificeis': [],
+        'alunos_baixo_desempenho': [],
+        'questoes_criticas': None
+    }
+    
+    # 1. Média de horas de estudo da turma
+    total_horas = sum(a['horas_estudo'] for a in alunos if a.get('horas_estudo') is not None)
+    if alunos:
+        dados['media_horas_estudo_turma'] = round(total_horas / len(alunos), 1)
+
+    # 2. Média de notas por prova
+    medias_por_prova = calcular_media_notas_por_prova()
+    if medias_por_prova:
+        dados['media_notas_provas'] = sorted(medias_por_prova, key=lambda x: x['titulo'])
+        
+        # 3. Média geral da turma
+        total_medias = sum(p['media'] for p in medias_por_prova)
+        dados['media_geral_turma'] = round(total_medias / len(medias_por_prova), 2)
+
+    # 4. Provas mais difíceis (top 3 com as menores médias)
+    provas_ordenadas = sorted(medias_por_prova, key=lambda x: x['media'])
+    dados['provas_dificeis'] = provas_ordenadas[:3]
+
+    # 5. Alunos com baixo desempenho (top 5 com as menores médias)
+    dados['alunos_baixo_desempenho'] = identificar_alunos_com_baixo_desempenho()
+
+    # 6. Questões críticas da prova mais difícil
+    if provas_ordenadas:
+        prova_mais_dificil_id = provas_ordenadas[0]['id']
+        questoes = identificar_questoes_criticas(prova_mais_dificil_id)
+        if questoes:
+            dados['questoes_criticas'] = {
+                'titulo_prova': provas_ordenadas[0]['titulo'],
+                'questoes': questoes
+            }
+            
+    return render_template('dashboard_professor.html', dados=dados)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True)

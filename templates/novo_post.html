@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Tópico{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Criar Novo Tópico no Fórum</h1>
+    <p>Inicie uma nova discussão para tirar suas dúvidas.</p>
+
+    <form method="post" action="{{ url_for('novo_post') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label for="titulo">Título do Tópico:</label>
+            <input type="text" id="titulo" name="titulo" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="curso">Associar ao Curso:</label>
+            <select id="curso" name="curso" class="form-select" required>
+                <option value="" disabled selected>Selecione um curso</option>
+                <option value="Lógica de Programação">Lógica de Programação</option>
+                <option value="Linguagens de Programação">Linguagens de Programação</option>
+                <option value="Algorítimos e Estruturas de dados">Algorítimos e Estruturas de dados</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="conteudo">Conteúdo da Mensagem:</label>
+            <textarea id="conteudo" name="conteudo" rows="8" class="form-control" required></textarea>
+        </div>
+        <button type="submit" class="action-btn save-btn">Publicar Tópico</button>
+    </form>
+</div>
+{% endblock %}

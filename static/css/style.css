@@ -636,6 +636,9 @@ body.dark-mode .flash-message.success {
     font-weight: 700;
     color: var(--text-color);
     line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .stat-info .label {
@@ -1080,6 +1083,7 @@ input:checked + .slider:before {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
 }
 .export-btn:hover {
     background-color: #2c3e50;
@@ -1173,9 +1177,9 @@ body.dark-mode .flash-message.success {
 }
 .message {
     display: flex;
-    align-items: flex-end;
-    gap: 10px;
-    max-width: 80%;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 75%;
 }
 .user-message {
     align-self: flex-end;
@@ -1185,37 +1189,48 @@ body.dark-mode .flash-message.success {
     align-self: flex-start;
 }
 .message-content {
-    background-color: var(--background-color);
-    padding: 12px 18px;
+    padding: 14px 20px;
     border-radius: 20px;
     position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    line-height: 1.5;
 }
+
 .user-message .message-content {
     background-color: var(--primary-color);
     color: white;
     border-bottom-right-radius: 5px;
 }
+
 .ia-message .message-content {
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
+    color: var(--text-color);
     border-bottom-left-radius: 5px;
 }
+
 .avatar {
-    width: 35px;
-    height: 35px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2em;
+    font-size: 1.4em;
     color: white;
+    flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
 .ia-avatar {
     background-color: var(--primary-color);
 }
+
 .user-avatar {
-    background-color: var(--secondary-text-color);
+    background-color: #727b84;
 }
+
 .chat-input-area {
     border-top: 1px solid var(--border-color);
     padding: 20px;
@@ -1242,14 +1257,48 @@ body.dark-mode .flash-message.success {
     font-size: 1.2em;
     cursor: pointer;
     transition: opacity 0.2s;
+    flex-shrink: 0;
 }
 #send-btn:hover {
     opacity: 0.8;
 }
+/* Estilos para as sugestões de conversa (melhorados) */
+.welcome-message {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.suggestion-pills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.suggestion-pill {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 10px 15px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.suggestion-pill:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
 /* ==========================================================================
    10. ESTILOS DE ACESSIBILIDADE
    ========================================================================== */
-
 /* Estilo de foco visível para navegação por teclado */
 a:focus,
 button:focus,
@@ -1260,7 +1309,7 @@ textarea:focus,
     outline: 3px solid var(--primary-color);
     outline-offset: 2px;
     box-shadow: 0 0 0 5px rgba(var(--primary-rgb), 0.3);
-    border-radius: 2px; /* Adiciona um leve arredondamento para o outline não ficar tão duro */
+    border-radius: 2px;
 }
 
 /* Esconde visualmente, mas mantém acessível para leitores de ecrã */
@@ -1277,13 +1326,11 @@ textarea:focus,
 }
 
 /* Ajustes de Contraste - Exemplo */
-/* O texto secundário no modo claro tem um contraste baixo. Vamos escurecê-lo. */
 :root {
-    --secondary-text-color: #5a6570; /* Cor anterior: #6c757d */
+    --secondary-text-color: #5a6570;
 }
-/* O texto secundário no modo escuro pode ser clareado para melhor contraste. */
 body.dark-mode {
-    --secondary-text-color: #b8c1c9; /* Cor anterior: #b0b0b0 */
+    --secondary-text-color: #b8c1c9;
 }
 /* --- Estilos para o Dashboard de Progresso --- */
 
@@ -1481,4 +1528,156 @@ body.dark-mode {
 .achievement-card.unlocked:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px var(--shadow-color);
+}
+/* Estilos para a barra de pesquisa na página de lista de alunos */
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto; /* Alinha a barra de pesquisa à direita */
+}
+
+.search-form {
+    display: flex;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--surface-color);
+}
+
+.search-input {
+    border: none;
+    padding: 10px 15px;
+    font-size: 1em;
+    background: transparent;
+    color: var(--text-color);
+    flex-grow: 1;
+}
+
+.search-input:focus {
+    outline: none;
+}
+
+.search-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.search-btn:hover {
+    background-color: #3b82e2; /* Um tom mais escuro da cor primária */
+}
+/* Estilos para o novo layout da página inicial */
+.main-header {
+    margin-bottom: 30px;
+}
+
+.main-header-content h1 {
+    font-size: 2.5em;
+    font-weight: 700;
+    margin: 0;
+}
+
+.main-header-content p {
+    font-size: 1.1em;
+    color: var(--secondary-text-color);
+    margin: 5px 0 0;
+}
+
+.content-wrapper {
+    display: flex;
+    gap: 40px;
+}
+
+.main-content {
+    flex: 1;
+}
+
+.dashboard-hub {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+}
+
+.hub-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-color: var(--card-bg-color);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-decoration: none;
+    color: var(--text-color);
+}
+
+.hub-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 24px var(--shadow-color);
+}
+
+.hub-card i {
+    font-size: 3.2em;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.hub-card h3 {
+    font-size: 1.4em;
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.activity-sidebar {
+    width: 300px;
+    padding: 20px;
+    background-color: var(--card-bg-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    border: 1px solid var(--border-color);
+}
+
+.activity-sidebar h3 {
+    font-size: 1.2em;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.achievements-list,
+.log-feed {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.achievement-item,
+.log-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.achievement-item i {
+    font-size: 1.5em;
+    color: var(--primary-color);
+}
+
+@media (max-width: 992px) {
+    .content-wrapper {
+        flex-direction: column;
+    }
+
+    .activity-sidebar {
+        width: 100%;
+    }
 }

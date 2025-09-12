@@ -13,33 +13,35 @@
     {% endwith %}
 
     <h2 style="font-weight: 400; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-top: 30px;">Alunos Cadastrados</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Idade</th>
-                <th>Curso</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for aluno in alunos %}
-            <tr>
-                <td>{{ aluno.nome }}</td>
-                <td>{{ aluno.idade }}</td>
-                <td>{{ aluno.curso | join(', ') }}</td>
-                <td class="actions-cell">
-                    {% if session.get('role') == 'admin' %}
-                        <a href="{{ url_for('editar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn edit-btn">Editar</a>
-                        <a href="{{ url_for('deletar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn delete-btn" onclick="return confirm('Tem certeza que deseja deletar este aluno e sua conta de login? Esta ação não pode ser desfeita.');">Deletar</a>
-                    {% else %}
-                        <span>Acesso restrito</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Idade</th>
+                    <th>Curso</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aluno in alunos %}
+                <tr>
+                    <td>{{ aluno.nome }}</td>
+                    <td>{{ aluno.idade }}</td>
+                    <td>{{ aluno.curso | join(', ') }}</td>
+                    <td class="actions-cell">
+                        {% if session.get('role') == 'admin' %}
+                            <a href="{{ url_for('editar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn edit-btn">Editar</a>
+                            <a href="{{ url_for('deletar_aluno', nome_do_aluno=aluno.nome) }}" class="action-btn delete-btn" onclick="return confirm('Tem certeza que deseja deletar este aluno e sua conta de login? Esta ação não pode ser desfeita.');">Deletar</a>
+                        {% else %}
+                            <span>Acesso restrito</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
     <h2 style="font-weight: 400; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-top: 50px;">Cadastrar Novo Aluno</h2>
     <form method="post" action="{{ url_for('gerenciar_alunos') }}" style="margin-top: 20px;">
@@ -125,7 +127,7 @@
         const role = selectElement.value;
         const horasEstudoField = document.getElementById('horas_estudo_field');
         const cursoField = document.getElementById('curso_field');
-        
+
         if (role === 'admin') {
             if (horasEstudoField) {
                 horasEstudoField.style.display = 'none';

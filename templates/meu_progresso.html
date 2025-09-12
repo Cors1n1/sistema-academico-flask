@@ -1,6 +1,30 @@
 {% extends "base.html" %}
-
 {% block title %}Meu Progresso{% endblock %}
+{% block head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <style>
+        .progresso-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .progresso-card {
+            background-color: var(--surface-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .progresso-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px var(--shadow-color);
+        }
+        .grafico-card {
+            grid-column: 1 / -1; /* Ocupa a largura total da grade */
+        }
+    </style>
+{% endblock %}
 
 {% block content %}
 <div class="card">
@@ -9,62 +33,114 @@
     </div>
     <div class="card-body">
         {% if dados.kpis.provas_realizadas > 0 %}
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <div class="kpi-icon" style="background-color: #4e73df;"><i class="fas fa-bullseye"></i></div>
-                    <div class="kpi-info">
+            <div class="progresso-grid">
+                <div class="progresso-card">
+                    <h3>Média Geral de Acerto</h3>
+                    <div class="kpi-info" style="text-align: center;">
                         <div class="kpi-value">{{ dados.kpis.media_geral }}%</div>
-                        <div class="kpi-label">Média Geral de Acerto</div>
                     </div>
                 </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon" style="background-color: #f6c23e;"><i class="fas fa-list-check"></i></div>
-                    <div class="kpi-info">
+                <div class="progresso-card">
+                    <h3>Provas Realizadas</h3>
+                    <div class="kpi-info" style="text-align: center;">
                         <div class="kpi-value">{{ dados.kpis.provas_realizadas }}</div>
-                        <div class="kpi-label">Total de Provas Realizadas</div>
                     </div>
                 </div>
+                {% if dados.kpis.horas_estudo %}
+                <div class="progresso-card">
+                    <h3>Média de Horas de Estudo</h3>
+                    <div class="kpi-info" style="text-align: center;">
+                        <div class="kpi-value">{{ dados.kpis.horas_estudo }} horas/dia</div>
+                        <p style="font-size: 0.9em; margin-top: 10px;">
+                            Sua meta: {{ aluno.get('meta_estudo', 'Não definida') }} horas
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+                {% for curso, media_turma in dados.media_turma_horas.items() %}
+                    {% if curso in aluno.get('curso', []) %}
+                        <div class="progresso-card">
+                            <h3>Média de Estudo ({{ curso }})</h3>
+                            <div class="kpi-info" style="text-align: center;">
+                                <div class="kpi-value">{{ media_turma }} horas/dia</div>
+                                <p style="font-size: 0.9em; margin-top: 10px;">Média da turma</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
             </div>
 
-            <div class="course-performance-container" style="margin-top: 50px;">
-                <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Desempenho por Curso</h3>
-                <div class="performance-list">
-                    {% for item in dados.desempenho_cursos %}
-                    <div class="performance-item">
-                        <span class="performance-label">{{ item.curso }}</span>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" style="width: {{ item.media }}%;"></div>
-                            <span class="progress-bar-label">{{ item.media }}%</span>
-                        </div>
+            <div class="grafico-card card" style="margin-top: 30px;">
+                <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px;">Progresso por Curso</h3>
+                {% for curso, progresso in dados.progresso_por_curso.items() %}
+                    <div class="chart-container" style="margin-bottom: 40px;">
+                        <h4>{{ curso }}</h4>
+                        <canvas id="grafico-{{ curso }}"></canvas>
                     </div>
-                    {% endfor %}
-                </div>
+                {% endfor %}
             </div>
 
             <div class="recent-activity-container" style="margin-top: 50px;">
                 <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Resultados Recentes</h3>
-                <table style="margin-top: 20px;">
-                    <thead>
-                        <tr>
-                            <th>Prova</th>
-                            <th>Data</th>
-                            <th>Pontuação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for atividade in dados.atividades_recentes %}
-                        <tr>
-                            <td>{{ atividade.titulo }}</td>
-                            <td>{{ atividade.data }}</td>
-                            <td><strong>{{ atividade.pontuacao }}</strong></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table style="margin-top: 20px;">
+                        <thead>
+                            <tr>
+                                <th>Prova</th>
+                                <th>Data</th>
+                                <th>Pontuação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for atividade in dados.atividades_recentes %}
+                            <tr>
+                                <td>{{ atividade.titulo }}</td>
+                                <td>{{ atividade.data }}</td>
+                                <td><strong>{{ atividade.pontuacao }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         {% else %}
             <p class="no-data">Você ainda não tem resultados de provas para que o seu progresso possa ser exibido.</p>
         {% endif %}
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const progressoPorCurso = {{ dados.progresso_por_curso | tojson }};
+        
+        for (const curso in progressoPorCurso) {
+            const ctx = document.getElementById('grafico-' + curso);
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: progressoPorCurso[curso].labels,
+                        datasets: [{
+                            label: 'Desempenho (%)',
+                            data: progressoPorCurso[curso].data,
+                            borderColor: 'var(--primary-color)',
+                            backgroundColor: 'rgba(var(--primary-rgb), 0.2)',
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    });
+</script>
 {% endblock %}

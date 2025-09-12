@@ -6,6 +6,14 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h2 class="card-title">Alunos Cadastrados</h2>
+        
+        <div class="search-bar">
+            <form action="{{ url_for('lista_alunos') }}" method="get" class="search-form">
+                <input type="text" name="search_query" placeholder="Pesquisar por nome ou curso..." class="search-input" value="{{ request.args.get('search_query', '') }}">
+                <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+        
         <div class="export-buttons">
             <a id="export-pdf-btn" href="{{ url_for('exportar', formato='pdf') }}" class="action-btn export-btn">
                 <i class="fas fa-file-pdf" style="margin-right: 8px;"></i>Exportar PDF
@@ -66,7 +74,8 @@
                 event.preventDefault();
                 const rootStyles = getComputedStyle(document.documentElement);
                 const currentColor = rootStyles.getPropertyValue('--primary-color').trim();
-                const url = event.currentTarget.href + '?color=' + encodeURIComponent(currentColor);
+                const searchParam = window.location.search;
+                const url = event.currentTarget.href + '?color=' + encodeURIComponent(currentColor) + searchParam;
                 window.location.href = url;
             });
         }

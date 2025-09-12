@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard do Professor{% endblock %}
+
+{% block head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .dashboard-card {
+            background-color: var(--surface-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px var(--shadow-color);
+        }
+        .chart-card {
+            grid-column: 1 / -1;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .list-group {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .list-group-item {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">Dashboard do Professor</h1>
+        <p>Visão geral do desempenho e progresso da turma.</p>
+    </div>
+    <div class="card-body">
+        {% if dados.media_notas_provas %}
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <h3 class="text-center">Média Geral da Turma</h3>
+                <div class="kpi-info" style="text-align: center;">
+                    <div class="kpi-value">{{ dados.media_geral_turma }}%</div>
+                </div>
+            </div>
+            <div class="dashboard-card">
+                <h3 class="text-center">Total de Provas</h3>
+                <div class="kpi-info" style="text-align: center;">
+                    <div class="kpi-value">{{ dados.total_provas }}</div>
+                </div>
+            </div>
+            <div class="dashboard-card">
+                <h3 class="text-center">Média de Estudo (Turma)</h3>
+                <div class="kpi-info" style="text-align: center;">
+                    <div class="kpi-value">{{ dados.media_horas_estudo_turma }} h/dia</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid" style="margin-top: 30px;">
+            <div class="dashboard-card chart-card">
+                <h3 class="text-center">Média de Notas por Prova</h3>
+                <canvas id="mediaNotasProvas"></canvas>
+            </div>
+            <div class="dashboard-card">
+                <h3 class="text-center">Provas Mais Difíceis</h3>
+                <ul class="list-group">
+                    {% for prova in dados.provas_dificeis %}
+                    <li class="list-group-item">{{ prova.titulo }} (Média: {{ prova.media }}%)</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="dashboard-card">
+                <h3 class="text-center">Alunos que Precisam de Ajuda</h3>
+                <ul class="list-group">
+                    {% for aluno in dados.alunos_baixo_desempenho %}
+                    <li class="list-group-item">{{ aluno.nome }} (Média: {{ aluno.media }}%)</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        
+        <div class="dashboard-card chart-card" style="margin-top: 30px;">
+            <h3 class="text-center">Taxa de Erro por Questão (Prova Mais Difícil)</h3>
+            {% if dados.questoes_criticas %}
+            <h4>Prova: {{ dados.questoes_criticas.titulo_prova }}</h4>
+            <canvas id="questoesCriticas"></canvas>
+            {% else %}
+            <p class="no-data">Nenhuma prova com resultados para analisar.</p>
+            {% endif %}
+        </div>
+        {% else %}
+        <p class="no-data">Não há dados suficientes para gerar o dashboard.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dados = {{ dados | tojson }};
+
+        // Gráfico de Média de Notas por Prova
+        if (dados.media_notas_provas && dados.media_notas_provas.length > 0) {
+            const ctx1 = document.getElementById('mediaNotasProvas').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: dados.media_notas_provas.map(p => p.titulo),
+                    datasets: [{
+                        label: 'Média de Notas (%)',
+                        data: dados.media_notas_provas.map(p => p.media),
+                        backgroundColor: 'rgba(78, 115, 223, 0.8)',
+                        borderColor: 'rgba(78, 115, 223, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+        }
+
+        // Gráfico de Questões Críticas (Prova Mais Difícil)
+        if (dados.questoes_criticas) {
+            const ctx2 = document.getElementById('questoesCriticas').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: dados.questoes_criticas.questoes.map(q => q.pergunta),
+                    datasets: [{
+                        data: dados.questoes_criticas.questoes.map(q => q.taxa_erro),
+                        backgroundColor: ['#e74c3c', '#f39c12', '#f1c40f', '#2ecc71', '#3498db'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'right' },
+                        title: { display: false }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -16,11 +16,20 @@
                 <p>Olá! Sou seu assistente de estudo. Pode me fazer perguntas sobre os temas das suas aulas ou pedir para te ajudar com algum exercício.</p>
             </div>
         </div>
+
+        <div id="welcome-message" class="welcome-message">
+            <h3>Comece sua conversa</h3>
+            <div class="suggestion-pills">
+                <button class="suggestion-pill">O que é Lógica de Programação?</button>
+                <button class="suggestion-pill">Me explique sobre a última aula de Algoritmos.</button>
+                <button class="suggestion-pill">Qual a diferença entre Java e Python?</button>
+                <button class="suggestion-pill">Gere uma questão de múltipla escolha sobre Estruturas de Dados.</button>
+            </div>
+        </div>
     </div>
     
     <div class="chat-input-area">
         <form id="chat-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="text" id="chat-input" placeholder="Digite sua pergunta..." required>
             <button type="submit" id="send-btn" title="Enviar"><i class="fas fa-paper-plane"></i></button>
         </form>
@@ -28,59 +37,58 @@
 </div>
 
 <script>
-    const csrfToken = "{{ csrf_token() }}";
+    document.addEventListener('DOMContentLoaded', function() {
+        const socket = io();
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const welcomeMessage = document.getElementById('welcome-message');
 
-    document.getElementById('chat-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const inputElement = document.getElementById('chat-input');
-        const userMessage = inputElement.value;
-        
-        if (userMessage.trim() === '') {
-            return;
+        const userInitial = "{{ session.username[0] | upper }}";
+
+        const suggestionPills = document.querySelectorAll('.suggestion-pill');
+        suggestionPills.forEach(pill => {
+            pill.addEventListener('click', function() {
+                chatInput.value = this.textContent;
+                chatForm.dispatchEvent(new Event('submit'));
+            });
+        });
+
+        function appendMessage(message, sender, user_name) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender + '-message');
+            
+            if (sender === 'ia') {
+                messageElement.innerHTML = `
+                    <span class="avatar ia-avatar"><i class="fas fa-robot"></i></span>
+                    <div class="message-content"><p>${message}</p></div>
+                `;
+            } else {
+                messageElement.innerHTML = `
+                    <div class="message-content"><p>${message}</p></div>
+                    <span class="avatar user-avatar">${user_name}</span>
+                `;
+            }
+            
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-        
-        appendMessage(userMessage, 'user');
-        inputElement.value = '';
 
-        fetch('{{ url_for("assistente_ia") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({ message: userMessage })
-        })
-        .then(response => response.json())
-        .then(data => {
-            appendMessage(data.response, 'ia');
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            appendMessage('Desculpe, ocorreu um erro ao processar sua solicitação.', 'ia');
+        socket.on('receber_mensagem', function(data) {
+            if (welcomeMessage) {
+                welcomeMessage.style.display = 'none';
+            }
+            appendMessage(data.message, data.user.toLowerCase(), userInitial);
+        });
+
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userMessage = chatInput.value;
+            if (userMessage.trim() !== '') {
+                socket.emit('enviar_mensagem', { 'message': userMessage });
+                chatInput.value = '';
+            }
         });
     });
-
-    function appendMessage(message, sender) {
-        const chatMessages = document.getElementById('chat-messages');
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-        messageElement.classList.add(sender + '-message');
-
-        if (sender === 'ia') {
-            messageElement.innerHTML = `
-                <span class="avatar ia-avatar"><i class="fas fa-robot"></i></span>
-                <div class="message-content"><p>${message}</p></div>
-            `;
-        } else {
-            messageElement.innerHTML = `
-                <div class="message-content"><p>${message}</p></div>
-                <span class="avatar user-avatar"><i class="fas fa-user"></i></span>
-            `;
-        }
-        
-        chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight; // Rola para o final
-    }
 </script>
 {% endblock %}

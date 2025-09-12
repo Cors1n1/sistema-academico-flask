@@ -4,6 +4,7 @@ import random
 import string
 from datetime import datetime, timedelta
 import jwt
+from collections import defaultdict
 
 # --- FUNÇÕES DE ALUNOS ---
 def carregar_dados():
@@ -79,6 +80,96 @@ def gerar_relatorio_dados():
         "faixas_idade": faixas_idade,
     }
 
+def calcular_media_horas_estudo_por_curso(curso_alvo):
+    """Calcula a média de horas de estudo de todos os alunos de um curso específico."""
+    alunos = carregar_alunos()
+    alunos_no_curso = [a for a in alunos if curso_alvo in a.get('curso', []) and a.get('horas_estudo') is not None]
+    
+    if not alunos_no_curso:
+        return 0.0
+
+    total_horas = sum(a['horas_estudo'] for a in alunos_no_curso)
+    return total_horas / len(alunos_no_curso)
+
+def calcular_media_notas_por_prova():
+    """Calcula a média de notas por prova para todos os alunos."""
+    resultados = carregar_resultados_provas()
+    provas = carregar_provas()
+    provas_info = {p['id']: p['titulo'] for p in provas}
+    
+    medias = defaultdict(lambda: {'total_pontos': 0, 'total_questoes': 0, 'total_alunos': 0})
+    
+    for r in resultados:
+        prova_id = r['prova_id']
+        medias[prova_id]['total_pontos'] += r['pontuacao']
+        medias[prova_id]['total_questoes'] += r['total_questoes']
+        medias[prova_id]['total_alunos'] += 1
+        
+    resultado_final = []
+    for prova_id, dados in medias.items():
+        if dados['total_questoes'] > 0:
+            media_percentual = round((dados['total_pontos'] / dados['total_questoes']) * 100, 2)
+            resultado_final.append({
+                'id': prova_id,
+                'titulo': provas_info.get(prova_id, 'Prova Desconhecida'),
+                'media': media_percentual
+            })
+            
+    return sorted(resultado_final, key=lambda x: x['media'])
+
+def identificar_questoes_criticas(prova_id):
+    """Identifica as questões com maior taxa de erro para uma prova específica."""
+    resultados = carregar_resultados_provas()
+    resultados_prova = [r for r in resultados if r['prova_id'] == prova_id]
+    
+    if not resultados_prova:
+        return None
+        
+    questoes = {}
+    
+    for r in resultados_prova:
+        for resposta in r['respostas_detalhadas']:
+            pergunta = resposta['pergunta']
+            if pergunta not in questoes:
+                questoes[pergunta] = {'erros': 0, 'total': 0}
+            
+            questoes[pergunta]['total'] += 1
+            if not resposta['correta']:
+                questoes[pergunta]['erros'] += 1
+                
+    questoes_criticas = []
+    for pergunta, dados in questoes.items():
+        if dados['total'] > 0:
+            taxa_erro = round((dados['erros'] / dados['total']) * 100, 2)
+            questoes_criticas.append({
+                'pergunta': pergunta,
+                'taxa_erro': taxa_erro
+            })
+            
+    return sorted(questoes_criticas, key=lambda x: x['taxa_erro'], reverse=True)
+
+def identificar_alunos_com_baixo_desempenho(limite=5):
+    """Identifica os alunos com as menores médias de notas."""
+    alunos = carregar_alunos()
+    resultados = carregar_resultados_provas()
+    
+    pontuacoes = defaultdict(lambda: {'total_pontos': 0, 'total_questoes': 0})
+    
+    for r in resultados:
+        pontuacoes[r['usuario']]['total_pontos'] += r['pontuacao']
+        pontuacoes[r['usuario']]['total_questoes'] += r['total_questoes']
+        
+    medias_alunos = []
+    for aluno in alunos:
+        nome_aluno = aluno['nome']
+        dados_pontuacao = pontuacoes[nome_aluno]
+        if dados_pontuacao['total_questoes'] > 0:
+            media = round((dados_pontuacao['total_pontos'] / dados_pontuacao['total_questoes']) * 100, 2)
+            medias_alunos.append({'nome': nome_aluno, 'media': media})
+            
+    return sorted(medias_alunos, key=lambda x: x['media'])[:limite]
+
+
 # --- FUNÇÕES DE USUÁRIOS ---
 def carregar_usuarios():
     if not os.path.exists('usuarios.json'): return []
@@ -108,12 +199,11 @@ def verificar_token_recuperacao(token, secret_key):
         payload = jwt.decode(token, secret_key, algorithms=['HS256'])
         return payload['user_id']
     except jwt.ExpiredSignatureError:
-        return 'expired'  # Token expirou
+        return 'expired'
     except jwt.InvalidTokenError:
-        return None      # Token inválido
+        return None
 
 # --- FUNÇÕES DE AULAS ---
-
 def carregar_aulas():
     if not os.path.exists("aulas.json"): return []
     try:
@@ -131,7 +221,6 @@ def salvar_aulas(aulas):
 
 # --- FUNÇÕES DE EXERCÍCIOS ---
 def carregar_exercicios():
-    """Carrega os dados dos exercícios do arquivo exercicios.json."""
     if not os.path.exists("exercicios.json"):
         return []
     try:
@@ -144,14 +233,11 @@ def carregar_exercicios():
         return []
 
 def salvar_exercicios(exercicios):
-    """Salva os dados dos exercícios no arquivo exercicios.json."""
     with open("exercicios.json", "w", encoding="utf-8") as f:
         json.dump(exercicios, f, ensure_ascii=False, indent=4)
 
 # --- FUNÇÕES DE PROVAS ---
-
 def carregar_provas():
-    """Carrega os dados das provas do arquivo provas.json."""
     if not os.path.exists("provas.json"):
         return []
     try:
@@ -164,19 +250,16 @@ def carregar_provas():
         return []
 
 def salvar_provas(provas):
-    """Salva os dados das provas no arquivo provas.json."""
     with open("provas.json", "w", encoding="utf-8") as f:
         json.dump(provas, f, ensure_ascii=False, indent=4)
         
 def gerar_id_prova(provas):
-    """Gera um ID único para uma nova prova (formato: P-XXXXX)."""
     while True:
         novo_id = 'P-' + ''.join(random.choices(string.digits, k=5))
         if not any(p.get('id') == novo_id for p in provas):
             return novo_id
 
 # --- FUNÇÕES DE RESULTADOS DE PROVAS ---
-
 def carregar_resultados_provas():
     if not os.path.exists("resultados_provas.json"):
         return []
@@ -202,9 +285,7 @@ def buscar_prova_por_id(prova_id):
     return next((p for p in provas if p.get('id') == prova_id), None)
 
 # --- FUNÇÕES DE GAMIFICAÇÃO ---
-
 def carregar_conquistas_definidas():
-    """Carrega a lista de todas as conquistas possíveis a partir de conquistas.json."""
     if not os.path.exists("conquistas.json"): return []
     try:
         with open("conquistas.json", "r", encoding="utf-8") as f:
@@ -213,9 +294,6 @@ def carregar_conquistas_definidas():
         return []
 
 def verificar_e_atribuir_conquistas(username):
-    """Verifica todas as conquistas para um determinado aluno e as atribui se os critérios forem cumpridos."""
-    
-    # Carregar todos os dados necessários
     pessoas = carregar_dados()
     aluno = next((p for p in pessoas if p.get('nome') == username), None)
     if not aluno: return []
@@ -230,36 +308,30 @@ def verificar_e_atribuir_conquistas(username):
     conquistas_desbloqueadas_nesta_verificacao = []
     ids_conquistas_aluno = {c['id'] for c in aluno['conquistas']}
 
-    # Lógica de verificação para cada conquista
     for conquista in conquistas_definidas:
         if conquista['id'] in ids_conquistas_aluno:
-            continue # Já possui esta conquista, pular
+            continue
 
         conquista_ganha = False
         
-        # 1. Primeira Prova
         if conquista['id'] == 'PRIMEIRA_PROVA' and len(resultados) >= 1:
             conquista_ganha = True
 
-        # 2. Destaque da Turma (>90%)
         if conquista['id'] == 'DESTAQUE':
             for r in resultados:
                 if r['total_questoes'] > 0 and (r['pontuacao'] / r['total_questoes']) * 100 > 90:
                     conquista_ganha = True
                     break
         
-        # 3. Perfeccionista (100%)
         if conquista['id'] == 'PERFECCIONISTA':
             for r in resultados:
                 if r['total_questoes'] > 0 and r['pontuacao'] == r['total_questoes']:
                     conquista_ganha = True
                     break
         
-        # 4. Maratonista (3 provas)
         if conquista['id'] == 'MARATONISTA' and len(resultados) >= 3:
             conquista_ganha = True
 
-        # 5. Especialista em Curso (completou todas as provas de um curso)
         cursos_para_verificar = {
             'ESPECIALISTA_LOGICA': 'Lógica de Programação',
             'ESPECIALISTA_LINGUAGENS': 'Linguagens de Programação',
@@ -273,7 +345,6 @@ def verificar_e_atribuir_conquistas(username):
             if ids_provas_curso and ids_provas_curso.issubset(ids_provas_realizadas_pelo_aluno):
                 conquista_ganha = True
 
-        # Se ganhou uma conquista, adiciona à lista do aluno
         if conquista_ganha:
             nova_conquista = {
                 "id": conquista['id'],
@@ -283,29 +354,45 @@ def verificar_e_atribuir_conquistas(username):
             aluno['conquistas'].append(nova_conquista)
             conquistas_desbloqueadas_nesta_verificacao.append(conquista)
 
-    # Salva os dados atualizados do aluno
     salvar_dados(pessoas)
     return conquistas_desbloqueadas_nesta_verificacao
 
+def calcular_progresso_por_curso_e_topico(username):
+    resultados = carregar_resultados_provas()
+    resultados_aluno = [r for r in resultados if r.get('usuario') == username]
+    
+    progresso_por_curso = defaultdict(lambda: {'labels': [], 'data': []})
+
+    for res in resultados_aluno:
+        curso = res.get('curso', 'Sem Curso')
+        titulo_prova = res.get('titulo_prova', 'Prova Sem Título')
+        pontuacao = res.get('pontuacao', 0)
+        total_questoes = res.get('total_questoes', 0)
+        
+        if total_questoes > 0:
+            porcentagem = round((pontuacao / total_questoes) * 100, 2)
+            progresso_por_curso[curso]['labels'].append(titulo_prova)
+            progresso_por_curso[curso]['data'].append(porcentagem)
+
+    return progresso_por_curso
+
 def calcular_ranking_por_curso():
-    """Calcula a média de acertos de todos os alunos e os classifica por curso."""
     alunos = carregar_alunos()
     resultados = carregar_resultados_provas()
     
-    # Dicionário para armazenar as pontuações dos alunos
-    pontuacoes = {aluno['nome']: {'total_pontos': 0, 'total_questoes': 0, 'cursos': aluno.get('curso', [])} for aluno in alunos}
+    pontuacoes = defaultdict(lambda: {'total_pontos': 0, 'total_questoes': 0, 'cursos': []})
+    
+    for aluno in alunos:
+        pontuacoes[aluno['nome']]['cursos'] = aluno.get('curso', [])
 
-    # Calcula o total de pontos e questões para cada aluno
     for res in resultados:
         username = res.get('usuario')
         if username in pontuacoes:
             pontuacoes[username]['total_pontos'] += res.get('pontuacao', 0)
             pontuacoes[username]['total_questoes'] += res.get('total_questoes', 0)
 
-    # Dicionário para agrupar os rankings por curso
     ranking_por_curso = {}
 
-    # Calcula a média e organiza os alunos nos rankings dos seus respectivos cursos
     for username, data in pontuacoes.items():
         if data['total_questoes'] > 0:
             media = round((data['total_pontos'] / data['total_questoes']) * 100, 2)
@@ -318,8 +405,24 @@ def calcular_ranking_por_curso():
                     ranking_por_curso[curso] = []
                 ranking_por_curso[curso].append(aluno_info)
 
-    # Ordena cada ranking de curso pela média
     for curso in ranking_por_curso:
         ranking_por_curso[curso] = sorted(ranking_por_curso[curso], key=lambda x: x['media'], reverse=True)
 
     return ranking_por_curso
+
+# --- FUNÇÕES DO FÓRUM ---
+def carregar_forum():
+    if not os.path.exists("forum.json"): return []
+    try:
+        with open("forum.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return []
+
+def salvar_forum(posts):
+    with open("forum.json", "w", encoding="utf-8") as f:
+        json.dump(posts, f, ensure_ascii=False, indent=4)
+
+def buscar_post_por_id(post_id):
+    posts = carregar_forum()
+    return next((p for p in posts if p.get('id') == post_id), None)

@@ -7,13 +7,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
     {% block head %}{% endblock %}
 </head>
 <body>
     <nav class="navbar" role="navigation" aria-label="Menu Principal">
         <div class="logo"><a href="{{ url_for('index') }}">Sistema Acadêmico</a></div>
-        
+
         <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="main-menu">
             <i class="fas fa-bars" aria-hidden="true"></i>
         </button>
@@ -24,7 +25,13 @@
                 <li><a href="{{ url_for('lista_alunos') }}" class="{{ 'active' if 'lista_alunos' in request.path else '' }}">Ver Turma</a></li>
                 <li><a href="{{ url_for('lista_exercicios') }}" class="{{ 'active' if 'lista_exercicios' in request.path or 'exercicio' in request.path else '' }}">Exercícios</a></li>
                 <li><a href="{{ url_for('lista_provas') }}" class="{{ 'active' if 'provas' in request.path else '' }}">Provas</a></li>
+                <li><a href="{{ url_for('forum') }}" class="{{ 'active' if 'forum' in request.path else '' }}">Fórum de Dúvidas</a></li>
+
+                {% if session.get('role') == 'aluno' %}
+                <li><a href="{{ url_for('meu_progresso') }}" class="{{ 'active' if request.path == '/meu_progresso' else '' }}">Meu Progresso</a></li>
                 <li><a href="{{ url_for('ranking') }}" class="{{ 'active' if request.path == '/ranking' else '' }}">Ranking</a></li>
+                <li><a href="{{ url_for('meu_boletim') }}" class="{{ 'active' if request.path == '/meu_boletim' else '' }}">Meu Boletim</a></li>
+                {% endif %}
 
                 {% if session.get('role') == 'admin' %}
                     <li class="nav-dropdown">
@@ -47,16 +54,12 @@
                             <li><a href="{{ url_for('gerenciar_resultados_provas') }}" class="{{ 'active' if 'gerenciar_resultados_provas' in request.path or 'ver_resultado_prova' in request.path else '' }}">Resultados Provas</a></li>
                         </ul>
                     </li>
-                {% else %}
-                    <li><a href="{{ url_for('meu_boletim') }}" class="{{ 'active' if request.path == '/meu_boletim' else '' }}">Meu Boletim</a></li>
-                    <li><a href="{{ url_for('meu_progresso') }}" class="{{ 'active' if request.path == '/meu_progresso' else '' }}">Meu Progresso</a></li>
                 {% endif %}
                 
                 <li><a href="{{ url_for('assistente_ia') }}" class="{{ 'active' if request.path == '/assistente_ia' else '' }}">Assistente de IA</a></li>
 
-                <li><a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a></li>
-                
                 {% if session.get('role') == 'admin' %}
+                    <li><a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a></li>
                     <li><a href="{{ url_for('view_logs') }}" class="{{ 'active' if request.path == '/logs' else '' }}">Ver Logs</a></li>
                 {% endif %}
             </ul>
@@ -79,7 +82,7 @@
                     <div id="customizer-panel" class="customizer-panel">
                         <h4>Cor do Tema</h4>
                         <div class="color-swatches">
-                            <div class="swatch" style="background-color: #4a90e2;" data-color="#4a90e2" aria-label="Selecionar cor azul"></div>
+                            <div class="swatch" style="background-color: #4e73df;" data-color="#4e73df" aria-label="Selecionar cor azul"></div>
                             <div class="swatch" style="background-color: #50b878;" data-color="#50b878" aria-label="Selecionar cor verde"></div>
                             <div class="swatch" style="background-color: #f5a623;" data-color="#f5a623" aria-label="Selecionar cor amarela"></div>
                             <div class="swatch" style="background-color: #e57373;" data-color="#e57373" aria-label="Selecionar cor vermelha"></div>
@@ -175,6 +178,20 @@
             const navLinks = document.querySelector('.nav-links');
             const navDropdowns = document.querySelectorAll('.nav-dropdown');
             const gradientToggle = document.getElementById('gradient-toggle');
+            const socket = io();
+
+            // Lógica de Notificações em Tempo Real
+            socket.on('nova_aula_ou_prova', function(data) {
+                const tipo = data.tipo;
+                const titulo = data.titulo;
+                alert(`Um(a) novo(a) ${tipo} "${titulo}" foi publicado(a)!`);
+            });
+
+            socket.on('nova_conquista', function(data) {
+                if (data.usuario === "{{ session.username }}") {
+                    alert(`🎉 Parabéns! Você desbloqueou uma nova conquista: "${data.titulo}"!`);
+                }
+            });
 
             // Responsive menu toggle
             if(menuToggle && navLinks) {
