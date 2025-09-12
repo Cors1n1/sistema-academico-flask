@@ -21,46 +21,38 @@
 
         <div class="nav-links">
             <ul class="main-menu" id="main-menu">
-                <li><a href="{{ url_for('lista_aulas') }}" class="{{ 'active' if 'aulas' in request.path else '' }}">Aulas</a></li>
-                <li><a href="{{ url_for('lista_alunos') }}" class="{{ 'active' if 'lista_alunos' in request.path else '' }}">Ver Turma</a></li>
-                <li><a href="{{ url_for('lista_exercicios') }}" class="{{ 'active' if 'lista_exercicios' in request.path or 'exercicio' in request.path else '' }}">Exercícios</a></li>
-                <li><a href="{{ url_for('lista_provas') }}" class="{{ 'active' if 'provas' in request.path else '' }}">Provas</a></li>
-                <li><a href="{{ url_for('forum') }}" class="{{ 'active' if 'forum' in request.path else '' }}">Fórum de Dúvidas</a></li>
+                <li><a href="{{ url_for('lista_aulas') }}" class="{{ 'active' if 'aulas' in request.path else '' }}"><i class="fas fa-book-reader fa-fw"></i> Aulas</a></li>
+                <li><a href="{{ url_for('lista_alunos') }}" class="{{ 'active' if 'lista_alunos' in request.path else '' }}"><i class="fas fa-users fa-fw"></i> Ver Turma</a></li>
+                <li><a href="{{ url_for('lista_exercicios') }}" class="{{ 'active' if 'lista_exercicios' in request.path or 'exercicio' in request.path else '' }}"><i class="fas fa-pencil-alt fa-fw"></i> Exercícios</a></li>
+                <li><a href="{{ url_for('lista_provas') }}" class="{{ 'active' if 'provas' in request.path else '' }}"><i class="fas fa-clipboard-check fa-fw"></i> Provas</a></li>
+                <li><a href="{{ url_for('forum') }}" class="{{ 'active' if 'forum' in request.path else '' }}"><i class="fas fa-comments fa-fw"></i> Fórum de Dúvidas</a></li>
 
                 {% if session.get('role') == 'aluno' %}
-                <li><a href="{{ url_for('meu_progresso') }}" class="{{ 'active' if request.path == '/meu_progresso' else '' }}">Meu Progresso</a></li>
-                <li><a href="{{ url_for('ranking') }}" class="{{ 'active' if request.path == '/ranking' else '' }}">Ranking</a></li>
-                <li><a href="{{ url_for('meu_boletim') }}" class="{{ 'active' if request.path == '/meu_boletim' else '' }}">Meu Boletim</a></li>
+                <li><a href="{{ url_for('meu_progresso') }}" class="{{ 'active' if request.path == '/meu_progresso' else '' }}"><i class="fas fa-chart-line fa-fw"></i> Meu Progresso</a></li>
+                <li><a href="{{ url_for('ranking') }}" class="{{ 'active' if request.path == '/ranking' else '' }}"><i class="fas fa-trophy fa-fw"></i> Ranking</a></li>
+                <li><a href="{{ url_for('meu_boletim') }}" class="{{ 'active' if request.path == '/meu_boletim' else '' }}"><i class="fas fa-graduation-cap fa-fw"></i> Meu Boletim</a></li>
                 {% endif %}
 
-                {% if session.get('role') == 'admin' %}
+                {% if session.get('role') in ['admin', 'professor'] %}
                     <li class="nav-dropdown">
-                        <a href="#" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">Gerenciar <i class="fas fa-caret-down" aria-hidden="true"></i></a>
+                        <a href="#" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false"><i class="fas fa-cogs fa-fw"></i> Gerenciar <i class="fas fa-caret-down"></i></a>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ url_for('gerenciar_alunos') }}" class="{{ 'active' if 'gerenciar_alunos' in request.path else '' }}">Alunos</a></li>
-                            <li><a href="{{ url_for('gerenciar_aulas') }}" class="{{ 'active' if 'gerenciar_aulas' in request.path else '' }}">Aulas</a></li>
-                            <li><a href="{{ url_for('gerenciar_exercicios') }}" class="{{ 'active' if 'gerenciar_exercicios' in request.path or 'criar_exercicio' in request.path or 'editar_exercicio' in request.path else '' }}">Exercícios</a></li>
-                            <li><a href="{{ url_for('gerenciar_provas') }}" class="{{ 'active' if 'gerenciar_provas' in request.path or 'criar_prova' in request.path or 'editar_prova' in request.path else '' }}">Provas</a></li>
-                            <li><a href="{{ url_for('gerenciar_resultados_provas') }}" class="{{ 'active' if 'gerenciar_resultados_provas' in request.path or 'ver_resultado_prova' in request.path else '' }}">Resultados Provas</a></li>
-                        </ul>
-                    </li>
-                {% elif session.get('role') == 'professor' %}
-                    <li class="nav-dropdown">
-                        <a href="#" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">Gerenciar <i class="fas fa-caret-down" aria-hidden="true"></i></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="{{ url_for('gerenciar_aulas') }}" class="{{ 'active' if 'gerenciar_aulas' in request.path else '' }}">Aulas</a></li>
-                            <li><a href="{{ url_for('gerenciar_exercicios') }}" class="{{ 'active' if 'gerenciar_exercicios' in request.path or 'criar_exercicio' in request.path or 'editar_exercicio' in request.path else '' }}">Exercícios</a></li>
-                            <li><a href="{{ url_for('gerenciar_provas') }}" class="{{ 'active' if 'gerenciar_provas' in request.path or 'criar_prova' in request.path or 'editar_prova' in request.path else '' }}">Provas</a></li>
-                            <li><a href="{{ url_for('gerenciar_resultados_provas') }}" class="{{ 'active' if 'gerenciar_resultados_provas' in request.path or 'ver_resultado_prova' in request.path else '' }}">Resultados Provas</a></li>
+                            {% if session.get('role') == 'admin' %}
+                            <li><a href="{{ url_for('gerenciar_alunos') }}">Alunos</a></li>
+                            {% endif %}
+                            <li><a href="{{ url_for('gerenciar_aulas') }}">Aulas</a></li>
+                            <li><a href="{{ url_for('gerenciar_exercicios') }}">Exercícios</a></li>
+                            <li><a href="{{ url_for('gerenciar_provas') }}">Provas</a></li>
+                            <li><a href="{{ url_for('gerenciar_resultados_provas') }}">Resultados Provas</a></li>
                         </ul>
                     </li>
                 {% endif %}
                 
-                <li><a href="{{ url_for('assistente_ia') }}" class="{{ 'active' if request.path == '/assistente_ia' else '' }}">Assistente de IA</a></li>
+                <li><a href="{{ url_for('assistente_ia') }}" class="{{ 'active' if request.path == '/assistente_ia' else '' }}"><i class="fas fa-robot fa-fw"></i> Assistente de IA</a></li>
 
                 {% if session.get('role') == 'admin' %}
-                    <li><a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}">Relatório</a></li>
-                    <li><a href="{{ url_for('view_logs') }}" class="{{ 'active' if request.path == '/logs' else '' }}">Ver Logs</a></li>
+                    <li><a href="{{ url_for('relatorio') }}" class="{{ 'active' if request.path == '/relatorio' else '' }}"><i class="fas fa-chart-pie fa-fw"></i> Relatório</a></li>
+                    <li><a href="{{ url_for('view_logs') }}" class="{{ 'active' if request.path == '/logs' else '' }}"><i class="fas fa-file-alt fa-fw"></i> Ver Logs</a></li>
                 {% endif %}
             </ul>
             

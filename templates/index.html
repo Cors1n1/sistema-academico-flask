@@ -2,149 +2,373 @@
 
 {% block title %}Hub Principal - Sistema Acadêmico{% endblock %}
 
-{% block content %}
-<div class="main-header">
-    <div class="main-header-content">
-        <h1>Bem-vindo(a), {{ session.username }}!</h1>
-        <p>Pronto(a) para começar sua jornada de aprendizado?</p>
-    </div>
-</div>
+{% block head %}
+    {{ super() }}
+    <style>
+        .upcoming-list a, .sidebar-list a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .ghost-item {
+            opacity: 0.5;
+            background-color: var(--primary-color);
+            border: 2px dashed var(--primary-color);
+        }
+        .ghost-item > * {
+            visibility: hidden;
+        }
+        .log-item {
+            display: flex;
+            gap: 15px;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-list li:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .log-icon {
+            font-size: 1.2em;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: white;
+        }
+        .log-icon.info { background-color: var(--primary-color); }
+        .log-icon.warning { background-color: #f39c12; }
+        .log-icon.error { background-color: var(--danger-color); }
+        
+        .log-info strong {
+            display: block;
+            font-size: 0.9em;
+            color: var(--text-color);
+        }
+        .log-info small {
+            font-size: 0.8em;
+            color: var(--secondary-text-color);
+        }
+    </style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const hub = document.querySelector('.dashboard-hub');
+        if (hub) {
+            const storageKey = `dashboardOrder_{{ session.username }}`;
 
+            const sortable = new Sortable(hub, {
+                animation: 150,
+                ghostClass: 'ghost-item',
+                onEnd: function () {
+                    const order = [];
+                    hub.querySelectorAll('.hub-card').forEach(card => {
+                        if (card.id) {
+                            order.push(card.id);
+                        }
+                    });
+                    localStorage.setItem(storageKey, JSON.stringify(order));
+                }
+            });
+
+            function loadOrder() {
+                const savedOrder = localStorage.getItem(storageKey);
+                if (savedOrder) {
+                    const order = JSON.parse(savedOrder);
+                    order.forEach(id => {
+                        const card = document.getElementById(id);
+                        if (card) {
+                            hub.appendChild(card);
+                        }
+                    });
+                }
+            }
+            loadOrder();
+        }
+    });
+    </script>
+{% endblock %}
+
+{% block content %}
 <div class="content-wrapper">
     <div class="main-content">
+        <div class="hero-banner" id="hub-hero">
+            <div class="hero-content">
+                <h1>Bem-vindo(a) de volta, {{ session.username }}!</h1>
+                <p>Sua jornada de aprendizado continua aqui. O que vamos estudar hoje?</p>
+                <a href="{{ url_for('lista_aulas') }}" class="cta-button">Ver Aulas</a>
+            </div>
+        </div>
+
+        {% if session.get('role') == 'aluno' and aluno %}
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <i class="fas fa-chart-line kpi-icon"></i>
+                <div class="kpi-info">
+                    <div class="kpi-value">{{ "%.1f"|format(aluno.media_geral|default(0)) }}%</div>
+                    <div class="kpi-label">Média Geral</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <i class="fas fa-clipboard-check kpi-icon"></i>
+                <div class="kpi-info">
+                    <div class="kpi-value">{{ aluno.provas_feitas|default(0) }}</div>
+                    <div class="kpi-label">Provas Realizadas</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <i class="fas fa-medal kpi-icon"></i>
+                <div class="kpi-info">
+                    <div class="kpi-value">{{ aluno.conquistas|length }}</div>
+                    <div class="kpi-label">Conquistas</div>
+                </div>
+            </div>
+        </div>
+        {% elif session.get('role') in ['professor', 'admin'] %}
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <i class="fas fa-users kpi-icon"></i>
+                <div class="kpi-info">
+                    <div class="kpi-value">{{ professor_kpis.total_alunos|default(0) }}</div>
+                    <div class="kpi-label">Alunos na Turma</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <i class="fas fa-file-alt kpi-icon"></i>
+                <div class="kpi-info">
+                    <div class="kpi-value">{{ professor_kpis.total_provas|default(0) }}</div>
+                    <div class="kpi-label">Provas Criadas</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <i class="fas fa-chart-bar kpi-icon"></i>
+                <div class="kpi-info">
+                    <div class="kpi-value">{{ "%.1f"|format(professor_kpis.media_geral_turma|default(0)) }}%</div>
+                    <div class="kpi-label">Média da Turma</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <section class="dashboard-hub">
             {% if session.get('role') == 'aluno' %}
-                <a href="{{ url_for('lista_aulas') }}" class="hub-card">
-                    <i class="fas fa-book-reader"></i>
-                    <h3>Aulas Disponíveis</h3>
-                </a>
-                <a href="{{ url_for('lista_exercicios') }}" class="hub-card">
-                    <i class="fas fa-pencil-alt"></i>
+                <a id="card-exercicios" href="{{ url_for('lista_exercicios') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-pencil-alt"></i></div>
                     <h3>Faça os Exercícios</h3>
                 </a>
-                <a href="{{ url_for('meu_progresso') }}" class="hub-card">
-                    <i class="fas fa-chart-line"></i>
-                    <h3>Ver Meu Progresso</h3>
+                <a id="card-provas" href="{{ url_for('lista_provas') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-clipboard-check"></i></div>
+                    <h3>Provas</h3>
                 </a>
-                <a href="{{ url_for('ranking') }}" class="hub-card">
-                    <i class="fas fa-trophy"></i>
+                <a id="card-progresso" href="{{ url_for('meu_progresso') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Meu Progresso</h3>
+                </a>
+                <a id="card-ranking" href="{{ url_for('ranking') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-trophy"></i></div>
                     <h3>Ranking da Turma</h3>
                 </a>
-                <a href="{{ url_for('meu_boletim') }}" class="hub-card">
-                    <i class="fas fa-clipboard-list"></i>
+                <a id="card-boletim" href="{{ url_for('meu_boletim') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-clipboard-list"></i></div>
                     <h3>Meu Boletim</h3>
                 </a>
-                <a href="{{ url_for('assistente_ia') }}" class="hub-card">
-                    <i class="fas fa-robot"></i>
+                <a id="card-ia" href="{{ url_for('assistente_ia') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-robot"></i></div>
                     <h3>Assistente de IA</h3>
                 </a>
-                <a href="{{ url_for('forum') }}" class="hub-card">
-                    <i class="fas fa-comments"></i>
+                <a id="card-forum" href="{{ url_for('forum') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-comments"></i></div>
                     <h3>Fórum de Dúvidas</h3>
                 </a>
-                <a href="{{ url_for('lista_alunos') }}" class="hub-card">
-                    <i class="fas fa-users"></i>
+                <a id="card-turma" href="{{ url_for('lista_alunos') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-users"></i></div>
                     <h3>Ver Turma</h3>
                 </a>
             {% elif session.get('role') == 'professor' %}
-                <a href="{{ url_for('gerenciar_aulas') }}" class="hub-card">
-                    <i class="fas fa-book-open"></i>
-                    <h3>Gerenciar Aulas</h3>
+                <a id="card-prof-aulas" href="{{ url_for('lista_aulas') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-book-reader"></i></div>
+                    <h3>Aulas</h3>
                 </a>
-                <a href="{{ url_for('dashboard_professor') }}" class="hub-card">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <h3>Ver Dashboard</h3>
-                </a>
-                <a href="{{ url_for('gerenciar_provas') }}" class="hub-card">
-                    <i class="fas fa-clipboard-check"></i>
-                    <h3>Gerenciar Provas</h3>
-                </a>
-                <a href="{{ url_for('gerenciar_exercicios') }}" class="hub-card">
-                    <i class="fas fa-tasks"></i>
-                    <h3>Gerenciar Exercícios</h3>
-                </a>
-                <a href="{{ url_for('gerenciar_resultados_provas') }}" class="hub-card">
-                    <i class="fas fa-file-invoice"></i>
-                    <h3>Resultados Provas</h3>
-                </a>
-                <a href="{{ url_for('lista_alunos') }}" class="hub-card">
-                    <i class="fas fa-users"></i>
+                <a id="card-prof-turma" href="{{ url_for('lista_alunos') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-users"></i></div>
                     <h3>Ver Turma</h3>
                 </a>
-                <a href="{{ url_for('forum') }}" class="hub-card">
-                    <i class="fas fa-comments"></i>
+                <a id="card-prof-exercicios" href="{{ url_for('lista_exercicios') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-pencil-alt"></i></div>
+                    <h3>Exercícios</h3>
+                </a>
+                <a id="card-prof-provas" href="{{ url_for('lista_provas') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-clipboard-check"></i></div>
+                    <h3>Provas</h3>
+                </a>
+                <a id="card-prof-forum" href="{{ url_for('forum') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-comments"></i></div>
                     <h3>Fórum de Dúvidas</h3>
                 </a>
-                <a href="{{ url_for('assistente_ia') }}" class="hub-card">
-                    <i class="fas fa-robot"></i>
+                <a id="card-prof-gerenciar-aulas" href="{{ url_for('gerenciar_aulas') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-edit"></i></div>
+                    <h3>Gerenciar Aulas</h3>
+                </a>
+                <a id="card-prof-gerenciar-exercicios" href="{{ url_for('gerenciar_exercicios') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-tasks"></i></div>
+                    <h3>Gerenciar Exercícios</h3>
+                </a>
+                <a id="card-prof-gerenciar-provas" href="{{ url_for('gerenciar_provas') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-file-signature"></i></div>
+                    <h3>Gerenciar Provas</h3>
+                </a>
+                <a id="card-prof-resultados" href="{{ url_for('gerenciar_resultados_provas') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-poll"></i></div>
+                    <h3>Resultados Provas</h3>
+                </a>
+                <a id="card-prof-ia" href="{{ url_for('assistente_ia') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-robot"></i></div>
                     <h3>Assistente de IA</h3>
                 </a>
             {% elif session.get('role') == 'admin' %}
-                <a href="{{ url_for('gerenciar_alunos') }}" class="hub-card">
-                    <i class="fas fa-user-cog"></i>
-                    <h3>Gerenciar Alunos</h3>
+                 <a id="card-admin-aulas" href="{{ url_for('lista_aulas') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-book-reader"></i></div>
+                    <h3>Aulas</h3>
                 </a>
-                <a href="{{ url_for('relatorio') }}" class="hub-card">
-                    <i class="fas fa-chart-pie"></i>
-                    <h3>Relatórios Detalhados</h3>
+                <a id="card-admin-turma" href="{{ url_for('lista_alunos') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-users"></i></div>
+                    <h3>Ver Turma</h3>
                 </a>
-                <a href="{{ url_for('view_logs') }}" class="hub-card">
-                    <i class="fas fa-history"></i>
-                    <h3>Ver Logs do Sistema</h3>
+                <a id="card-admin-exercicios" href="{{ url_for('lista_exercicios') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-pencil-alt"></i></div>
+                    <h3>Exercícios</h3>
                 </a>
-                <a href="{{ url_for('gerenciar_aulas') }}" class="hub-card">
-                    <i class="fas fa-book-open"></i>
-                    <h3>Gerenciar Aulas</h3>
+                <a id="card-admin-provas" href="{{ url_for('lista_provas') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-clipboard-check"></i></div>
+                    <h3>Provas</h3>
                 </a>
-                <a href="{{ url_for('gerenciar_exercicios') }}" class="hub-card">
-                    <i class="fas fa-tasks"></i>
-                    <h3>Gerenciar Exercícios</h3>
-                </a>
-                <a href="{{ url_for('gerenciar_provas') }}" class="hub-card">
-                    <i class="fas fa-clipboard-check"></i>
-                    <h3>Gerenciar Provas</h3>
-                </a>
-                <a href="{{ url_for('gerenciar_resultados_provas') }}" class="hub-card">
-                    <i class="fas fa-file-invoice"></i>
-                    <h3>Resultados Provas</h3>
-                </a>
-                <a href="{{ url_for('forum') }}" class="hub-card">
-                    <i class="fas fa-comments"></i>
+                <a id="card-admin-forum" href="{{ url_for('forum') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-comments"></i></div>
                     <h3>Fórum de Dúvidas</h3>
                 </a>
-                <a href="{{ url_for('assistente_ia') }}" class="hub-card">
-                    <i class="fas fa-robot"></i>
+                <a id="card-admin-gerenciar-alunos" href="{{ url_for('gerenciar_alunos') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-user-cog"></i></div>
+                    <h3>Gerenciar Alunos</h3>
+                </a>
+                <a id="card-admin-gerenciar-aulas" href="{{ url_for('gerenciar_aulas') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-edit"></i></div>
+                    <h3>Gerenciar Aulas</h3>
+                </a>
+                <a id="card-admin-gerenciar-exercicios" href="{{ url_for('gerenciar_exercicios') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-tasks"></i></div>
+                    <h3>Gerenciar Exercícios</h3>
+                </a>
+                <a id="card-admin-gerenciar-provas" href="{{ url_for('gerenciar_provas') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-file-signature"></i></div>
+                    <h3>Gerenciar Provas</h3>
+                </a>
+                <a id="card-admin-resultados" href="{{ url_for('gerenciar_resultados_provas') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-poll"></i></div>
+                    <h3>Resultados Provas</h3>
+                </a>
+                <a id="card-admin-ia" href="{{ url_for('assistente_ia') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-robot"></i></div>
                     <h3>Assistente de IA</h3>
+                </a>
+                <a id="card-admin-relatorio" href="{{ url_for('relatorio') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-chart-pie"></i></div>
+                    <h3>Relatório</h3>
+                </a>
+                <a id="card-admin-logs" href="{{ url_for('view_logs') }}" class="hub-card">
+                    <div class="hub-card-icon"><i class="fas fa-file-alt"></i></div>
+                    <h3>Ver Logs</h3>
                 </a>
             {% endif %}
         </section>
     </div>
 
     <aside class="activity-sidebar">
-        {% if session.get('role') == 'aluno' and aluno %}
-            <h3>Minhas Conquistas Recentes</h3>
-            <div class="achievements-list">
-                {% for conquista in aluno.get('conquistas', []) | reverse | slice(5) %}
-                <div class="achievement-item">
-                    <i class="fas fa-medal"></i>
-                    <div class="achievement-info">
-                        <strong>{{ conquista.titulo }}</strong>
-                        <small>Desbloqueado em {{ conquista.data }}</small>
-                    </div>
-                </div>
-                {% endfor %}
+        {% if session.get('role') == 'aluno' %}
+            <div class="sidebar-widget">
+                <h3>Últimas Conquistas</h3>
+                <ul class="achievements-list">
+                    {% for conquista in aluno.conquistas | reverse %}
+                        {% if loop.index <= 4 %}
+                        <li class="achievement-item">
+                            <div class="achievement-icon-wrapper"><i class="fas fa-medal"></i></div>
+                            <div class="achievement-info">
+                                <strong>{{ conquista.titulo }}</strong>
+                                <small>Desbloqueado em {{ conquista.data }}</small>
+                            </div>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="sidebar-widget">
+                <h3>Próximas Atividades</h3>
+                <ul class="upcoming-list">
+                    {% for atividade in proximas_atividades %}
+                    <a href="{{ atividade.link }}">
+                        <li class="upcoming-item">
+                            {% if atividade.tipo == 'prova' %}
+                                <div class="upcoming-icon" style="background-color: #e74c3c;"><i class="fas fa-flag-checkered"></i></div>
+                            {% else %}
+                                <div class="upcoming-icon" style="background-color: #f39c12;"><i class="fas fa-pencil-alt"></i></div>
+                            {% endif %}
+                            <div class="upcoming-info">
+                                <strong>{{ atividade.titulo }}</strong>
+                                <small>{{ atividade.info }}</small>
+                            </div>
+                        </li>
+                    </a>
+                    {% else %}
+                    <p class="no-data" style="font-size: 0.9em;">Nenhuma atividade pendente.</p>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% elif session.get('role') == 'professor' %}
+            <div class="sidebar-widget">
+                <h3>Últimos Alunos Cadastrados</h3>
+                <ul class="sidebar-list">
+                    {% for aluno in sidebar_data.ultimos_alunos | reverse %}
+                        <li>{{ aluno.nome }}</li>
+                    {% else %}
+                        <li class="no-data" style="font-size: 0.9em;">Nenhum aluno recente.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="sidebar-widget">
+                <h3>Últimas Provas Criadas</h3>
+                <ul class="sidebar-list">
+                    {% for prova in sidebar_data.ultimas_provas %}
+                        <li>{{ prova.titulo }}</li>
+                    {% else %}
+                         <li class="no-data" style="font-size: 0.9em;">Nenhuma prova recente.</li>
+                    {% endfor %}
+                </ul>
             </div>
         {% elif session.get('role') == 'admin' %}
-            <h3>Últimas Atividades (Logs)</h3>
-            <div class="log-feed">
-                <div class="log-item">
-                    <strong>INFO:</strong> Usuário 'admin' fez login.
-                    <small>12/09/2025 10:50</small>
-                </div>
-                <div class="log-item">
-                    <strong>WARNING:</strong> Login falhou para 'visitante'.
-                    <small>12/09/2025 10:45</small>
-                </div>
+            <div class="sidebar-widget">
+                <h3>Logs Recentes</h3>
+                <ul class="sidebar-list">
+                    {% for log in sidebar_data.ultimos_logs | reverse %}
+                        <li class="log-item">
+                            {% if log.level == 'INFO' %}
+                                <div class="log-icon info"><i class="fas fa-info-circle"></i></div>
+                            {% elif log.level == 'WARNING' %}
+                                <div class="log-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+                            {% else %}
+                                <div class="log-icon error"><i class="fas fa-times-circle"></i></div>
+                            {% endif %}
+                            <div class="log-info">
+                                <strong>{{ log.message }}</strong>
+                                <small>{{ log.timestamp }}</small>
+                            </div>
+                        </li>
+                    {% else %}
+                         <li class="no-data" style="font-size: 0.9em;">Nenhum log para exibir.</li>
+                    {% endfor %}
+                </ul>
+                <a href="{{ url_for('view_logs') }}" class="view-all-link">Ver Todos...</a>
             </div>
         {% endif %}
     </aside>
