@@ -1,9 +1,8 @@
 [
     {
         "username": "Victor",
-        "password_hash": "scrypt:32768:8:1$Cq96bdS5tStWHJa7$b90baf66422756675f0aff729c00b250cfa5f31ed27a722d4793e85ef8299ca20c745454253fad8020b9960c86b3d93bc2398bb0aafa42a526e8535e99a63c49",
-        "role": "admin",
-        "reset_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiVmljdG9yIiwiZXhwIjoxNzU3NjMxOTI5fQ.XN0JAaaI1x5XbCruetpj-nlPV7DPvcMNjg_8qQfsPkg"
+        "password_hash": "scrypt:32768:8:1$QogK9YyQNSP61pUN$52dd8f10af3c7242a069b7d8259b83e52692ab0075abee7a292b133db75c30022c9d0c35b52e66802e0fa292c1c05eeb62423366f734002c74577754fc9a58da",
+        "role": "admin"
     },
     {
         "username": "Aluno",

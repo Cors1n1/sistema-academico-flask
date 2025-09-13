@@ -146,6 +146,40 @@ def esqueci_a_senha():
         return redirect(url_for('login'))
     return render_template('esqueci_a_senha.html')
 
+@app.route('/redefinir_senha/<token>', methods=['GET', 'POST'])
+def redefinir_senha(token):
+    username = verificar_token_recuperacao(token, app.secret_key)
+    if username == 'expired':
+        flash('O link de redefinição de senha expirou. Por favor, solicite um novo.', 'danger')
+        return redirect(url_for('esqueci_a_senha'))
+    if not username:
+        flash('Link de redefinição inválido ou corrompido.', 'danger')
+        return redirect(url_for('esqueci_a_senha'))
+
+    if request.method == 'POST':
+        nova_senha = request.form['nova_senha']
+        confirmar_nova_senha = request.form['confirmar_nova_senha']
+
+        if nova_senha != confirmar_nova_senha:
+            flash('As senhas não coincidem. Por favor, tente novamente.', 'danger')
+            return redirect(url_for('redefinir_senha', token=token))
+        
+        usuarios = carregar_usuarios()
+        user = next((u for u in usuarios if u['username'] == username), None)
+
+        if user and user.get('reset_token') == token:
+            user['password_hash'] = generate_password_hash(nova_senha)
+            user.pop('reset_token', None)
+            salvar_usuarios(usuarios)
+            flash('Sua senha foi redefinida com sucesso! Por favor, faça o login.', 'success')
+            app.logger.info(f"Senha do usuário '{username}' redefinida com sucesso.")
+            return redirect(url_for('login'))
+        else:
+            flash('Link de redefinição inválido ou já utilizado.', 'danger')
+            return redirect(url_for('esqueci_a_senha'))
+
+    return render_template('redefinir_senha.html')
+    
 @app.route('/alterar_senha', methods=['GET', 'POST'])
 @login_required
 def alterar_senha():
@@ -1174,7 +1208,7 @@ def meu_progresso():
             dados_dashboard['media_turma_horas'][curso] = round(calcular_media_horas_estudo_por_curso(curso), 1)
 
     dados_dashboard['progresso_por_curso'] = calcular_progresso_por_curso_e_topico(username)
-    return render_template('meu_progresso.html', dados=dados_dashboard, aluno=aluno_atual)
+    return render_template('meu_progresso.html', dados=dados, aluno=aluno_atual)
 
 # --- NOVA ROTA PARA O DASHBOARD DO PROFESSOR ---
 @app.route('/dashboard_professor')
